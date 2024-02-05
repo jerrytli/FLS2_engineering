@@ -1,0 +1,84 @@
+---
+title: "flg22 normalized ROS"
+output: html_document
+date: "2023-01-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+pc = read.csv("../R/Bubble plot data with relative ROS%_240121.csv", header = TRUE)
+pcm = melt(pc, id = c("Receptor"))
+pcm$Receptor <- factor(pcm$Receptor,levels=unique(pcm$Receptor))
+```
+Color bubble
+```{r}
+colours = c( "#A54657",  "#582630", "#F7EE7F", "#4DAA57","#F1A66A","#F26157", "#F9ECCC", "#679289", "#33658A",
+"#F6AE2D","#86BBD8")
+
+xx = ggplot(pcm, aes(x = Receptor, y = variable)) + 
+     geom_point(aes(size = value, fill = variable), alpha = 0.75, shape = 21) + 
+     scale_size_continuous(limits = c(0, 100), range = c(1,16), breaks = c(25,50,75,100)) + 
+     labs( x= "", y = "", size = "Normalized ROS (%)", fill = "")  + 
+     theme(legend.key=element_blank(), 
+           axis.text.x = element_text(colour = "black", size = 14, face = "bold",  vjust = 0.3), 
+          axis.text.y = element_text(colour = "black", face = "bold", size = 11), 
+           legend.text = element_text(size = 10, face ="bold", colour ="black"), 
+           legend.title = element_text(size = 12, face = "bold"), 
+           legend.position = "right") +  
+     scale_fill_manual(values = colours, guide = FALSE) + 
+     scale_y_discrete(limits = rev(levels(pcm$variable))) 
+ggsave(filename = "../R/flg22 variants ROS normalization.pdf", width = 5.5, height = 6)
+```
+
+
+Grey bubble
+```{r}
+# Convert 'value' to numeric, handling NAs
+pcm$value <- as.numeric(as.character(pcm$value))
+
+# Plotting code
+xx <- ggplot(pcm, aes(x = Receptor, y = variable)) + 
+  geom_point(aes(size = value), alpha = 0.85, shape = 21, fill = "#555555", color = "black") + 
+  scale_size_continuous(limits = c(0, 100), range = c(1, 16), breaks = c(25, 50, 75, 100)) + 
+  labs(x = "", y = "", size = "Normalized ROS (%)", fill = "")  + 
+  theme_minimal() +
+  theme(
+    legend.key = element_blank(), 
+    axis.text.x = element_text(colour = "black", size = 14, face = "bold", angle = 45, vjust = 1, hjust = 1), 
+    axis.text.y = element_text(colour = "black", face = "bold", size = 14), 
+    legend.text = element_text(size = 10, face = "bold", colour = "black"), 
+    legend.title = element_text(size = 12, face = "bold"), 
+    legend.position = "right",
+    panel.grid.major = element_line(colour = "lightgrey", linewidth = 0.5),
+    panel.grid.minor = element_blank()
+  ) +  
+  scale_y_discrete(limits = rev(levels(pcm$variable))) 
+
+ggsave(filename = "../R/flg22 variants ROS normalization.pdf", width = 5.4, height = 4.4)
+
+
+
+```
