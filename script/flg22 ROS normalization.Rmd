@@ -33,7 +33,7 @@ plot(pressure)
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 ```{r}
-pc = read.csv("WTNb_XL_Tj_Qv.csv", header = TRUE)
+pc = read.csv("../input/WTNb_XL_Tj_Qv.csv", header = TRUE)
 pcm = melt(pc, id = c("Receptor"))
 pcm$Receptor <- factor(pcm$Receptor,levels=unique(pcm$Receptor))
 ```
@@ -55,13 +55,13 @@ xx = ggplot(pcm, aes(x = Receptor, y = variable)) +
      scale_fill_manual(values = colours, guide = FALSE) + 
      scale_y_discrete(limits = rev(levels(pcm$variable))) 
 print(xx)
-ggsave(filename = "output/Figure_1_All_FLS2_bubble.pdf", width = 5.6, height = 6.5)
+ggsave(filename = "../output/Figure_1_All_FLS2_bubble.pdf", width = 5.6, height = 6.5)
 ```
 
 
 Grey bubble for Vr-XLFLS2 group
 ```{r}
-pc = read.csv("Vr-XL.csv", header = TRUE)
+pc = read.csv("../input/Vr-XL.csv", header = TRUE)
 pcm = melt(pc, id = c("Receptor"))
 pcm$Receptor <- factor(pcm$Receptor,levels=unique(pcm$Receptor))
 
@@ -82,13 +82,13 @@ xx <- ggplot(pcm, aes(y = Receptor, x = variable)) +
   ) +
   scale_y_discrete(limits = rev(levels(pcm$Receptor))) 
 print(xx)
-ggsave(filename = "output/Vr-XL.pdf", width = 7, height = 3)
+ggsave(filename = "../output/Vr-XL.pdf", width = 7, height = 3.2)
 
 ```
 
 Grey bubble for Qv-FcFLS2 group
 ```{r}
-pc = read.csv("Fc-Qv.csv", header = TRUE)
+pc = read.csv("../input/Fc-Qv.csv", header = TRUE)
 pcm = melt(pc, id = c("Receptor"))
 pcm$Receptor <- factor(pcm$Receptor,levels=unique(pcm$Receptor))
 
@@ -109,6 +109,6 @@ xx <- ggplot(pcm, aes(y = Receptor, x = variable)) +
   ) +
   scale_y_discrete(limits = rev(levels(pcm$Receptor))) 
 print(xx)
-ggsave(filename = "output/Qv-Fc.pdf", width = 7, height = 3)
+ggsave(filename = "../output/Qv-Fc.pdf", width = 7, height = 3)
 
 ```

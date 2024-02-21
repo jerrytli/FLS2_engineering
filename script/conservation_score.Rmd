@@ -1,0 +1,51 @@
+  
+```{r}
+library(ggplot2)
+library(zoo)
+```
+
+```{r}
+# Assuming your data is in a CSV file named 'Conservation_score.csv'
+# and it contains two columns: 'Position' and 'Consurf'
+conservation_scores <- read.csv('../input/Conservation_score.csv')
+
+# Calculate the sliding window average
+window_size <- 25
+conservation_scores$Sliding_Average <- zoo::rollapply(conservation_scores$Consurf, 
+                                                      width = window_size, 
+                                                      by = 1, 
+                                                      FUN = mean, 
+                                                      align = 'center', 
+                                                      fill = NA)
+# Define the custom ggplot theme
+my_ggplot_theme <- theme_linedraw() +
+  theme(text = element_text(size = 16, family = "Helvetica"),
+        axis.title.x = element_text(size = 14, color = "black", family = "Helvetica"),
+        axis.title.y = element_text(size = 14, color = "black", family = "Helvetica"),
+        axis.text.x = element_text(size = 12, color = "black", family = "Helvetica"),
+        axis.text.y = element_text(size = 14, color = "black", family = "Helvetica"),
+        axis.ticks = element_line(size = 0.8),
+        axis.ticks.length.y = unit(1.5, "mm"),
+        plot.background = element_rect(fill = "white"),
+        panel.grid = element_blank(), 
+        panel.border = element_rect(color = "black", size = 0.8))
+
+# Create the plot with vertical lines at specified positions and apply the custom theme
+p <- ggplot(conservation_scores, aes(x = Position, y = Sliding_Average)) +
+    #geom_line(size = 1.1) + # Adjust this value to make the line thicker
+    geom_smooth(se = FALSE, method = "loess", span = 0.01) + # Add a smooth curve (change span for smoothness)
+    geom_vline(xintercept = c(247, 391, 412, 439, 460), color = "red", linetype = "longdash") +
+    my_ggplot_theme +
+    #scale_y_continuous(limits = c(NA, 9)) + # Set y-axis max to 9
+    scale_x_continuous(breaks = seq(100, 700, by = 100)) + # Set x-axis breaks at every 100 units
+    labs(title = "Fagales",
+         x = "Amino Acid Position",
+         y = "Consurf Grade")
+
+# Save the plot to a file
+ggsave("../output/QvFLS2_consurf.pdf", plot = p, width = 10, height = 6, dpi = 300)
+
+# Print the plot to the R console
+print(p)
+
+```
