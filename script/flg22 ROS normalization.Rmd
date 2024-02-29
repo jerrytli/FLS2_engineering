@@ -82,7 +82,7 @@ xx <- ggplot(pcm, aes(y = Receptor, x = variable)) +
   ) +
   scale_y_discrete(limits = rev(levels(pcm$Receptor))) 
 print(xx)
-ggsave(filename = "../output/Vr-XL.pdf", width = 7, height = 3.2)
+ggsave(filename = "../output/Vr-XL.pdf", width = 7, height = 3.4)
 
 ```
 
@@ -109,6 +109,6 @@ xx <- ggplot(pcm, aes(y = Receptor, x = variable)) +
   ) +
   scale_y_discrete(limits = rev(levels(pcm$Receptor))) 
 print(xx)
-ggsave(filename = "../output/Qv-Fc.pdf", width = 7, height = 3)
+ggsave(filename = "../output/Qv-Fc.pdf", width = 7, height = 3.4)
 
 ```
