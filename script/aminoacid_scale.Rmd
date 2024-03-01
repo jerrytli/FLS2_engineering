@@ -28,6 +28,7 @@ plot(pressure)
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
+<<<<<<< HEAD
 # Data 
 ```{r}
 # Simulate some data 
@@ -134,6 +135,8 @@ head(my_data)
 ```
 
 
+=======
+>>>>>>> 77e19871d58538b485558872781f7c0a86872a9c
 ```{r}
 jitter_plot <- my_data %>% 
   mutate(category = factor(category, levels = c(
@@ -145,6 +148,7 @@ jitter_plot <- my_data %>%
              shape = 21, position = position_jitter(width = 0.1, seed = 666)) +
   stat_summary(fun.data = mean_se, geom = "linerange", 
                aes(group = category), size = 1) +
+<<<<<<< HEAD
   #geom_segment(data = my_contrasts, aes(y = txt_y, yend = txt_y),
                #x = 1.2, xend = 1.8) + 
   #geom_text(data = my_contrasts, vjust = -0.25, x = 1.5,
@@ -192,6 +196,10 @@ jitter_plot <- my_data %>%
                aes(group = category), size = 1) +
   #geom_segment(data = my_contrasts, aes(y = txt_y, yend = txt_y),
                #x = 1.2, xend = 1.8) + 
+=======
+  geom_segment(data = my_contrasts, aes(y = txt_y, yend = txt_y),
+               x = 1.2, xend = 1.8) + 
+>>>>>>> 77e19871d58538b485558872781f7c0a86872a9c
   geom_text(data = my_contrasts, vjust = -0.25, x = 1.5,
             size = 3, 
             aes(label = paste0(
@@ -217,6 +225,7 @@ jitter_plot <- my_data %>%
   )
 
 jitter_plot
+<<<<<<< HEAD
 ```
 
 
@@ -261,4 +270,6 @@ print(jitter_plot) # Print the plot
 ggsave("protein_bulkiness_plot.png", plot = jitter_plot, width = 10, height = 6, dpi = 300)
 
 
+=======
+>>>>>>> 77e19871d58538b485558872781f7c0a86872a9c
 ```

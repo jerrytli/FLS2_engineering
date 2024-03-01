@@ -99,8 +99,13 @@ my_ggplot_theme <- theme_linedraw() +
 
 # Create the plot with smooth curves for each dataset
 p <- ggplot(omega_data_combined, aes(x = pos, y = Sliding_Average, color = Group)) +
+<<<<<<< HEAD
   #geom_line(size = 1.1) + 
   geom_smooth(se = FALSE, method = "loess", span = 0.3) +
+=======
+  geom_line(size = 1.1) + 
+  #geom_smooth(se = FALSE, method = "loess", span = 0.01) +
+>>>>>>> 77e19871d58538b485558872781f7c0a86872a9c
   my_ggplot_theme +
   scale_x_continuous(breaks = seq(100, 700, by = 100)) +
   labs(title = "ω dN/dS Across Plant orders",
