@@ -1,0 +1,275 @@
+---
+title: "aminoacid_scale"
+output: html_document
+date: "2024-02-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+<<<<<<< HEAD
+# Data 
+```{r}
+# Simulate some data 
+set.seed(666)
+
+control_1 <- rnorm(n = 5, mean = 30, sd = 5) 
+control_2 <- rnorm(n = 5, mean = 50, sd = 5)
+control_3 <- rnorm(n = 5, mean = 20, sd = 5) 
+
+total_mean <- 100
+adjustment_ctrl <- total_mean / sum(c(mean(control_1), mean(control_2), mean(control_3)))
+control_1 <- control_1 * adjustment_ctrl
+control_2 <- control_2 * adjustment_ctrl
+control_3 <- control_3 * adjustment_ctrl
+
+trt_1 <- rnorm(n = 5, mean = 10, sd = 5)
+trt_2 <- rnorm(n = 5, mean = 30, sd = 5)
+trt_3 <- rnorm(n = 5, mean = 60, sd = 5)
+
+adjustment_trt <- total_mean / sum(c(mean(trt_1), mean(trt_2), mean(trt_3)))
+trt_1 <- trt_1 * adjustment_trt
+trt_2 <- trt_2 * adjustment_trt
+trt_3 <- trt_3 * adjustment_trt
+```
+
+Let's say in this hypothetical experiment, we had blueberry plants in two groups.
+One group was the control; the other was treated with a chemical to make fruit development faster.  
+Each group had 5 plants. 
+The response of the treatment was divided into 3 categories: 
+1) light green fruits, 2) light blue fruits, and 3) dark blue fruits. 
+100 fruits from each plant were examined and the number of fruits in each category was counted. 
+The percentage of fruits in each category was calculated and reported. 
+The question of the study is: did the chemical treatment work? 
+```{r}
+library(tidyverse) 
+#library(emmeans) # for linear model 
+library(RColorBrewer) # for the colors 
+library(rcartocolor) # for the colors 
+library(patchwork) # for putting graphs together
+```
+
+# Data 
+```{r}
+# Simulate some data 
+set.seed(666)
+
+control_1 <- rnorm(n = 5, mean = 30, sd = 5) 
+control_2 <- rnorm(n = 5, mean = 50, sd = 5)
+control_3 <- rnorm(n = 5, mean = 20, sd = 5) 
+
+total_mean <- 100
+adjustment_ctrl <- total_mean / sum(c(mean(control_1), mean(control_2), mean(control_3)))
+control_1 <- control_1 * adjustment_ctrl
+control_2 <- control_2 * adjustment_ctrl
+control_3 <- control_3 * adjustment_ctrl
+
+trt_1 <- rnorm(n = 5, mean = 10, sd = 5)
+trt_2 <- rnorm(n = 5, mean = 30, sd = 5)
+trt_3 <- rnorm(n = 5, mean = 60, sd = 5)
+
+adjustment_trt <- total_mean / sum(c(mean(trt_1), mean(trt_2), mean(trt_3)))
+trt_1 <- trt_1 * adjustment_trt
+trt_2 <- trt_2 * adjustment_trt
+trt_3 <- trt_3 * adjustment_trt
+```
+
+
+## Data wrangling 
+```{r}
+my_data <- rbind(
+  control_1 %>% 
+  as.data.frame() %>% 
+  mutate(group = "ctrl") %>% 
+  mutate(category = "light green"), 
+  
+  control_2 %>% 
+  as.data.frame() %>% 
+  mutate(group = "ctrl") %>% 
+  mutate(category = "light blue"),
+  
+  control_3 %>% 
+  as.data.frame() %>% 
+  mutate(group = "ctrl") %>% 
+  mutate(category = "dark blue"),
+  
+  trt_1 %>% 
+  as.data.frame() %>% 
+  mutate(group = "trt") %>% 
+  mutate(category = "light green"), 
+  
+  trt_2 %>% 
+  as.data.frame() %>% 
+  mutate(group = "trt") %>% 
+  mutate(category = "light blue"),
+  
+  trt_3 %>% 
+  as.data.frame() %>% 
+  mutate(group = "trt") %>% 
+  mutate(category = "dark blue")
+  ) %>% 
+  rename(percent_of_fruit = ".")
+
+head(my_data)
+```
+
+
+=======
+>>>>>>> 77e19871d58538b485558872781f7c0a86872a9c
+```{r}
+jitter_plot <- my_data %>% 
+  mutate(category = factor(category, levels = c(
+    "light green", "light blue", "dark blue"
+  ))) %>% 
+  ggplot(aes(x = group, y = percent_of_fruit)) +
+  facet_grid(.~ category, scales = "free_y") +
+  geom_point(aes(fill = category), color = "grey30", size = 2, alpha = 0.8,
+             shape = 21, position = position_jitter(width = 0.1, seed = 666)) +
+  stat_summary(fun.data = mean_se, geom = "linerange", 
+               aes(group = category), size = 1) +
+<<<<<<< HEAD
+  #geom_segment(data = my_contrasts, aes(y = txt_y, yend = txt_y),
+               #x = 1.2, xend = 1.8) + 
+  #geom_text(data = my_contrasts, vjust = -0.25, x = 1.5,
+            #size = 3, 
+            #aes(label = paste0(
+            #  "p = ", signif(p.value, 2)
+           # ),
+           # y = txt_y)) +
+  scale_fill_manual(values = c(
+    carto_pal(7, "BluYl")[2],
+    carto_pal(7, "Purp")[2],
+    carto_pal(7, "Sunset")[c(7)]
+  ), limits = c("light green", "light blue", "dark blue")) +
+  labs(x = "group",
+       y = "% of fruits",
+       fill = "fruit color",
+       caption = "The better way for mean separation.") +
+  guides(fill = "none") +
+  theme_classic() +
+  theme(
+    plot.caption = element_text(hjust = 0),
+    panel.spacing = unit(0.6, "lines"),
+    strip.text = element_blank(),
+    strip.background = element_blank()
+  )
+
+jitter_plot
+```
+
+
+
+```{r}
+
+my_data <- read.csv("../input/")
+
+jitter_plot <- my_data %>% 
+  mutate(category = factor(category, levels = c(
+    "light green", "light blue", "dark blue"
+  ))) %>% 
+  ggplot(aes(x = group, y = percent_of_fruit)) +
+  facet_grid(.~ category, scales = "free_y") +
+  geom_point(aes(fill = category), color = "grey30", size = 2, alpha = 0.8,
+             shape = 21, position = position_jitter(width = 0.1, seed = 666)) +
+  stat_summary(fun.data = mean_se, geom = "linerange", 
+               aes(group = category), size = 1) +
+  #geom_segment(data = my_contrasts, aes(y = txt_y, yend = txt_y),
+               #x = 1.2, xend = 1.8) + 
+=======
+  geom_segment(data = my_contrasts, aes(y = txt_y, yend = txt_y),
+               x = 1.2, xend = 1.8) + 
+>>>>>>> 77e19871d58538b485558872781f7c0a86872a9c
+  geom_text(data = my_contrasts, vjust = -0.25, x = 1.5,
+            size = 3, 
+            aes(label = paste0(
+              "p = ", signif(p.value, 2)
+            ),
+            y = txt_y)) +
+  scale_fill_manual(values = c(
+    carto_pal(7, "BluYl")[2],
+    carto_pal(7, "Purp")[2],
+    carto_pal(7, "Sunset")[c(7)]
+  ), limits = c("light green", "light blue", "dark blue")) +
+  labs(x = "group",
+       y = "% of fruits",
+       fill = "fruit color",
+       caption = "The better way for mean separation.") +
+  guides(fill = "none") +
+  theme_classic() +
+  theme(
+    plot.caption = element_text(hjust = 0),
+    panel.spacing = unit(0.6, "lines"),
+    strip.text = element_blank(),
+    strip.background = element_blank()
+  )
+
+jitter_plot
+<<<<<<< HEAD
+```
+
+
+```{r}
+library(ggplot2)
+library(reshape2)
+
+# Load the data
+data <- read.csv('../input/dummy.csv', header = TRUE)
+
+# Renaming the unnamed columns to a uniform naming scheme
+colnames(data)[-1] <- paste0('homolog_', 1:(ncol(data)-1))
+
+# Melting the data to a long format
+melted_data <- melt(data, id.vars = 'pos', variable.name = 'Homolog', value.name = 'BulkinessScore')
+
+# Calculate the standard deviation for each position
+std_devs <- melted_data %>%
+  group_by(pos) %>%
+  summarise(
+    mean = mean(BulkinessScore),
+    sd = sd(BulkinessScore)
+  ) %>%
+  ungroup()
+
+# Plotting the data
+jitter_plot <- ggplot(melted_data, aes(x = pos, y = BulkinessScore)) +
+  geom_jitter(aes(color = pos), width = 0.15, height = 0.2) +  # Add some jitter to see overlapping points
+  geom_errorbar(data = std_devs, aes(x = pos, ymin = mean-sd, ymax = mean+sd), 
+                width = 0.2, color = "black") +  # Add standard deviation bars
+  labs(x = "Amino Acid Sequence", y = "Residue Bulkiness Score", title = "Bulkiness Scores Across Protein Homologs") +
+  theme_classic() +
+  theme(
+    plot.caption = element_text(hjust = 0),
+    panel.spacing = unit(0.6, "lines"),
+    axis.text.x = element_text(angle = 90, hjust = 1)  # Rotate x labels for better readability
+  )
+
+print(jitter_plot) # Print the plot
+
+# Save the plot to a file
+ggsave("protein_bulkiness_plot.png", plot = jitter_plot, width = 10, height = 6, dpi = 300)
+
+
+=======
+>>>>>>> 77e19871d58538b485558872781f7c0a86872a9c
+```
