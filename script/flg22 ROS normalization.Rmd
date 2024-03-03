@@ -22,6 +22,7 @@ summary(cars)
 ```{R}
 library(reshape2)
 library(ggplot2)
+library(dplyr)
 ```
 
 You can also embed plots, for example:
@@ -33,29 +34,49 @@ plot(pressure)
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 ```{r}
-pc = read.csv("../input/WTNb_XL_Tj_Qv.csv", header = TRUE)
-pcm = melt(pc, id = c("Receptor"))
-pcm$Receptor <- factor(pcm$Receptor,levels=unique(pcm$Receptor))
-```
-Color bubble
-```{r}
-colours = c( "#A54657",  "#582630", "#4DAA57","#F1A66A","#F26157", "#F9ECCC", "#679289", "#33658A",
-"#F6AE2D","#86BBD8")
+library(ggplot2)
+library(reshape2)
+library(dplyr)
 
-xx = ggplot(pcm, aes(x = Receptor, y = variable)) + 
-     geom_point(aes(size = value, fill = variable), alpha = 0.75, shape = 21) + 
-     scale_size_continuous(limits = c(0, 160), range = c(1,16), breaks = c(25, 50,75,100,160)) + 
-     labs( x= "", y = "", size = "Normalized ROS (%)", fill = "")  + 
-     theme(legend.key=element_blank(), 
-           axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", size = 14, face = "bold", vjust = 1), 
-          axis.text.y = element_text(colour = "black", face = "bold", size = 13), 
-           legend.text = element_text(size = 10, face ="bold", colour ="black"), 
-           legend.title = element_text(size = 12, face = "bold"), 
-           legend.position = "right") +  
-     scale_fill_manual(values = colours, guide = FALSE) + 
-     scale_y_discrete(limits = rev(levels(pcm$variable))) 
+# Read the CSV file
+pc <- read.csv("../input/WTNb_XL_Tj_Qv.csv")
+
+# Melt the data frame
+pcm <- melt(pc, id = c("Receptor"))
+
+# Ensure Receptor is a factor with the correct levels
+pcm$Receptor <- factor(pcm$Receptor, levels = c("NbFLS2", "FLS2XL", "TjFLS2", "QvFLS2"))
+
+# Create a new column 'Color' with the default colors based on 'Receptor'
+pcm$Color <- case_when(
+  pcm$Receptor == "FLS2XL" & pcm$value >= 10 ~ "#33658A",
+  pcm$Receptor == "QvFLS2" & pcm$value >= 10 ~ "#F26157",
+  pcm$Receptor == "TjFLS2" & pcm$value >= 10 ~ "#679289",
+  pcm$Receptor == "NbFLS2" & pcm$value >= 10 ~ "#3a3b3c",
+  pcm$value < 10 ~ "lightgray", # Apply light gray color when value is less than 10
+  TRUE ~ NA_character_ # For unexpected cases
+)
+
+# Proceed with the ggplot
+xx <- ggplot(pcm, aes(x = Receptor, y = variable)) + 
+  geom_point(aes(size = value, fill = Color), alpha = 0.75, shape = 21) + 
+  scale_size_continuous(limits = c(0, 160), range = c(1, 16), breaks = c(25, 50, 75, 100, 160)) + 
+  labs(x = "", y = "", size = "Normalized ROS (%)", fill = "") + 
+  theme(legend.key = element_blank(), 
+        axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", size = 14, face = "bold", vjust = 1), 
+        axis.text.y = element_text(colour = "black", face = "bold", size = 13), 
+        legend.text = element_text(size = 10, face ="bold", colour ="black"), 
+        legend.title = element_text(size = 12, face = "bold"), 
+        legend.position = "right") + 
+  scale_fill_identity(guide = FALSE) +  # Use colors directly from the Color column
+  scale_y_discrete(limits = rev(levels(pcm$variable)))
+
 print(xx)
+
+# Save the plot
 ggsave(filename = "../output/Figure_1_All_FLS2_bubble.pdf", width = 5.6, height = 6.5)
+
+
 ```
 
 
