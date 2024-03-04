@@ -1,15 +1,16 @@
 ```{r}
 library(ggmsa)
 library(Biostrings)
+library(svglite)
 ```
 
 
 ```{r}
 flg22_alg <- readAAMultipleAlignment("../input/flg22 variants show in bubble plot.fasta", 'fasta')
 mycustom <- as.data.frame(read.csv("../input/custom_color.csv"))
- ggmsa(flg22_alg, 1, 22, seq_name = TRUE, char_width = 0.7,custom_color = mycustom,  font = "TimesNewRoman", ) + geom_seqlogo(custom_color = mycustom)
+ ggmsa(flg22_alg, 1, 22, seq_name = TRUE, char_width = 0.7,custom_color = mycustom,  font = "helvetical") + geom_seqlogo(custom_color = mycustom)
  ggsave(filename = "../output/flg22_alg.pdf", width = 7, height = 4)
- ggsave(filename = "../output/flg22_alg.emf", width = 7, height = 4)
+ ggsave(filename = "../output/flg22_alg.svg", width = 7, height = 4)
 ```
 
 
