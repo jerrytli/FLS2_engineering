@@ -185,6 +185,8 @@ heatmap_plot <- ggplot(matrix_melted, aes(variable, Row, fill = value)) +
   paletteer::scale_fill_paletteer_c("viridis::viridis", direction = 1) + # this is perfect
   scale_x_discrete(expand = c(0, 0)) + # No space for X axis
   scale_y_continuous(trans = 'reverse', breaks = 1:28, labels = 1:28, expand = c(0, 0)) + # No space for Y axis
+  geom_vline(xintercept = 6.5, size = 1, color = "black") + # Thick line between V6 and V7
+  geom_vline(xintercept = 13.5, size = 1, color = "black") + # Thick line between V13 and V14
   #coord_fixed(ratio = 1) + # This ensures that tiles are square if that's desired
   theme_classic() + # Use a minimal theme
   theme(
@@ -201,7 +203,7 @@ heatmap_plot <- ggplot(matrix_melted, aes(variable, Row, fill = value)) +
 
 # Print the heatmap
 print(heatmap_plot)
-ggsave("../output/RCM_Qv.pdf", width = 5, height = 5)
+ggsave("../output/RCM_Qv.pdf", width = 4.5, height = 5)
 ```
 
 
