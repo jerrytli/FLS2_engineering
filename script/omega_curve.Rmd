@@ -75,7 +75,7 @@ read_and_smooth <- function(file_path, window_size) {
 }
 
 # Define the window size for smoothing
-window_size <- 80
+window_size <- 75
 
 # Read and smooth data from all CSV files
 files <- c("../input/fagales_omega.csv", "../input/brassicales_omega.csv", "../input/rosales_omega.csv")
@@ -86,11 +86,11 @@ omega_data_combined <- do.call(rbind, omega_data)
 
 # Define the custom ggplot theme
 my_ggplot_theme <- theme_linedraw() +
-  theme(text = element_text(size = 16, family = "Helvetica"),
-        axis.title.x = element_text(size = 14, color = "black", family = "Helvetica"),
-        axis.title.y = element_text(size = 14, color = "black", family = "Helvetica"),
-        axis.text.x = element_text(size = 12, color = "black", family = "Helvetica"),
-        axis.text.y = element_text(size = 14, color = "black", family = "Helvetica"),
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 14, color = "black"),
+        axis.title.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_text(size = 12, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"),
         axis.ticks = element_line(size = 0.8),
         axis.ticks.length.y = unit(1.5, "mm"),
         plot.background = element_rect(fill = "white"),
@@ -105,15 +105,15 @@ p <- ggplot(omega_data_combined, aes(x = pos, y = Sliding_Average, color = Group
   #geom_smooth(se = FALSE, method = "loess", span = 0.01) +
   my_ggplot_theme +
   scale_x_continuous(breaks = seq(100, 700, by = 100)) +
-  labs(title = "ω dN/dS Across Plant orders",
+  labs(title = "dN/dS Across Plant orders",
        x = "Amino Acid Position",
-       y = "ω dN/dS",
+       y = " dN/dS",
        color = "Plant order") +  # Update the legend title
-  scale_color_manual(values = c("#8DA0CB", "#FC8D62", "#66C2A5", "#D55E00"),
+  scale_color_manual(values = c( "#66C2A5", "#C84D4C","#8DA0CB", "#D55E00"),
                      labels = c("Brassicales order", "Fagales order", "Rosales order"))  # Update the legend labels
 
 # Save the plot to a file
-ggsave("../output/combined_omega_curves.pdf", plot = p, width = 13, height = 5, dpi = 300)
+ggsave("../output/combined_omega_curves.pdf", plot = p, width = 13, height = 4, dpi = 300)
 
 # Print the plot to the R console
 print(p)
@@ -197,13 +197,17 @@ heatmap_plot <- ggplot(matrix_melted, aes(variable, Row, fill = value)) +
     panel.border = element_blank(), # Remove panel border
     plot.background = element_blank(), # Remove plot background
     panel.background = element_blank(), # Remove panel background
+        legend.position = "bottom", # Move legend to bottom
+    legend.direction = "horizontal" # Horizontal legend
+  ) +
+  labs(fill = "Conservation score") # Label for the legend
     #axis.ticks = element_blank() # Remove axis ticks
-  ) 
+   
   #labs(title = "Heatmap with Custom Color Gradient", x = "Column", y = "Row", fill = "Value")
 
 # Print the heatmap
 print(heatmap_plot)
-ggsave("../output/RCM_Qv.pdf", width = 4.5, height = 5)
+ggsave("../output/RCM_Qv.pdf", width = 3.7, height = 5)
 ```
 
 
