@@ -190,6 +190,99 @@ library(reshape2)
 
 # Read the data from the file
 file_path <- "../input/until Carpinus_viminea.txt" # Replace path_to_your_file with the actual path
+rcm_qv <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
+
+# Convert the data frame to a vector of values
+values <- as.numeric(unlist(rcm))
+
+# Ensure the length of values is compatible with a 14x28 matrix
+if (length(values) != 14*28) {
+  stop("The number of values in the file does not match the expected size of a 14x28 matrix.")
+}
+
+# Reshape the vector into a matrix
+matrix_rcm_qv <- matrix(values, ncol = 14, byrow = TRUE)
+
+# If you need to manipulate or analyze the matrix, you can do so here.
+
+# Optionally, write the matrix to a new CSV file if needed
+write.csv(matrix_rcm_qv, "../output/rcm_qv_matrix_output.csv", row.names = FALSE)
+
+```
+
+####Plot the RCM plot for Qv
+
+```{r}
+# Load required libraries
+library(ggplot2)
+library(reshape2)  # For melt function
+library(paletteer)
+
+# Read the matrix data
+matrix_rcm_qv <- read.csv("../output/matrix_output.csv", header = TRUE)
+
+# Create a new column 'Row' to preserve the row index before melting
+matrix_rcm_qv$Row <- seq_len(nrow(matrix_rcm_qv))
+
+# Melt the data for use with ggplot, with 'Row' as the id variable
+matrix_rcm_qv_melted <- melt(matrix_rcm_qv, id.vars = 'Row')
+
+# Define the color scale with blue for minimum and yellow for maximum
+#blue_yellow_scale <- scale_fill_gradient2(low = "blue", mid = "green", high = "yellow", midpoint = 4, space = "Lab", transform = "identity")
+
+# Create the heatmap
+heatmap_plot <- ggplot(matrix_rcm_qv_melted, aes(variable, Row, fill = value)) +
+   geom_raster(interpolate = TRUE) +
+  geom_tile(color = "darkgrey") +
+  #blue_yellow_scale+
+  #paletteer::scale_fill_paletteer_c("ggthemes::Orange-Blue Diverging", direction = -1) +
+  #paletteer::scale_fill_paletteer_c("grDevices::RdYlBu", direction = -1) +
+  #paletteer::scale_fill_paletteer_c("grDevices::Spectral", direction = -1) +
+ # paletteer::scale_fill_paletteer_c("oompaBase::blueyellow", direction = 1) +
+  #paletteer::scale_fill_paletteer_c("grDevices::topo.colors", direction = 1) +
+  #paletteer::scale_fill_paletteer_c("grDevices::Plasma", direction = 1) +  # this is good
+   #paletteer::scale_fill_paletteer_c("grDevices::ag_Sunset", direction = 1) +  # this is good
+  # paletteer::scale_fill_paletteer_c("grDevices::YlOrRd", direction = 1) + # this is good
+  #paletteer::scale_fill_paletteer_c("grDevices::YlGnBu", direction = 1) + # this is good
+    #paletteer::scale_fill_paletteer_c("oompaBase::jetColors", direction = 1) + # this is perfect
+    #paletteer::scale_fill_paletteer_c("pals::kovesi.linear_bgy_10_95_c74", direction = 1) + # this is okay
+  paletteer::scale_fill_paletteer_c("viridis::viridis", direction = 1) + # this is perfect
+  scale_x_discrete(expand = c(0, 0)) + # No space for X axis
+  scale_y_continuous(trans = 'reverse', breaks = 1:28, labels = 1:28, expand = c(0, 0)) + # No space for Y axis
+  geom_vline(xintercept = 6.5, size = 0.7, color = "black") + # Thick line between V6 and V7
+  geom_vline(xintercept = 12.5, size = 0.7, color = "black") + # Thick line between V13 and V14
+  #coord_fixed(ratio = 1) + # This ensures that tiles are square if that's desired
+  theme_classic() + # Use a minimal theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1), # Adjust the angle of x axis labels if needed
+    axis.text.y = element_text(angle = 0), # Adjust the angle of y axis labels if needed
+    panel.grid.major = element_blank(), # Remove major grid lines
+    panel.grid.minor = element_blank(), # Remove minor grid lines
+    panel.border = element_blank(), # Remove panel border
+    plot.background = element_blank(), # Remove plot background
+    panel.background = element_blank(), # Remove panel background
+        legend.position = "bottom", # Move legend to bottom
+    legend.direction = "horizontal" # Horizontal legend
+  ) +
+  labs(fill = "Conservation score") # Label for the legend
+    #axis.ticks = element_blank() # Remove axis ticks
+   
+  #labs(title = "Heatmap with Custom Color Gradient", x = "Column", y = "Row", fill = "Value")
+
+# Print the heatmap
+print(heatmap_plot)
+ggsave("../output/RCM_Qv.pdf", width = 3.7, height = 5)
+```
+
+
+####Load RCM output matrix for XL
+
+```{r}
+# Load necessary library
+library(reshape2)
+
+# Read the data from the file
+file_path <- "../input/13_vitales_rcm_scores.txt" # Replace path_to_your_file with the actual path
 rcm <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
@@ -209,8 +302,7 @@ matrix_rcm <- matrix(values, ncol = 14, byrow = TRUE)
 write.csv(matrix_rcm, "../output/matrix_output.csv", row.names = FALSE)
 
 ```
-
-####Plot the RCM plot
+####Plot the RCM plot for XL
 
 ```{r}
 # Load required libraries
@@ -271,7 +363,7 @@ heatmap_plot <- ggplot(matrix_melted, aes(variable, Row, fill = value)) +
 
 # Print the heatmap
 print(heatmap_plot)
-ggsave("../output/RCM_Qv.pdf", width = 3.7, height = 5)
+ggsave("../output/RCM_XL.pdf", width = 3.7, height = 5)
 ```
 
 
