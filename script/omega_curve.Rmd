@@ -84,6 +84,8 @@ omega_data <- lapply(files, function(f) read_and_smooth(f, window_size))
 # Combine all data frames into one
 omega_data_combined <- do.call(rbind, omega_data)
 
+write.csv(omega_data_combined, file = "../output/combined_omega.csv")
+
 # Define the custom ggplot theme
 my_ggplot_theme <- theme_linedraw() +
   theme(text = element_text(size = 16),
@@ -121,7 +123,67 @@ print(p)
 ```
 
 
-Load RCM output matrix
+```{r}
+write.csv(omega_data_combined, file = "../output/combined_omega.csv")
+```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Read the data
+data <- read.csv("../output/combined_omega.csv")
+
+# Function to extract data for a specified range and group
+extract_data <- function(data, group_name, start_pos, end_pos) {
+  data %>%
+    filter(Group == group_name & pos >= start_pos & pos <= end_pos) %>%
+    mutate(relative_pos = pos - start_pos + 1) # Create a new column for relative position (1 to 24)
+}
+
+# Define ranges for each group
+fagales_range <- c(101, 124)
+brassicales_range <- c(121, 144)
+rosales_range <- c(151, 174)
+
+# Extract data for each range
+fagales_data <- extract_data(data, "input/fagales_omega", fagales_range[1], fagales_range[2])
+brassicales_data <- extract_data(data, "input/brassicales_omega", brassicales_range[1], brassicales_range[2])
+rosales_data <- extract_data(data, "input/rosales_omega", rosales_range[1], rosales_range[2])
+
+# Combine extracted data and set custom colors
+combined_data <- rbind(
+  fagales_data %>% mutate(Group = "Fagales"),
+  brassicales_data %>% mutate(Group = "Brassicales"),
+  rosales_data %>% mutate(Group = "Rosales")
+) %>% 
+  mutate(color = ifelse(`dN.dS` > 1, case_when(
+    Group == "Brassicales" ~ "#66C2A5",
+    Group == "Fagales" ~ "#C84D4C",
+    Group == "Rosales" ~ "#8DA0CB"
+  ), case_when(
+    Group == "Brassicales" ~ "gray70",
+    Group == "Fagales" ~ "gray65",
+    Group == "Rosales" ~ "gray60"
+  )))
+
+# Plot with custom color rules and a red line for dN/dS = 1
+ggplot(combined_data, aes(x = relative_pos, y = `dN.dS`, fill = color)) +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.5) +
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed") +
+  scale_fill_identity() + # Use the actual colors specified in the data frame
+  scale_x_continuous(expand = c(0, 0), breaks = 1:24, labels = 1:24) + # X-axis labeled from 1 to 24
+  scale_y_continuous(expand = c(0, 0)) + # Remove padding in y-axis
+  labs(x = "Amino Acid Position", y = "dN/dS Value") +
+  theme_classic() +
+  theme(legend.position = "right")
+ggsave("../output/omega_region_1.pdf", width = 6, height = 3)
+
+```
+
+####Load RCM output matrix
+
 ```{r}
 # Load necessary library
 library(reshape2)
@@ -147,6 +209,8 @@ matrix_rcm <- matrix(values, ncol = 14, byrow = TRUE)
 write.csv(matrix_rcm, "../output/matrix_output.csv", row.names = FALSE)
 
 ```
+
+####Plot the RCM plot
 
 ```{r}
 # Load required libraries
@@ -185,8 +249,8 @@ heatmap_plot <- ggplot(matrix_melted, aes(variable, Row, fill = value)) +
   paletteer::scale_fill_paletteer_c("viridis::viridis", direction = 1) + # this is perfect
   scale_x_discrete(expand = c(0, 0)) + # No space for X axis
   scale_y_continuous(trans = 'reverse', breaks = 1:28, labels = 1:28, expand = c(0, 0)) + # No space for Y axis
-  geom_vline(xintercept = 6.5, size = 1, color = "black") + # Thick line between V6 and V7
-  geom_vline(xintercept = 13.5, size = 1, color = "black") + # Thick line between V13 and V14
+  geom_vline(xintercept = 6.5, size = 0.7, color = "black") + # Thick line between V6 and V7
+  geom_vline(xintercept = 12.5, size = 0.7, color = "black") + # Thick line between V13 and V14
   #coord_fixed(ratio = 1) + # This ensures that tiles are square if that's desired
   theme_classic() + # Use a minimal theme
   theme(
