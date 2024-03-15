@@ -107,6 +107,7 @@ p <- ggplot(omega_data_combined, aes(x = pos, y = Sliding_Average, color = Group
   #geom_smooth(se = FALSE, method = "loess", span = 0.01) +
   my_ggplot_theme +
   scale_x_continuous(breaks = seq(100, 700, by = 100)) +
+  #scale_y_continuous(limits = c(0.18, 0.59))+
   labs(title = "dN/dS Across Plant orders",
        x = "Amino Acid Position",
        y = " dN/dS",
@@ -127,6 +128,8 @@ print(p)
 write.csv(omega_data_combined, file = "../output/combined_omega.csv")
 ```
 
+
+####Plot dN/dS at region 1
 ```{r}
 # Load necessary libraries
 library(ggplot2)
@@ -143,42 +146,89 @@ extract_data <- function(data, group_name, start_pos, end_pos) {
 }
 
 # Define ranges for each group
-fagales_range <- c(101, 124)
-brassicales_range <- c(121, 144)
-rosales_range <- c(151, 174)
+fagales_range <- c(216, 287)
+brassicales_range <- c(219, 290)
+rosales_range <- c(216, 287)
 
 # Extract data for each range
-fagales_data <- extract_data(data, "input/fagales_omega", fagales_range[1], fagales_range[2])
-brassicales_data <- extract_data(data, "input/brassicales_omega", brassicales_range[1], brassicales_range[2])
-rosales_data <- extract_data(data, "input/rosales_omega", rosales_range[1], rosales_range[2])
+fagales_data_region_1 <- extract_data(data, "input/fagales_omega", fagales_range[1], fagales_range[2])
+brassicales_data_region_1 <- extract_data(data, "input/brassicales_omega", brassicales_range[1], brassicales_range[2])
+rosales_data_region_1 <- extract_data(data, "input/rosales_omega", rosales_range[1], rosales_range[2])
 
 # Combine extracted data and set custom colors
 combined_data <- rbind(
-  fagales_data %>% mutate(Group = "Fagales"),
-  brassicales_data %>% mutate(Group = "Brassicales"),
-  rosales_data %>% mutate(Group = "Rosales")
+  fagales_data_region_1 %>% mutate(Group = "Fagales"),
+  brassicales_data_region_1 %>% mutate(Group = "Brassicales"),
+  rosales_data_region_1 %>% mutate(Group = "Rosales")
 ) %>% 
   mutate(color = ifelse(`dN.dS` > 1, case_when(
     Group == "Brassicales" ~ "#66C2A5",
     Group == "Fagales" ~ "#C84D4C",
     Group == "Rosales" ~ "#8DA0CB"
   ), case_when(
-    Group == "Brassicales" ~ "gray70",
-    Group == "Fagales" ~ "gray65",
-    Group == "Rosales" ~ "gray60"
+    Group == "Brassicales" ~ "gray75",
+    Group == "Fagales" ~ "gray73",
+    Group == "Rosales" ~ "gray77"
   )))
 
 # Plot with custom color rules and a red line for dN/dS = 1
 ggplot(combined_data, aes(x = relative_pos, y = `dN.dS`, fill = color)) +
-  geom_bar(stat = "identity", position = position_dodge(), width = 0.5) +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.9) +
   geom_hline(yintercept = 1, color = "red", linetype = "dashed") +
   scale_fill_identity() + # Use the actual colors specified in the data frame
-  scale_x_continuous(expand = c(0, 0), breaks = 1:24, labels = 1:24) + # X-axis labeled from 1 to 24
+  scale_x_continuous(expand = c(0, 0), breaks = c(0, 11, 25, 35, 49, 59, 72), labels = c("0"," ", "25", " ", "49", " ","72")) +
   scale_y_continuous(expand = c(0, 0)) + # Remove padding in y-axis
-  labs(x = "Amino Acid Position", y = "dN/dS Value") +
+  labs(x = "Amino Acid Position", y = expression(Posterior ~ mean ~ omega ~ "(dN/dS)")) +
   theme_classic() +
-  theme(legend.position = "right")
-ggsave("../output/omega_region_1.pdf", width = 6, height = 3)
+  theme(legend.position = "right",
+         axis.text.x = element_text(size = 14, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"))
+ggsave("../output/omega_region_1.pdf", width = 7.5, height = 2)
+
+```
+
+####Region 2
+```{r}
+# Define ranges for each group
+fagales_range <- c(411, 482)
+brassicales_range <- c(408, 479)
+rosales_range <- c(411, 482)
+
+# Extract data for each range
+fagales_data_region_2 <- extract_data(data, "input/fagales_omega", fagales_range[1], fagales_range[2])
+brassicales_data_region_2 <- extract_data(data, "input/brassicales_omega", brassicales_range[1], brassicales_range[2])
+rosales_data_region_2 <- extract_data(data, "input/rosales_omega", rosales_range[1], rosales_range[2])
+
+# Combine extracted data and set custom colors
+combined_data <- rbind(
+  fagales_data_region_2 %>% mutate(Group = "Fagales"),
+  brassicales_data_region_2 %>% mutate(Group = "Brassicales"),
+  rosales_data_region_2 %>% mutate(Group = "Rosales")
+) %>% 
+  mutate(color = ifelse(`dN.dS` > 1, case_when(
+    Group == "Brassicales" ~ "#66C2A5",
+    Group == "Fagales" ~ "#C84D4C",
+    Group == "Rosales" ~ "#8DA0CB"
+  ), case_when(
+    Group == "Brassicales" ~ "gray75",
+    Group == "Fagales" ~ "gray73",
+    Group == "Rosales" ~ "gray77"
+  )))
+
+# Plot with custom color rules and a red line for dN/dS = 1
+ggplot(combined_data, aes(x = relative_pos, y = `dN.dS`, fill = color)) +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.85) +
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed") +
+  scale_fill_identity() + # Use the actual colors specified in the data frame
+  scale_x_continuous(expand = c(0, 0), breaks = c(0, 11, 25, 35, 49, 59, 72), labels = c("0"," ", "25", " ", "49", " ","72")) +
+  scale_y_continuous(expand = c(0, 0)) + # Remove padding in y-axis
+  labs(x = "Amino Acid Position", y = expression(Posterior ~ mean ~ omega ~ "(dN/dS)")) +
+  theme_classic() +
+   theme(legend.position = "right",
+         axis.text.x = element_text(size = 14, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"),
+        axis.title.y = element_text(size = 14, color = "black"))
+ggsave("../output/omega_region_2.pdf", width = 7.5, height = 3)
 
 ```
 
