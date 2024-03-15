@@ -100,7 +100,7 @@ pcm <- melt(pc, id = c("Receptor"))
 new_order_vector <- c("flg22Pae", "flg22Agro", "flg22.002", "flg22.006", "flg22.007", "flg22.001", "flg22.004")
 
 # Step 2: Rename the x-axis columns according to the mapping
-labels_vector <- c("Pae", "Atu", "Rrh", "Ras_1", "Ras_2", "Dic", "Eam")
+labels_vector <- c("Pae", "Atu", "Rrh", "Rals_1", "Rals_2", "Dic", "Eam")
 
 
 # Ensure Receptor order is as in the raw dataset
@@ -158,7 +158,7 @@ pcm <- melt(pc, id = c("Receptor"))
 new_order_vector <- c("flg22Pae", "flg22Agro", "flg22.006", "flg22.007", "flg22.001", "flg22.005")
 
 # Step 2: Rename the x-axis columns according to the mapping
-labels_vector <- c("Pae", "Atu", "Ras_1", "Ras_2", "Dic", "Pal")
+labels_vector <- c("Pae", "Atu", "Rals_1", "Rals_2", "Dic", "Pal")
 
 # Ensure Receptor order is as in the raw dataset
 pcm$Receptor <- factor(pcm$Receptor, levels = unique(pc$Receptor))
