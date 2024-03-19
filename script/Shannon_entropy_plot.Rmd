@@ -1,0 +1,132 @@
+---
+title: "Shannon Entropy"
+output: html_document
+date: "2024-03-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+  
+```{r}
+library(ggplot2)
+library(zoo)
+```
+
+
+### Normalized Shanon Entropy
+```{r}
+
+entropy <- read.table('../input/entropylist.tsv',sep = '\t', header = TRUE)
+
+# Define the custom ggplot theme
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 14, color = "black"),
+        axis.title.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_text(size = 14, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"),
+        axis.ticks = element_line(size = 0.8))
+
+
+# Create the plot with vertical lines at specified positions and apply the custom theme
+p <- ggplot(filter(entropy, Order == "Rosales"), aes(x = Position, y = Entropy, color = Order)) +
+    geom_line(size = 1.0) + # Adjust this value to make the line thicker
+    #geom_smooth(se = FALSE, method = "loess", span = 0.1, color = "black") + # Add a smooth curve (change span for smoothness)
+    geom_vline(xintercept = c(247, 391, 412, 439, 460), color = "red", alpha = 0.3) +
+    geom_hline(yintercept = (1.5/log2(20)), col = "red") +
+    my_ggplot_theme +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 0.8)) + # Set y-axis max to 9
+    scale_x_continuous(expand = c(0, 0), breaks = seq(100, 700, by = 100)) + # Set x-axis breaks at every 100 units
+    labs(title = "Fagales",
+         x = "Amino Acid Position",
+         y = "Normalized Shannon Entropy")
+
+# Save the plot to a file
+ggsave("../output/Fagales_entropy.pdf", plot = p, width = 10, height = 5, dpi = 300)
+
+# Print the plot to the R console
+print(p)
+
+```
+
+
+####Plot dN/dS at region 1
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Read the data
+entropy <- read.table('../input/entropylist.tsv',sep = '\t', header = TRUE)
+
+# Function to extract data for a specified range and group
+extract_entropy <- function(data, group_name, start_pos, end_pos) {
+  data %>%
+    filter(Order == group_name & Position >= start_pos & Position <= end_pos) %>%
+    mutate(relative_pos = Position - start_pos + 1) # Create a new column for relative position (1 to 24)
+}
+
+# Define ranges for each group
+fagales_range <- c(216, 263)
+brassicales_range <- c(219, 266)
+rosales_range <- c(216, 263)
+
+# Extract data for each range
+fagales_entropy_region_1 <- extract_entropy(entropy, "Fagales", fagales_range[1], fagales_range[2])
+brassicales_entropy_region_1 <- extract_entropy(entropy, "brassicales", brassicales_range[1], brassicales_range[2])
+rosales_entropy_region_1 <- extract_entropy(entropy, "Rosales", rosales_range[1], rosales_range[2])
+
+# Combine extracted data and set custom colors
+combined_data <- rbind(
+  fagales_entropy_region_1 %>% mutate(Order = "Fagales"),
+  brassicales_entropy_region_1 %>% mutate(Order = "Brassicales"),
+  rosales_entropy_region_1 %>% mutate(Order = "Rosales")
+) %>% 
+  mutate(color = ifelse(`Entropy` > 0.347, case_when(
+    Order == "Brassicales" ~ "#66C2A5",
+    Order == "Fagales" ~ "#C84D4C",
+    Order == "Rosales" ~ "#8DA0CB"
+  ), case_when(
+    Order == "Brassicales" ~ "gray75",
+    Order == "Fagales" ~ "gray73",
+    Order == "Rosales" ~ "gray77"
+  )))
+
+# Plot with custom color rules and a red line for entropy = 0.347
+ggplot(combined_data, aes(x = relative_pos, y = `Entropy`, fill = color)) +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.85) +
+  geom_hline(yintercept = 0.347, color = "red", linetype = "dashed") +
+  scale_fill_identity() + # Use the actual colors specified in the data frame
+  scale_x_continuous(expand = c(0, 0), breaks = c(0, 11, 25, 35, 48), labels = c("0"," ", "25", " ", "48")) +
+  scale_y_continuous(expand = c(0, 0)) + # Remove padding in y-axis
+  labs(x = "Amino Acid Position", y = "Normalized Shannon Entropy" )+
+  theme_classic() +
+   theme(legend.position = "right",
+         axis.text.x = element_text(size = 15, color = "black"),
+        axis.text.y = element_text(size = 15, color = "black"),
+        axis.title.y = element_text(size = 15, color = "black"),
+        axis.title.x = element_blank())
+ggsave("../output/entropy_region_1.pdf", width = 6, height = 3)
+
+```
