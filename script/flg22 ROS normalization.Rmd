@@ -97,10 +97,10 @@ pc <- read.csv("../input/Vr-XL.csv", header = TRUE)
 pcm <- melt(pc, id = c("Receptor"))
 
 # Step 1: Specify the order of the x-axis
-new_order_vector <- c("flg22Pae", "flg22Agro", "flg22.002", "flg22.006", "flg22.007", "flg22.001", "flg22.004")
+new_order_vector <- c("flg22Pae", "flg22Agro", "flg22.002", "flg22.001", "flg22.004")
 
 # Step 2: Rename the x-axis columns according to the mapping
-labels_vector <- c("Pae", "Atu", "Rrh", "Rals_1", "Rals_2", "Dic", "Eam")
+labels_vector <- c("Pae", "Atu", "Rrh", "Dic", "Eam")
 
 
 # Ensure Receptor order is as in the raw dataset
@@ -144,7 +144,7 @@ print(xx)
 
 # Save the plot to a file
 
-ggsave(filename = "../output/Vr-XL.pdf", width = 7, height = 3.4, bg = "transparent")
+ggsave(filename = "../output/Vr-XL.pdf", width = 6.5, height = 3.4, bg = "transparent")
 
 ```
 

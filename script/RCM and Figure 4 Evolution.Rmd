@@ -308,11 +308,11 @@ ggsave("../output/omega_region_2.pdf",  width = 6, height = 3)
 library(reshape2)
 
 # Read the data from the file
-file_path <- "../input/until Carpinus_viminea.txt" # Replace path_to_your_file with the actual path
+file_path <- "../input/fagales_RCM_43FLS2.txt" # Replace path_to_your_file with the actual path
 rcm_qv <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
-values <- as.numeric(unlist(rcm))
+values <- as.numeric(unlist(rcm_qv))
 
 # Ensure the length of values is compatible with a 14x28 matrix
 if (length(values) != 14*28) {
@@ -329,7 +329,7 @@ write.csv(matrix_rcm_qv, "../output/rcm_qv_matrix_output.csv", row.names = FALSE
 
 ```
 
-####Plot the RCM plot for Qv
+####Plot the RCM plot for Fagales order
 
 ```{r}
 # Load required libraries
@@ -338,7 +338,7 @@ library(reshape2)  # For melt function
 library(paletteer)
 
 # Read the matrix data
-matrix_rcm_qv <- read.csv("../output/matrix_output.csv", header = TRUE)
+matrix_rcm_qv <- read.csv("../output/rcm_qv_matrix_output.csv", header = TRUE)
 
 # Create a new column 'Row' to preserve the row index before melting
 matrix_rcm_qv$Row <- seq_len(nrow(matrix_rcm_qv))
@@ -390,22 +390,22 @@ heatmap_plot <- ggplot(matrix_rcm_qv_melted, aes(variable, Row, fill = value)) +
 
 # Print the heatmap
 print(heatmap_plot)
-ggsave("../output/RCM_Qv.pdf", width = 3.7, height = 5)
+ggsave("../output/RCM_fagales.pdf", width = 3.7, height = 5)
 ```
 
 
-####Load RCM output matrix for XL
+####Load RCM output matrix for Vitales
 
 ```{r}
 # Load necessary library
 library(reshape2)
 
 # Read the data from the file
-file_path <- "../input/14_vitales_rcm_scores.txt" # Replace path_to_your_file with the actual path
-rcm <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
+file_path <- "../input/26_Vitales_order_RCM_txt" # Replace path_to_your_file with the actual path
+rcm_vitales <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
-values <- as.numeric(unlist(rcm))
+values <- as.numeric(unlist(rcm_vitales))
 
 # Ensure the length of values is compatible with a 14x28 matrix
 if (length(values) != 14*28) {
@@ -418,7 +418,7 @@ matrix_rcm <- matrix(values, ncol = 14, byrow = TRUE)
 # If you need to manipulate or analyze the matrix, you can do so here.
 
 # Optionally, write the matrix to a new CSV file if needed
-write.csv(matrix_rcm, "../output/matrix_output.csv", row.names = FALSE)
+write.csv(matrix_rcm, "../output/vitales_matrix_output.csv", row.names = FALSE)
 
 ```
 ####Plot the RCM plot for XL
@@ -430,7 +430,7 @@ library(reshape2)  # For melt function
 library(paletteer)
 
 # Read the matrix data
-matrix_rcm <- read.csv("../output/matrix_output.csv", header = TRUE)
+matrix_rcm <- read.csv("../output/vitales_matrix_output.csv", header = TRUE)
 
 # Create a new column 'Row' to preserve the row index before melting
 matrix_rcm$Row <- seq_len(nrow(matrix_rcm))
@@ -482,7 +482,7 @@ heatmap_plot <- ggplot(matrix_melted, aes(variable, Row, fill = value)) +
 
 # Print the heatmap
 print(heatmap_plot)
-ggsave("../output/RCM_XL.pdf", width = 3.7, height = 5)
+ggsave("../output/RCM_Vitales.pdf", width = 3.7, height = 5)
 ```
 
 

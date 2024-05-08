@@ -63,7 +63,7 @@ pcm$Color <- case_when(
 xx <- ggplot(pcm, aes(x = Receptor, y = variable)) + 
   geom_point(aes(size = value, fill = Color), alpha = 0.75, shape = 21) + 
   scale_size_continuous(limits = c(0, 160), range = c(1, 16), breaks = c(25, 50, 75, 100, 160)) + 
-  labs(x = "", y = "", size = "Normalized Calcium (%)", fill = "") + 
+  labs(x = "", y = "", size = "Normalized Ca2+ (%)", fill = "") + 
   theme_classic() +
   theme(
     legend.key = element_blank(), 

@@ -34,7 +34,7 @@ library(zoo)
 ```
 
 
-### Normalized Shanon Entropy
+### Normalized Shanon Entropy calculated using Sr33 Sr50 paper's code
 ```{r}
 
 entropy <- read.table('../input/entropylist.tsv',sep = '\t', header = TRUE)
