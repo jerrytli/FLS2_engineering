@@ -148,9 +148,12 @@ my_ggplot_theme <- theme_classic() +
 
 
 # Define the regions for each dataset (add an upper bound to the last region based on your data)
-fagales_regions <- c(72, 96, 123, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360, 384, 408, 432, 456, 480, 504, 528, 552, 576, 603, 626, 650, 675, 699, 723, max(fagales_data$pos) + 1)
-rosales_regions <- c(72, 96, 123, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360, 384, 408, 432, 456, 480, 504, 528, 552, 576, 603, 626, 653, 678, 699, 723, max(rosales_data$pos) + 1)
-brassicales_regions <- c(72, 96, 123, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360, 387, 411, 435, 459, 483, 507, 531, 555, 579, 605, 629, 653, 680, 705, 729, max(brassicales_data$pos) + 1)
+fagales_regions <- c(72, 96, 120, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360, 384, 408, 432, 456, 480, 504, 528, 552, 576, 602, 626, 650, 675, 699, 723, max(fagales_data$pos) + 1)
+
+
+rosales_regions <- c(74, 98, 122, 146, 170, 194, 218, 242, 266, 290, 314, 338, 362, 386, 410, 434, 458, 482, 506, 530, 554, 578, 604, 628, 652, 677, 701, 726, max(rosales_data$pos) + 1)
+
+brassicales_regions <- c(74, 98, 122, 146, 170, 194, 218, 242, 266, 290, 314, 338, 362, 386, 409, 433, 457, 481, 505, 529, 553, 577, 603, 627, 651, 678, 703, 727, max(brassicales_data$pos) + 1)
 
 # Calculate distributions
 fagales_dist <- calculate_distribution(fagales, fagales_regions)
