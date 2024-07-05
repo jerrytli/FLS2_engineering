@@ -1,0 +1,135 @@
+---
+title: "discarded code"
+author: "Jerry Li"
+date: "2024-07-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+
+####Omega
+
+### Normalized Shanon Entropy
+```{r}
+
+entropy <- read.table('../input/entropylist.tsv',sep = '\t', header = TRUE)
+
+# Define the custom ggplot theme
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 14, color = "black"),
+        axis.title.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_text(size = 14, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"),
+        axis.ticks = element_line(size = 0.8))
+
+
+# Create the plot with vertical lines at specified positions and apply the custom theme
+p <- ggplot(filter(entropy, Order == "Rosales"), aes(x = Position, y = Entropy, color = Order)) +
+    geom_line(size = 1.0) + # Adjust this value to make the line thicker
+    #geom_smooth(se = FALSE, method = "loess", span = 0.1, color = "black") + # Add a smooth curve (change span for smoothness)
+    geom_vline(xintercept = c(247, 391, 412, 439, 460), color = "red", alpha = 0.3) +
+    geom_hline(yintercept = (1.5/log2(20)), col = "red") +
+    my_ggplot_theme +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 0.8)) + # Set y-axis max to 9
+    scale_x_continuous(expand = c(0, 0), breaks = seq(100, 700, by = 100)) + # Set x-axis breaks at every 100 units
+    labs(title = "Fagales",
+         x = "Amino Acid Position",
+         y = "Normalized Shannon Entropy")
+
+# Save the plot to a file
+ggsave("../output/Fagales_entropy.pdf", plot = p, width = 10, height = 5, dpi = 300)
+
+# Print the plot to the R console
+print(p)
+
+```
+
+
+#### Combined Curves
+```{r}
+library(ggplot2)
+library(zoo)
+library(dplyr)
+
+# Function to read data and calculate sliding average
+read_and_smooth <- function(file_path, window_size) {
+  # Read the CSV file
+  omega <- read.csv(file_path)
+  
+  # Calculate the sliding window average
+  omega$Sliding_Average <- zoo::rollapply(omega$dN.dS, 
+                                           width = window_size, 
+                                           by = 1, 
+                                           FUN = mean, 
+                                           align = 'center', 
+                                           fill = NA)
+  # Add a column for the group (file identifier)
+  omega$Group <- gsub(".*?/(.*)\\.csv$", "\\1", file_path)
+  
+  return(omega)
+}
+
+# Define the window size for smoothing
+window_size <- 55
+
+# Read and smooth data from all CSV files
+files <- c("../input/fagales_omega.csv", "../input/brassicales_omega.csv", "../input/rosales_omega.csv")
+omega_data <- lapply(files, function(f) read_and_smooth(f, window_size))
+
+# Combine all data frames into one
+omega_data_combined <- do.call(rbind, omega_data)
+
+write.csv(omega_data_combined, file = "../output/combined_omega.csv")
+
+# Define the custom ggplot theme
+my_ggplot_theme <- theme_linedraw() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 14, color = "black"),
+        axis.title.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_text(size = 12, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"),
+        axis.ticks = element_line(size = 0.8),
+        axis.ticks.length.y = unit(1.5, "mm"),
+        plot.background = element_rect(fill = "white"),
+        panel.grid = element_blank(), 
+        panel.border = element_rect(color = "black", size = 0.8))
+
+# Create the plot with smooth curves for each dataset
+p <- ggplot(omega_data_combined, aes(x = pos, y = Sliding_Average, color = Group)) +
+  #geom_line(size = 1.1) + 
+  #geom_smooth(se = FALSE, method = "loess", span = 0.3) +
+  geom_line(size = 1) + 
+  #geom_smooth(se = FALSE, method = "loess", span = 0.01) +
+  my_ggplot_theme +
+  scale_x_continuous(expand = c(0,0), breaks = seq(100, 700, by = 100)) +
+  #scale_y_continuous(limits = c(0.18, 0.59))+
+  labs(title = "dN/dS Across Plant orders",
+       x = "Amino Acid Position",
+       y = " dN/dS",
+       color = "Plant order") +  # Update the legend title
+  scale_color_manual(values = c( "#66C2A5", "#C84D4C","#8DA0CB", "#D55E00"),
+                     labels = c("Brassicales order", "Fagales order", "Rosales order"))  # Update the legend labels
+
+# Save the plot to a file
+ggsave("../output/combined_omega_curves.pdf", plot = p, width = 13, height = 4, dpi = 300)
+
+# Print the plot to the R console
+print(p)
+
+```
+
+
