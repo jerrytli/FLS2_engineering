@@ -49,9 +49,9 @@ rosales_regions <- c(74, 98, 122, 146, 170, 194, 218, 242, 266, 290, 314, 338, 3
 brassicales_regions <- c(74, 98, 122, 146, 170, 194, 218, 242, 266, 290, 314, 338, 362, 386, 409, 433, 457, 481, 505, 529, 553, 577, 603, 627, 651, 678, 703, 727, max(brassicales_data$pos) + 1)
 
 # Calculate distributions
-fagales_dist <- calculate_distribution(fagales, fagales_regions)
-rosales_dist <- calculate_distribution(rosales, rosales_regions)
-brassicales_dist <- calculate_distribution(brassicales, brassicales_regions)
+fagales_dist <- calculate_distribution(fagales_data, fagales_regions)
+rosales_dist <- calculate_distribution(rosales_data, rosales_regions)
+brassicales_dist <- calculate_distribution(brassicales_data, brassicales_regions)
 
 # Calculate average distribution
 average_dist <- (fagales_dist + rosales_dist + brassicales_dist) / 3
@@ -66,7 +66,7 @@ data_melted <- melt(data, id.vars = 'regions')
 distribution <- ggplot() +
   geom_bar(data = data_melted[data_melted$variable != "average_dist", ], 
            aes(x = regions, y = value, fill = variable), 
-           stat = "identity", position = position_dodge(width = 0.5), alpha = 0.8) +
+           stat = "identity", position = position_dodge(width = 0.5), alpha = 0.7) +
   geom_line(data = data.frame(regions, average_dist = average_dist), 
             aes(x = regions, y = average_dist, group = 1), color = "black", size = 0.7, alpha = 0.5) +
   #geom_point(data = data.frame(regions, average_dist = average_dist), 
@@ -74,7 +74,7 @@ distribution <- ggplot() +
   labs(x = "LRR", y = "Proportion of residues with omega > 1") +
   scale_x_discrete(breaks = regions) +
   scale_y_continuous(expand = c(0, 0))+
-  scale_fill_manual(values = c("fagales_dist" = "#FC8D62", "rosales_dist" = "#8DA0CB", "brassicales_dist" = "#66C2A5")) +
+  scale_fill_manual(values = c("fagales_dist" = "#EF797E", "rosales_dist" = "#8DA0CB", "brassicales_dist" = "#FDCCA5")) +
   my_ggplot_theme 
 
 print(distribution)
@@ -127,8 +127,8 @@ combined_data <- rbind(
   rosales_data_region_1 %>% mutate(Group = "Rosales")
 ) %>% 
   mutate(color = ifelse(`dN/dS` > 1, case_when(
-    Group == "Brassicales" ~ "#66C2A5",
-    Group == "Fagales" ~ "#C84D4C",
+    Group == "Brassicales" ~ "#FDCCA5",
+    Group == "Fagales" ~ "#EF797E",
     Group == "Rosales" ~ "#8DA0CB"
   ), case_when(
     Group == "Brassicales" ~ "gray75",
@@ -175,8 +175,8 @@ combined_data <- rbind(
   rosales_data_region_2 %>% mutate(Group = "Rosales")
 ) %>% 
   mutate(color = ifelse(`dN/dS` > 1, case_when(
-    Group == "Brassicales" ~ "#66C2A5",
-    Group == "Fagales" ~ "#C84D4C",
+    Group == "Brassicales" ~ "#FDCCA5",
+    Group == "Fagales" ~ "#EF797E",
     Group == "Rosales" ~ "#8DA0CB"
   ), case_when(
     Group == "Brassicales" ~ "gray75",
