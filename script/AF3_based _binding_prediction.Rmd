@@ -15,7 +15,7 @@ library(ggplot2)
 library(dplyr)
 
 # Read the data
-data <- read.csv("input/af3/ipTM_ploting.csv")
+data <- read.csv("../input/af3/ipTM_ploting.csv")
 
 # Define the range of cutoffs and expand the data
 cutoffs <- seq(0.7, 0.9, by = 0.01)
@@ -66,14 +66,14 @@ ggsave("output/af3/AF3_accuracy.pdf", dpi = 300, width = 8, height = 5)
 
 
 ```{r}
+# Load necessary libraries
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 
-# Load the main data with the specified path
-data <- read.csv("../input/af3/ipTM_ploting.csv")  # Make sure this path is correct for your file system
+# Load and prepare the data
+data <- read.csv("../input/af3/ipTM_ploting.csv")
 
-# Assume data processing to calculate Accuracy, Type 1 Error, and Type 2 Error already exists here
 data_processed <- data %>%
   mutate(
     Accuracy = ifelse((Average_ipTM >= 0.83 & Experimental_Result == "Yes") | 
@@ -83,35 +83,53 @@ data_processed <- data %>%
   ) %>%
   group_by(flg22_variants) %>%
   summarise(
-    Accuracy = mean(Accuracy) * 100,
-    Type_1_Error_Rate = mean(Type_1_Error) * 100,
-    Type_2_Error_Rate = mean(Type_2_Error) * 100
+    Accuracy_Percentage = mean(Accuracy) * 100,
+    Type_1_Error_Percentage = mean(Type_1_Error) * 100,
+    Type_2_Error_Percentage = mean(Type_2_Error) * 100,
+    .groups = 'drop'
+  )
+
+# Correctly pivot the data
+data_long <- data_processed %>%
+  pivot_longer(
+    cols = c("Accuracy_Percentage", "Type_1_Error_Percentage", "Type_2_Error_Percentage"),
+    names_to = "Metric",
+    values_to = "Percentage"
   ) %>%
-  pivot_longer(cols = c("Accuracy", "Type_1_Error_Rate", "Type_2_Error_Rate"), 
-               names_to = "Metric", values_to = "Percentage")
+  mutate(Metric = gsub("_Percentage$", "", Metric))
 
-# Load the similarity data, assumed to be correctly prepared or separate
+# Set the order of flg22 variants as in the similarity matrix
+variant_order <- c("csp22", "Paeflg22", "Atuflg22", "Ddaflg22", "Rrhflg22", "Eamflg22", "Pviflg22", "Rso_1flg22", "Rso_2flg22", "Xfrflg22", "Xorflg22")
+data_long$flg22_variants <- factor(data_long$flg22_variants, levels = variant_order)
+data_long$Metric <- factor(data_long$Metric, levels = c("Type_1_Error", "Type_2_Error", "Accuracy"))
+# Prepare similarity data
 similarity_data <- data.frame(
-  flg22_variants = c("csp22", "Paeflg22", "Atuflg22", "Ddaflg22", "Rrhflg22", 
-                     "Eamflg22", "Pviflg22", "Rso_1flg22", "Rso_2flg22", "Xfrflg22", "Xorflg22"),
-  Similarity = c(0, 100, 50, 36.4, 59.1, 68.2, 63.6, 63.6, 31.8, 59.1, 59.1)
+  flg22_variants = variant_order,
+  sim = c(24.1, 100, 50, 36.4, 59.1, 68.2, 63.6, 63.6, 31.8, 59.1, 59.1)
 )
+similarity_data$flg22_variants <- factor(similarity_data$flg22_variants, levels = variant_order)
 
-# Plot using ggplot2
-ggplot(data_processed, aes(x = flg22_variants, y = Percentage, fill = Metric)) +
+# Plot
+stacked_plot <- ggplot(data_long, aes(x = flg22_variants, y = Percentage, fill = Metric)) +
   geom_bar(stat = "identity", position = "stack") +
-  scale_fill_manual(values = c("Accuracy" = "blue", "Type 1 Error Rate" = "red", "Type 2 Error Rate" = "green")) +
-  geom_line(data = similarity_data, aes(x = flg22_variants, y = Similarity, group = 1), color = "black") +
-  geom_point(data = similarity_data, aes(x = flg22_variants, y = Similarity), color = "black", size = 3) +
-  scale_y_continuous(name = "Percentage", sec.axis = sec_axis(~., name = "Percent Similarity")) +
-  labs(title = "Metrics and Percent Similarity for Each flg22 Variant at ipTM Cutoff 0.83",
+  scale_fill_manual(values = c("Accuracy" = "#4477aa", "Type_1_Error" = "#ee6677", "Type_2_Error" = "#ccbb44")) +
+  labs(title = "Metrics for Each flg22 Variant at ipTM Cutoff 0.83",
        x = "flg22 Variants", y = "Percentage") +
-  theme_minimal() +
+  my_ggplot_theme +
+   scale_y_continuous(expand = c(0, 0), limits = c(0, 105))+
+   scale_x_discrete(expand = c(0, 0))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Save the plot
-ggsave("metrics_and_similarity_plot.pdf", width = 10, height = 6)
+# Add similarity data as a line plot over the bars
+final_plot <- stacked_plot +
+  geom_line(data = similarity_data, aes(x = flg22_variants, y = sim, group = 1), color = "black", size = 0.8, inherit.aes = FALSE, alpha = 0.7) +
+  geom_point(data = similarity_data, aes(x = flg22_variants, y = sim), color = "black", size = 1.2, inherit.aes = FALSE)
 
+# Display the combined plot
+print(final_plot)
+
+# Optionally, save the plot
+ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 10, height = 6)
 
 
 ```
