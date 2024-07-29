@@ -1,0 +1,117 @@
+---
+title: "AF_based_binding_prediction"
+author: "Jerry Li"
+date: "2024-07-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Load required libraries
+library(ggplot2)
+library(dplyr)
+
+# Read the data
+data <- read.csv("input/af3/ipTM_ploting.csv")
+
+# Define the range of cutoffs and expand the data
+cutoffs <- seq(0.7, 0.9, by = 0.01)
+expanded_data <- data %>% 
+  crossing(Cutoff = cutoffs) %>% 
+  mutate(
+    Cutoff = as.numeric(Cutoff),  # Ensure Cutoff is numeric
+    Accurate = ifelse(Average_ipTM >= Cutoff & Experimental_Result == "Yes" |
+                      Average_ipTM < Cutoff & Experimental_Result == "No", 1, 0),
+    Type_1_Error = ifelse(Average_ipTM >= Cutoff & Experimental_Result == "No", 1, 0),
+    Type_2_Error = ifelse(Average_ipTM < Cutoff & Experimental_Result == "Yes", 1, 0)
+  ) %>% 
+  group_by(Cutoff) %>% 
+  summarise(
+    Accuracy = mean(Accurate),
+    Type_1_Error_Rate = mean(Type_1_Error),
+    Type_2_Error_Rate = mean(Type_2_Error),
+    .groups = 'drop'
+  )
+
+# Find the optimal cutoff where accuracy is maximum
+optimal_cutoff_index <- which.max(expanded_data$Accuracy)
+optimal_cutoff <- expanded_data$Cutoff[optimal_cutoff_index]
+max_accuracy <- expanded_data$Accuracy[optimal_cutoff_index]
+max_type_1_error_rate <- expanded_data$Type_1_Error_Rate[optimal_cutoff_index]
+max_type_2_error_rate <- expanded_data$Type_2_Error_Rate[optimal_cutoff_index]
+
+# Output results
+cat("Optimal ipTM Cutoff:", optimal_cutoff, "\n")
+cat("Highest Accuracy:", max_accuracy * 100, "%\n")
+cat("Type 1 Error Rate at Optimal Cutoff:", max_type_1_error_rate * 100, "%\n")
+cat("Type 2 Error Rate at Optimal Cutoff:", max_type_2_error_rate * 100, "%\n")
+
+# Plotting
+ggplot(expanded_data, aes(x = Cutoff)) +
+  geom_line(aes(y = Accuracy, color = "Accuracy"), size = 1.2) +
+  geom_line(aes(y = Type_1_Error_Rate, color = "Type 1 Error Rate"), size = 1) +
+  geom_line(aes(y = Type_2_Error_Rate, color = "Type 2 Error Rate"), size = 1) +
+  geom_vline(xintercept = 0.83, linetype = "dashed", color = "gray", size = 0.5) +
+  scale_color_manual(values = c("Accuracy" = "#4477aa", "Type 1 Error Rate" = "#ee6677", "Type 2 Error Rate" = "#ccbb44")) +
+  labs(x = "Average ipTM Cutoff", y = "% Percentage", title = "AF3 Accuracy") +
+  my_ggplot_theme
+
+ggsave("output/af3/AF3_accuracy.pdf", dpi = 300, width = 8, height = 5)
+
+
+```
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# Load the main data with the specified path
+data <- read.csv("../input/af3/ipTM_ploting.csv")  # Make sure this path is correct for your file system
+
+# Assume data processing to calculate Accuracy, Type 1 Error, and Type 2 Error already exists here
+data_processed <- data %>%
+  mutate(
+    Accuracy = ifelse((Average_ipTM >= 0.83 & Experimental_Result == "Yes") | 
+                      (Average_ipTM < 0.83 & Experimental_Result == "No"), 1, 0),
+    Type_1_Error = ifelse(Average_ipTM >= 0.83 & Experimental_Result == "No", 1, 0),
+    Type_2_Error = ifelse(Average_ipTM < 0.83 & Experimental_Result == "Yes", 1, 0)
+  ) %>%
+  group_by(flg22_variants) %>%
+  summarise(
+    Accuracy = mean(Accuracy) * 100,
+    Type_1_Error_Rate = mean(Type_1_Error) * 100,
+    Type_2_Error_Rate = mean(Type_2_Error) * 100
+  ) %>%
+  pivot_longer(cols = c("Accuracy", "Type_1_Error_Rate", "Type_2_Error_Rate"), 
+               names_to = "Metric", values_to = "Percentage")
+
+# Load the similarity data, assumed to be correctly prepared or separate
+similarity_data <- data.frame(
+  flg22_variants = c("csp22", "Paeflg22", "Atuflg22", "Ddaflg22", "Rrhflg22", 
+                     "Eamflg22", "Pviflg22", "Rso_1flg22", "Rso_2flg22", "Xfrflg22", "Xorflg22"),
+  Similarity = c(0, 100, 50, 36.4, 59.1, 68.2, 63.6, 63.6, 31.8, 59.1, 59.1)
+)
+
+# Plot using ggplot2
+ggplot(data_processed, aes(x = flg22_variants, y = Percentage, fill = Metric)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_manual(values = c("Accuracy" = "blue", "Type 1 Error Rate" = "red", "Type 2 Error Rate" = "green")) +
+  geom_line(data = similarity_data, aes(x = flg22_variants, y = Similarity, group = 1), color = "black") +
+  geom_point(data = similarity_data, aes(x = flg22_variants, y = Similarity), color = "black", size = 3) +
+  scale_y_continuous(name = "Percentage", sec.axis = sec_axis(~., name = "Percent Similarity")) +
+  labs(title = "Metrics and Percent Similarity for Each flg22 Variant at ipTM Cutoff 0.83",
+       x = "flg22 Variants", y = "Percentage") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Save the plot
+ggsave("metrics_and_similarity_plot.pdf", width = 10, height = 6)
+
+
+
+```
