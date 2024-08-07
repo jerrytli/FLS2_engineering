@@ -55,11 +55,12 @@ ggplot(expanded_data, aes(x = Cutoff)) +
   geom_line(aes(y = Type_1_Error_Rate, color = "Type 1 Error Rate"), size = 1) +
   geom_line(aes(y = Type_2_Error_Rate, color = "Type 2 Error Rate"), size = 1) +
   geom_vline(xintercept = 0.83, linetype = "dashed", color = "gray", size = 0.5) +
+  geom_hline(yintercept = 0.788, linetype = "dashed", color = "gray", size = 0.5) +
   scale_color_manual(values = c("Accuracy" = "#4477aa", "Type 1 Error Rate" = "#ee6677", "Type 2 Error Rate" = "#ccbb44")) +
-  labs(x = "Average ipTM Cutoff", y = "% Percentage", title = "AF3 Accuracy") +
+  labs(x = "Average ipTM Cutoff", y = "Performance Metrics", title = "AF3 Accuracy") +
   my_ggplot_theme
 
-ggsave("output/af3/AF3_accuracy.pdf", dpi = 300, width = 8, height = 5)
+ggsave("../output/af3/AF3_accuracy.pdf", dpi = 300, width = 8, height = 5)
 
 
 ```
@@ -131,5 +132,53 @@ print(final_plot)
 # Optionally, save the plot
 ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 10, height = 6)
 
+
+```
+
+
+
+###Scatterplot, ipTM and pTM
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(pROC)
+library(readr)  # Use read_csv from readr
+
+# Read the data from the CSV file
+data <- read_csv("../input/af3/ipTM_ploting.csv")  # Ensure the correct path and file extension
+
+# Ensure the experimental results are properly formatted
+data$Experimental_Result <- as.factor(data$Experimental_Result)
+
+# Calculate the ROC curve
+roc_obj <- roc(response = data$Experimental_Result, predictor = data$Average_ipTM)
+
+# Extract coordinates for the ROC curve
+coords <- coords(roc_obj, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
+coords_df <- as.data.frame(coords)  # Convert to data frame for ggplot
+
+# Calculate AUC
+auc_value <- auc(roc_obj)
+
+# Calculate maximum accuracy index
+max_acc_index <- which.max(coords_df$accuracy)
+
+# Plot the ROC curve using ggplot2
+roc_plot <- ggplot(coords_df, aes(x = 1 - specificity, y = sensitivity)) +
+  geom_line(color = "#4477aa", size = 1.2) +
+  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "navy") +
+  geom_point(aes(x = 1 - specificity[max_acc_index], y = sensitivity[max_acc_index]), color = "black", size = 2) +
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  labs(title = sprintf("ROC Curve with AUC: %.2f", auc_value), 
+       subtitle = sprintf("Optimal Threshold: %.2f", coords_df$threshold[max_acc_index]),
+       x = "False Positive Rate", y = "True Positive Rate") +
+ my_ggplot_theme
+
+# Print the plot
+print(roc_plot)
+
+# Save the plot
+ggsave("../output/af3/ROC.pdf", plot = roc_plot, width = 6, height = 6, dpi = 300)
 
 ```
