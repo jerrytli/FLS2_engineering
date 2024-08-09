@@ -182,3 +182,35 @@ print(roc_plot)
 ggsave("../output/af3/ROC.pdf", plot = roc_plot, width = 6, height = 6, dpi = 300)
 
 ```
+
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(readr)  # For reading the CSV file
+
+# Read the data from a CSV file
+data <- read_csv("../input/af3/ipTM_ploting.csv")
+
+# Assuming the data has columns 'Experimental_Result' and 'Average_ipTM'
+data <- data %>%
+  mutate(Experimental_Result = factor(Experimental_Result))
+
+# Creating the raincloud plot
+ggplot(data, aes(x = Experimental_Result, y = Average_ipTM, fill = Experimental_Result)) +
+  geom_violin(trim = FALSE, alpha = 0.5, color = NA) +  # Density plot
+  geom_boxplot(width = 0.03, outlier.shape = NA, alpha = 0.5) +  # Boxplot inside the violin
+  geom_jitter(size = 1, alpha = 0.8, color = "black", width = 0.1) +  # Points with jitter
+  scale_fill_manual(values = c("#ccbb44", "#4477aa")) +  # Custom colors for each experimental result
+  labs(title = "Raincloud Plot of Average ipTM by Experimental Result",
+       x = "Experimental Result",
+       y = "Average ipTM") +
+  #geom_hline(yintercept = 0.83, linetype = "solid", color = "darkgrey", size = 0.5) +
+ my_ggplot_theme
+
+# Optionally, you can save the plot to a file
+ggsave("../output/af3/raincloud.pdf", width = 10, height = 6, dpi = 300)
+
+
+```
