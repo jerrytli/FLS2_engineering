@@ -13,6 +13,15 @@ knitr::opts_chunk$set(echo = TRUE)
 # Load required libraries
 library(ggplot2)
 library(dplyr)
+library(tidyr)
+
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"),
+        axis.text.x = element_text(size = 20, color = "black"),
+        axis.text.y = element_text(size = 20, color = "black"),
+        axis.ticks = element_line(size = 0.8))
 
 # Read the data
 data <- read.csv("../input/af3/ipTM_ploting.csv")
@@ -179,9 +188,55 @@ roc_plot <- ggplot(coords_df, aes(x = 1 - specificity, y = sensitivity)) +
 print(roc_plot)
 
 # Save the plot
-ggsave("../output/af3/ROC.pdf", plot = roc_plot, width = 6, height = 6, dpi = 300)
+ggsave("../output/af3/ROC.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
 
 ```
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(readr)
+library(dplyr)
+
+# Load the data from a CSV file
+data <- read_csv("../input/af3/ipTM_ploting.csv")  # Replace with the correct file path
+
+# Calculate the categories based on your conditions:
+# Accurate: (ipTM >= 0.83 and Experimental Result = Yes) or (ipTM < 0.83 and Experimental Result = No)
+# Type 1 Error: (ipTM >= 0.83 and Experimental Result = No)
+# Type 2 Error: (ipTM < 0.83 and Experimental Result = Yes)
+data <- data %>%
+  mutate(Category = case_when(
+    (Average_ipTM >= 0.83 & Experimental_Result == "Yes") | (Average_ipTM < 0.83 & Experimental_Result == "No") ~ "Accurate",
+    Average_ipTM >= 0.83 & Experimental_Result == "No" ~ "Type 1 Error",
+    Average_ipTM < 0.83 & Experimental_Result == "Yes" ~ "Type 2 Error",
+    TRUE ~ "Uncategorized"  # Handling any data that does not fit the above categories
+  ))
+
+# Define a custom theme
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"),
+        axis.text.x = element_text(size = 20, color = "black"),
+        axis.text.y = element_text(size = 20, color = "black"),
+        axis.ticks = element_line(size = 0.8))
+
+# Adding jitter to the pTM values within ggplot using geom_jitter
+ggplot(data, aes(x=Average_pTM, y=Average_ipTM, fill=Category)) +
+  geom_jitter(width=0.004, height=0, alpha=0.8, size=3, shape=21, stroke=0.5, color="white") +  # Adding jitter only horizontally with white outline
+  scale_fill_manual(values=c("Accurate"="#4477aa", "Type 1 Error"="#ee6677", "Type 2 Error"="#ccbb44")) +
+  labs(x="pTM", y="ipTM", title="Scatter Plot of pTM vs. ipTM") +
+  xlim(0.82, 0.92) + ylim(0.3, 1)+
+  my_ggplot_theme
+  
+
+# Display the plot
+print(ggplot)
+ggsave("../output/af3/scatter.pdf", width = 7, height = 6, dpi = 300)
+
+```
+
 
 
 ```{r}
@@ -199,18 +254,19 @@ data <- data %>%
 
 # Creating the raincloud plot
 ggplot(data, aes(x = Experimental_Result, y = Average_ipTM, fill = Experimental_Result)) +
-  geom_violin(trim = FALSE, alpha = 0.5, color = NA) +  # Density plot
-  geom_boxplot(width = 0.03, outlier.shape = NA, alpha = 0.5) +  # Boxplot inside the violin
-  geom_jitter(size = 1, alpha = 0.8, color = "black", width = 0.1) +  # Points with jitter
+  geom_violin(trim = FALSE, alpha = 0.5, color = NA, show.legend = FALSE) +  # Density plot
+  geom_boxplot(width = 0.03, outlier.shape = NA, alpha = 0.5, show.legend = FALSE) +  # Boxplot inside the violin
+  geom_jitter(size = 1, alpha = 0.8, color = "black", width = 0.1, show.legend = FALSE) +  # Points with jitter
   scale_fill_manual(values = c("#ccbb44", "#4477aa")) +  # Custom colors for each experimental result
   labs(title = "Raincloud Plot of Average ipTM by Experimental Result",
        x = "Experimental Result",
        y = "Average ipTM") +
   #geom_hline(yintercept = 0.83, linetype = "solid", color = "darkgrey", size = 0.5) +
+  #legend()+
  my_ggplot_theme
 
 # Optionally, you can save the plot to a file
-ggsave("../output/af3/raincloud.pdf", width = 10, height = 6, dpi = 300)
+ggsave("../output/af3/raincloud.pdf", width = 6, height = 6, dpi = 300)
 
 
 ```
