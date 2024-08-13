@@ -270,3 +270,47 @@ ggsave("../output/af3/raincloud.pdf", width = 6, height = 6, dpi = 300)
 
 
 ```
+
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(readr)  # Ensure read_csv is available
+
+# Read the data
+data <- read_csv("../input/af3/ipTM_ploting.csv")
+
+# Apply cutoff to 'Average_ipTM' to get predictions
+data$Predicted_Result <- ifelse(data$Average_ipTM >= 0.83, "Yes", "No")
+
+# Calculate the confusion matrix
+table_data <- table(Actual = data$Experimental_Result, Predicted = data$Predicted_Result)
+
+# Normalize the confusion matrix by actual outcomes
+table_data_normalized <- prop.table(table_data, 1)
+
+# Convert the matrix to a dataframe for ggplot, including actual counts
+df_cm <- as.data.frame(table_data)
+names(df_cm) <- c("Actual", "Predicted", "Count")
+df_cm$Freq <- as.vector(table_data_normalized)
+
+# Plotting
+ggplot(data = df_cm, aes(x = Predicted, y = Actual, fill = Freq)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = sprintf("%.2f\n(%d)", Freq, Count), color = ifelse(Freq > 0.7, "white", "black")),
+            vjust = 0.5, hjust = 0.5, size = 7) +  # Center text and increase size
+  scale_fill_gradient(low = "#f7fbff", high = "#08306b") +  # Using a blue gradient from light to dark
+  scale_color_identity() +  # Allow direct color specification in geom_text
+  labs(title = "Normalized Confusion Matrix for ipTM Predictions", x = "Predicted Label", y = "Actual Label") +
+  theme_minimal() +
+  theme(text = element_text(size = 14),
+        axis.title.x = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"),
+        axis.text.x = element_text(size = 20, color = "black"),
+        axis.text.y = element_text(size = 20, color = "black"),
+        axis.ticks = element_line(size = 0.8),
+        legend.position = "none")
+
+ggsave("../output/af3/confusion_matrix.pdf", width = 6.5, height = 6, dpi = 300)
+```
