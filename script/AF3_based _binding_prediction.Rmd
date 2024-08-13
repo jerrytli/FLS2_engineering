@@ -282,7 +282,10 @@ library(readr)  # Ensure read_csv is available
 data <- read_csv("../input/af3/ipTM_ploting.csv")
 
 # Apply cutoff to 'Average_ipTM' to get predictions
-data$Predicted_Result <- ifelse(data$Average_ipTM >= 0.83, "Yes", "No")
+data$Predicted_Result <- ifelse(data$Average_ipTM >= 0.83, "Perception", "No Perception")
+
+# Adjust experimental result for consistent labeling
+data$Experimental_Result <- ifelse(data$Experimental_Result == "Yes", "Perception", "No Perception")
 
 # Calculate the confusion matrix
 table_data <- table(Actual = data$Experimental_Result, Predicted = data$Predicted_Result)
@@ -303,14 +306,16 @@ ggplot(data = df_cm, aes(x = Predicted, y = Actual, fill = Freq)) +
   scale_fill_gradient(low = "#f7fbff", high = "#08306b") +  # Using a blue gradient from light to dark
   scale_color_identity() +  # Allow direct color specification in geom_text
   labs(title = "Normalized Confusion Matrix for ipTM Predictions", x = "Predicted Label", y = "Actual Label") +
-  theme_minimal() +
+  theme_void() +
   theme(text = element_text(size = 14),
-        axis.title.x = element_text(size = 20, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
-        axis.text.x = element_text(size = 20, color = "black"),
-        axis.text.y = element_text(size = 20, color = "black"),
-        axis.ticks = element_line(size = 0.8),
+        axis.title.x = element_text(size = 18, color = "black"),
+        axis.title.y = element_text(size = 18, color = "black", angle = 90),
+        axis.text.x = element_text(size = 18, color = "black"),
+        axis.text.y = element_text(size = 18, color = "black"),
+#        axis.ticks = element_line(size = 0.8),
         legend.position = "none")
 
-ggsave("../output/af3/confusion_matrix.pdf", width = 6.5, height = 6, dpi = 300)
+# Save the plot
+ggsave("../output/af3/confusion_matrix.pdf", width = 7, height = 6, dpi = 300)
+
 ```
