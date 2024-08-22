@@ -21,55 +21,76 @@ my_ggplot_theme <- theme_classic() +
         axis.title.y = element_text(size = 20, color = "black"),
         axis.text.x = element_text(size = 20, color = "black"),
         axis.text.y = element_text(size = 20, color = "black"),
-        axis.ticks = element_line(size = 0.8))
+        axis.ticks = element_line(size = 0.8),
+        legend.position = c(0.85, 0.2), # Adjust position to bottom right above x-axis
+        legend.background = element_rect(fill = "white", color = "black"),
+        legend.title = element_blank(), # Remove the legend title for a cleaner look
+        legend.text = element_text(size = 14))
 
 # Read and prepare the data
 data <- read.csv("../input/af3/ipTM_ploting.csv")
 
-# Define the range of cutoffs and expand the data
+# Define the range of cutoffs
 cutoffs <- seq(0.7, 0.9, by = 0.01)
-expanded_data <- data %>% 
-  crossing(Cutoff = cutoffs) %>% 
-  mutate(
-    Cutoff = as.numeric(Cutoff),
-    Accurate = ifelse(Average_ipTM >= Cutoff & Experimental_Result == "Yes" |
-                      Average_ipTM < Cutoff & Experimental_Result == "No", 1, 0),
-    False_Positive = ifelse(Average_ipTM >= Cutoff & Experimental_Result == "No", 1, 0),
-    False_Negative = ifelse(Average_ipTM < Cutoff & Experimental_Result == "Yes", 1, 0),
-    True_Positive = ifelse(Average_ipTM >= Cutoff & Experimental_Result == "Yes", 1, 0),
-    True_Negative = ifelse(Average_ipTM < Cutoff & Experimental_Result == "No", 1, 0)
-  ) %>% 
-  group_by(Cutoff) %>% 
-  summarise(
-    Accuracy = mean(Accurate),
-    False_Positive_Rate = sum(False_Positive) / sum(False_Positive + True_Negative),
-    False_Negative_Rate = sum(False_Negative) / sum(False_Negative + True_Positive),
-    .groups = 'drop'
-  )
 
-# Find the optimal cutoff where accuracy is maximum
-optimal_cutoff_index <- which.max(expanded_data$Accuracy)
-optimal_cutoff <- expanded_data$Cutoff[optimal_cutoff_index]
-max_accuracy <- expanded_data$Accuracy[optimal_cutoff_index]
+# Function to calculate accuracy for a given subset of data
+calculate_accuracy <- function(data_subset) {
+  expanded_data <- data_subset %>% 
+    crossing(Cutoff = cutoffs) %>% 
+    mutate(
+      Cutoff = as.numeric(Cutoff),
+      Accurate = ifelse(Average_ipTM >= Cutoff & Known_outcome == "Perception" |
+                        Average_ipTM < Cutoff & Known_outcome == "No perception", 1, 0)
+    ) %>% 
+    group_by(Cutoff) %>% 
+    summarise(
+      Accuracy = mean(Accurate),
+      .groups = 'drop'
+    )
+  return(expanded_data)
+}
+
+# Calculate accuracy for all data, only AtFLS2, and non-AtFLS2
+accuracy_all <- calculate_accuracy(data)
+accuracy_AtFLS2 <- calculate_accuracy(data[data$receptor == "AtFLS2", ])
+accuracy_non_AtFLS2 <- calculate_accuracy(data[data$receptor != "AtFLS2", ])
+
+# Find the optimal cutoff where accuracy is maximum for each group
+optimal_cutoff_all <- accuracy_all$Cutoff[which.max(accuracy_all$Accuracy)]
+max_accuracy_all <- max(accuracy_all$Accuracy)
+
+optimal_cutoff_AtFLS2 <- accuracy_AtFLS2$Cutoff[which.max(accuracy_AtFLS2$Accuracy)]
+max_accuracy_AtFLS2 <- max(accuracy_AtFLS2$Accuracy)
+
+optimal_cutoff_non_AtFLS2 <- accuracy_non_AtFLS2$Cutoff[which.max(accuracy_non_AtFLS2$Accuracy)]
+max_accuracy_non_AtFLS2 <- max(accuracy_non_AtFLS2$Accuracy)
 
 # Output results
-cat("Optimal ipTM Cutoff:", optimal_cutoff, "\n")
-cat("Highest Accuracy:", max_accuracy * 100, "%\n")
+cat("All Data - Optimal ipTM Cutoff:", optimal_cutoff_all, "\n")
+cat("All Data - Highest Accuracy:", max_accuracy_all * 100, "%\n")
+cat("AtFLS2 - Optimal ipTM Cutoff:", optimal_cutoff_AtFLS2, "\n")
+cat("AtFLS2 - Highest Accuracy:", max_accuracy_AtFLS2 * 100, "%\n")
+cat("Non-AtFLS2 - Optimal ipTM Cutoff:", optimal_cutoff_non_AtFLS2, "\n")
+cat("Non-AtFLS2 - Highest Accuracy:", max_accuracy_non_AtFLS2 * 100, "%\n")
 
 # Plotting
-ggplot(expanded_data, aes(x = Cutoff)) +
-  geom_line(aes(y = Accuracy, color = "Accuracy"), size = 1.2) +
-  geom_line(aes(y = False_Positive_Rate, color = "False Positive Rate"), size = 1) +
-  geom_line(aes(y = False_Negative_Rate, color = "False Negative Rate"), size = 1) +
-  geom_vline(xintercept = optimal_cutoff, linetype = "dashed", color = "gray", size = 0.5) +
-  scale_color_manual(values = c("Accuracy" = "#4477aa",
-                                "False Positive Rate" = "#ee6677",
-                                "False Negative Rate" = "#ccbb44")) +
-  labs(x = "Average ipTM Cutoff", y = "Performance Metrics", title = "AF3 Accuracy and Error Rates") +
+ggplot() +
+  geom_line(data = accuracy_all, aes(x = Cutoff, y = Accuracy, color = "All Data"), size = 1) +
+  geom_line(data = accuracy_AtFLS2, aes(x = Cutoff, y = Accuracy, color = "AtFLS2"), size = 1) +
+  geom_line(data = accuracy_non_AtFLS2, aes(x = Cutoff, y = Accuracy, color = "Non-AtFLS2"), size = 1) +
+  geom_vline(xintercept = optimal_cutoff_all, linetype = "dashed", color = "#4477aa", size = 1) +
+  geom_vline(xintercept = optimal_cutoff_AtFLS2, linetype = "dashed", color = "#ccbb44", size = 1) +
+  geom_vline(xintercept = optimal_cutoff_non_AtFLS2, linetype = "dashed", color = "#117733", size = 1, alpha = 0.5) +
+  scale_color_manual(values = c("All Data" = "#4477aa",
+                                "AtFLS2" = "#ccbb44",
+                                "Non-AtFLS2" = "#117733")) +
+  scale_y_continuous(limits = c(0.4, 1), breaks = seq(0, 1, by = 0.1)) +
+  labs(x = "Average ipTM Cutoff", y = "Accuracy", title = "AF3 Accuracy Curves by Receptor Subset") +
   my_ggplot_theme
 
 # Save the plot
-ggsave("../output/af3/AF3_accuracy.pdf", dpi = 300, width = 8, height = 5)
+ggsave("../output/af3/AF3_accuracy_by_receptor.pdf", dpi = 300, width = 7, height = 5)
+
 
 ```
 
@@ -85,10 +106,10 @@ data <- read.csv("../input/af3/ipTM_ploting.csv") %>%
 
 data_processed <- data %>%
   mutate(
-    Accuracy = ifelse((Average_ipTM >= 0.83 & Experimental_Result == "Yes") | 
-                      (Average_ipTM < 0.83 & Experimental_Result == "No"), 1, 0),
-    Type_1_Error = ifelse(Average_ipTM >= 0.83 & Experimental_Result == "No", 1, 0),
-    Type_2_Error = ifelse(Average_ipTM < 0.83 & Experimental_Result == "Yes", 1, 0)
+    Accuracy = ifelse((Average_ipTM >= 0.83 & Known_outcome == "Perception") | 
+                      (Average_ipTM < 0.83 & Known_outcome == "No perception"), 1, 0),
+    Type_1_Error = ifelse(Average_ipTM >= 0.83 & Known_outcome == "No perception", 1, 0),
+    Type_2_Error = ifelse(Average_ipTM < 0.83 & Known_outcome == "Perception", 1, 0)
   ) %>%
   group_by(flg22_variants) %>%
   summarise(
@@ -158,6 +179,8 @@ print(final_plot)
 # Optionally, save the plot
 ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 4.2, height = 6)
 ```
+
+
 ```{r}
 library(ggplot2)
 library(dplyr)
@@ -179,20 +202,20 @@ cutoff <- 0.83
 # Calculate accuracy based on the cutoff
 data <- data %>%
   mutate(
-    Accurate = ifelse((Average_ipTM >= cutoff & Experimental_Result == "Yes") | 
-                      (Average_ipTM < cutoff & Experimental_Result == "No"), 1, 0)
+    Accurate = ifelse((Average_ipTM >= cutoff & Known_outcome == "Perception") | 
+                      (Average_ipTM < cutoff & Known_outcome == "No perception"), 1, 0)
   )
 
-# Group by Experimental_Result and calculate accuracy percentage
+# Group by Known_outcome and calculate accuracy percentage
 accuracy_data <- data %>%
-  group_by(Experimental_Result) %>%
+  group_by(Known_outcome) %>%
   summarise(
     Accuracy_Percentage = mean(Accurate) * 100,
     .groups = 'drop'
   )
 
 # Plotting the bar graph
-plot <- ggplot(accuracy_data, aes(x = Experimental_Result, y = Accuracy_Percentage, fill = Experimental_Result)) +
+plot <- ggplot(accuracy_data, aes(x = Known_outcome, y = Accuracy_Percentage, fill = Known_outcome)) +
   geom_bar(stat = "identity", alpha = 0.7) +
   labs(title = "Accuracy Rate by Experimental Result at ipTM Cutoff = 0.83",
        x = "Experimental Result",
@@ -217,38 +240,54 @@ library(readr)  # Use read_csv from readr
 data <- read_csv("../input/af3/ipTM_ploting.csv")  # Ensure the correct path and file extension
 
 # Ensure the experimental results are properly formatted
-data$Experimental_Result <- as.factor(data$Experimental_Result)
+data$Known_outcome <- as.factor(data$Known_outcome)
 
-# Calculate the ROC curve
-roc_obj <- roc(response = data$Experimental_Result, predictor = data$Average_ipTM)
+# Subset data for the three groups
+data_all <- data
+data_AtFLS2 <- data[data$receptor == "AtFLS2", ]
+data_no_AtFLS2 <- data[data$receptor != "AtFLS2", ]
 
-# Extract coordinates for the ROC curve
-coords <- coords(roc_obj, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
-coords_df <- as.data.frame(coords)  # Convert to data frame for ggplot
+# Calculate ROC curves for each subset
+roc_all <- roc(response = data_all$Known_outcome, predictor = data_all$Average_ipTM)
+roc_AtFLS2 <- roc(response = data_AtFLS2$Known_outcome, predictor = data_AtFLS2$Average_ipTM)
+roc_no_AtFLS2 <- roc(response = data_no_AtFLS2$Known_outcome, predictor = data_no_AtFLS2$Average_ipTM)
 
-# Calculate AUC
-auc_value <- auc(roc_obj)
+# Extract AUC values
+auc_all <- auc(roc_all)
+auc_AtFLS2 <- auc(roc_AtFLS2)
+auc_no_AtFLS2 <- auc(roc_no_AtFLS2)
 
-# Calculate maximum accuracy index
-max_acc_index <- which.max(coords_df$accuracy)
+# Extract coordinates for the ROC curves
+coords_all <- coords(roc_all, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
+coords_AtFLS2 <- coords(roc_AtFLS2, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
+coords_no_AtFLS2 <- coords(roc_no_AtFLS2, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
 
-# Plot the ROC curve using ggplot2
-roc_plot <- ggplot(coords_df, aes(x = 1 - specificity, y = sensitivity)) +
-  geom_line(color = "#4477aa", size = 1.2) +
+# Convert to data frames for ggplot
+coords_all_df <- as.data.frame(coords_all)
+coords_AtFLS2_df <- as.data.frame(coords_AtFLS2)
+coords_no_AtFLS2_df <- as.data.frame(coords_no_AtFLS2)
+
+# Plot the ROC curves using ggplot2
+roc_plot <- ggplot() +
+  geom_line(data = coords_all_df, aes(x = 1 - specificity, y = sensitivity), color = "#4477aa", size = 1.2) +
+  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#ccbb44", size = 1.2) +
+  geom_line(data = coords_no_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#117733", size = 1.2) +
   geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "navy") +
-  geom_point(aes(x = 1 - specificity[max_acc_index], y = sensitivity[max_acc_index]), color = "black", size = 2) +
+  annotate("text", x = 0.95, y = 0.05, label = sprintf("AUC (Non-AtFLS2): %.2f", auc_no_AtFLS2), color = "#117733", hjust = 1, vjust = 0) +
+  annotate("text", x = 0.95, y = 0.19, label = sprintf("AUC (AtFLS2): %.2f", auc_AtFLS2), color = "#ccbb44", hjust = 1, vjust = 0) +
+  annotate("text", x = 0.95, y = 0.12, label = sprintf("AUC (All): %.2f", auc_all), color = "#4477aa", hjust = 1, vjust = 0) +
   scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
-  labs(title = sprintf("ROC Curve with AUC: %.2f", auc_value), 
-       subtitle = sprintf("Optimal Threshold: %.2f", coords_df$threshold[max_acc_index]),
+  labs(title = "ROC Curves for Different Receptor Subsets", 
        x = "False Positive Rate", y = "True Positive Rate") +
- my_ggplot_theme
+  my_ggplot_theme
 
 # Print the plot
 print(roc_plot)
 
 # Save the plot
-ggsave("../output/af3/ROC.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+ggsave("../output/af3/ROC_multiple_curves.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+
 
 ```
 
@@ -262,14 +301,14 @@ library(dplyr)
 data <- read_csv("../input/af3/ipTM_ploting.csv")  # Replace with the correct file path
 
 # Calculate the categories based on your conditions:
-# Accurate: (ipTM >= 0.83 and Experimental Result = Yes) or (ipTM < 0.83 and Experimental Result = No)
-# Type 1 Error: (ipTM >= 0.83 and Experimental Result = No)
-# Type 2 Error: (ipTM < 0.83 and Experimental Result = Yes)
+# Accurate: (ipTM >= 0.83 and Experimental Result = Perception) or (ipTM < 0.83 and Experimental Result = No perception)
+# Type 1 Error: (ipTM >= 0.83 and Experimental Result = No perception)
+# Type 2 Error: (ipTM < 0.83 and Experimental Result = Perception)
 data <- data %>%
   mutate(Category = case_when(
-    (Average_ipTM >= 0.83 & Experimental_Result == "Yes") | (Average_ipTM < 0.83 & Experimental_Result == "No") ~ "Accurate",
-    Average_ipTM >= 0.83 & Experimental_Result == "No" ~ "Type 1 Error",
-    Average_ipTM < 0.83 & Experimental_Result == "Yes" ~ "Type 2 Error",
+    (Average_ipTM >= 0.83 & Known_outcome == "Perception") | (Average_ipTM < 0.83 & Known_outcome == "No perception") ~ "Accurate",
+    Average_ipTM >= 0.83 & Known_outcome == "No perception" ~ "Type 1 Error",
+    Average_ipTM < 0.83 & Known_outcome == "Perception" ~ "Type 2 Error",
     TRUE ~ "Uncategorized"  # Handling any data that does not fit the above categories
   ))
 
@@ -308,26 +347,52 @@ library(readr)  # For reading the CSV file
 # Read the data from a CSV file
 data <- read_csv("../input/af3/ipTM_ploting.csv")
 
-# Assuming the data has columns 'Experimental_Result' and 'Average_ipTM'
+# Assuming the data has columns 'Known_outcome' and 'Average_ipTM'
 data <- data %>%
-  mutate(Experimental_Result = factor(Experimental_Result))
+  mutate(Known_outcome = factor(Known_outcome))
 
-# Creating the raincloud plot
-ggplot(data, aes(x = Experimental_Result, y = Average_ipTM, fill = Experimental_Result)) +
+# Assess normality using Shapiro-Wilk test
+shapiro_results <- data %>%
+  group_by(Known_outcome) %>%
+  summarise(shapiro_p_value = shapiro.test(Average_ipTM)$p.value)
+
+print("Shapiro-Wilk Test for Normality:")
+print(shapiro_results)
+
+# If p-value < 0.05, data is not normally distributed
+if(any(shapiro_results$shapiro_p_value < 0.05)) {
+  test_method <- "wilcox.test"
+  test_name <- "Wilcoxon rank-sum test"
+  # Perform Wilcoxon rank-sum test
+  wilcox_test <- wilcox.test(Average_ipTM ~ Known_outcome, data = data)
+  p_value <- wilcox_test$p.value
+} else {
+  test_method <- "t.test"
+  test_name <- "t-test"
+  # Perform t-test
+  t_test <- t.test(Average_ipTM ~ Known_outcome, data = data)
+  p_value <- t_test$p.value
+}
+
+# Print the selected test method and p-value
+print(paste("Selected test:", test_name))
+print(paste("P-value:", p_value))
+
+# Creating the raincloud plot without p-value display
+ggplot(data, aes(x = Known_outcome, y = Average_ipTM, fill = Known_outcome)) +
   geom_violin(trim = FALSE, alpha = 0.5, color = NA, show.legend = FALSE) +  # Density plot
   geom_boxplot(width = 0.03, outlier.shape = NA, alpha = 0.5, show.legend = FALSE) +  # Boxplot inside the violin
   geom_jitter(size = 1, alpha = 0.8, color = "black", width = 0.1, show.legend = FALSE) +  # Points with jitter
+   annotate("text", x = 1.5, y = max(data$Average_ipTM) + 0.1, 
+           label = expression(italic(p) < "0.0001"), size = 7, hjust = 0.5) +  # Add italic p-value text above violins
   scale_fill_manual(values = c("#ccbb44", "#4477aa")) +  # Custom colors for each experimental result
   labs(title = "Raincloud Plot of Average ipTM by Experimental Result",
        x = "Experimental Result",
        y = "Average ipTM") +
-  #geom_hline(yintercept = 0.83, linetype = "solid", color = "darkgrey", size = 0.5) +
-  #legend()+
- my_ggplot_theme
+  my_ggplot_theme
 
 # Optionally, you can save the plot to a file
-ggsave("../output/af3/raincloud.pdf", width = 6, height = 6, dpi = 300)
-
+ggsave("../output/af3/raincloud.pdf", width = 6.5, height = 6, dpi = 300)
 
 ```
 
@@ -345,10 +410,10 @@ data <- read_csv("../input/af3/ipTM_ploting.csv")
 data$Predicted_Result <- ifelse(data$Average_ipTM >= 0.83, "Perception", "No Perception")
 
 # Adjust experimental result for consistent labeling
-data$Experimental_Result <- ifelse(data$Experimental_Result == "Yes", "Perception", "No Perception")
+data$Known_outcome <- ifelse(data$Known_outcome == "Perception", "Perception", "No Perception")
 
 # Calculate the confusion matrix
-table_data <- table(Actual = data$Experimental_Result, Predicted = data$Predicted_Result)
+table_data <- table(Actual = data$Known_outcome, Predicted = data$Predicted_Result)
 
 # Normalize the confusion matrix by actual outcomes
 table_data_normalized <- prop.table(table_data, 1)
