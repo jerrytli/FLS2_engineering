@@ -97,7 +97,7 @@ pc <- read.csv("../input/ros/Vr-XL.csv", header = TRUE)
 pcm <- melt(pc, id = c("Receptor"))
 
 # Step 1: Specify the order of the x-axis
-new_order_vector <- c("Pae", "Atu", "Rrh", "Dic", "Eam")
+new_order_vector <- c("Pae", "Atu", "Rrh", "Ddi", "Eam")
 
 
 # Ensure Receptor order is as in the raw dataset
