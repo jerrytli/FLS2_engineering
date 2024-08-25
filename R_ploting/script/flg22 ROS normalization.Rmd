@@ -38,6 +38,8 @@ library(ggplot2)
 library(reshape2)
 library(dplyr)
 
+setwd("~/R/FLS2_engineering/R_ploting/script/")
+
 # Read the CSV file
 pc <- read.csv("../input/ros/WTNb_XL_Tj_Qv.csv")
 

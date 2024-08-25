@@ -13,6 +13,8 @@ library(readr)
 library(ggplot2)
 library(dplyr)
 
+setwd("~/R/FLS2_engineering/R_ploting/script/")
+
 # Load the data
 fagales_data <- read.csv("../input/omega/fagales_M8_omega.csv")
 rosales_data <- read.csv("../input/omega/rosales_M8_omega.csv")
@@ -79,7 +81,7 @@ distribution <- ggplot() +
 
 print(distribution)
 # Save the plot to a file
-ggsave("../output/Fig4.omega_curves/omega_distribution_plot.pdf", plot = distribution, width = 13, height = 4, dpi = 300)
+ggsave("../output/omega/omega_distribution_plot.pdf", plot = distribution, width = 13, height = 4, dpi = 300)
 
 
 ```
@@ -87,7 +89,7 @@ ggsave("../output/Fig4.omega_curves/omega_distribution_plot.pdf", plot = distrib
 
 
 ```{r}
-write.csv(omega_data_combined, file = "../output/Fig4.omega_curves/combined_omega.csv")
+write.csv(omega_data_combined, file = "../output/omega/combined_omega.csv")
 ```
 
 
@@ -151,7 +153,7 @@ ggplot(combined_data, aes(x = relative_pos, y = `dN/dS`, fill = color)) +
         axis.text.y = element_text(size = 15, color = "black"),
         axis.title.y = element_text(size = 15, color = "black"),
         axis.title.x = element_blank())
-ggsave("../output/Fig4.omega_curves/raw_omega_region_1.pdf", width = 5.5, height = 3)
+ggsave("../output/omega/raw_omega_region_1.pdf", width = 5.5, height = 3)
 
 ```
 
@@ -199,11 +201,11 @@ ggplot(combined_data, aes(x = relative_pos, y = `dN/dS`, fill = color)) +
         axis.text.y = element_text(size = 15, color = "black"),
         axis.title.y = element_text(size = 15, color = "black"),
         axis.title.x = element_blank())
-ggsave("../output/Fig4.omega_curves/raw_omega_region_2.pdf",  width = 5.5, height = 3)
+ggsave("../output/omega/raw_omega_region_2.pdf",  width = 5.5, height = 3)
 
 ```
 
-####Load RCM output matrix
+####Load RCM output matrix for fagales
 
 ```{r}
 # Load necessary library
@@ -211,10 +213,10 @@ library(reshape2)
 
 # Read the data from the file
 file_path <- "../input/fagales_RCM_43FLS2.txt" # Replace path_to_your_file with the actual path
-rcm_qv <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
+rcm_fagales <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
-values <- as.numeric(unlist(rcm_qv))
+values <- as.numeric(unlist(rcm_fagales))
 
 # Ensure the length of values is compatible with a 14x28 matrix
 if (length(values) != 14*28) {
@@ -222,12 +224,12 @@ if (length(values) != 14*28) {
 }
 
 # Reshape the vector into a matrix
-matrix_rcm_qv <- matrix(values, ncol = 14, byrow = TRUE)
+matrix_rcm_fagales <- matrix(values, ncol = 14, byrow = TRUE)
 
 # If you need to manipulate or analyze the matrix, you can do so here.
 
 # Optionally, write the matrix to a new CSV file if needed
-write.csv(matrix_rcm_qv, "../output/rcm_qv_matrix_output.csv", row.names = FALSE)
+write.csv(matrix_rcm_fagales, "../output/rcm/fagales_matrix_output.csv", row.names = FALSE)
 
 ```
 
@@ -240,19 +242,19 @@ library(reshape2)  # For melt function
 library(paletteer)
 
 # Read the matrix data
-matrix_rcm_qv <- read.csv("../output/rcm_qv_matrix_output.csv", header = TRUE)
+matrix_rcm_fagales <- read.csv("../output/rcm_qv_matrix_output.csv", header = TRUE)
 
 # Create a new column 'Row' to preserve the row index before melting
-matrix_rcm_qv$Row <- seq_len(nrow(matrix_rcm_qv))
+matrix_rcm_fagales$Row <- seq_len(nrow(matrix_rcm_fagales))
 
 # Melt the data for use with ggplot, with 'Row' as the id variable
-matrix_rcm_qv_melted <- melt(matrix_rcm_qv, id.vars = 'Row')
+matrix_rcm_fagales_melted <- melt(matrix_rcm_fagales, id.vars = 'Row')
 
 # Define the color scale with blue for minimum and yellow for maximum
 #blue_yellow_scale <- scale_fill_gradient2(low = "blue", mid = "green", high = "yellow", midpoint = 4, space = "Lab", transform = "identity")
 
 # Create the heatmap
-heatmap_plot <- ggplot(matrix_rcm_qv_melted, aes(variable, Row, fill = value)) +
+heatmap_plot <- ggplot(matrix_rcm_fagales_melted, aes(variable, Row, fill = value)) +
    geom_raster(interpolate = TRUE) +
   geom_tile(color = "darkgrey") +
   #blue_yellow_scale+
@@ -292,7 +294,7 @@ heatmap_plot <- ggplot(matrix_rcm_qv_melted, aes(variable, Row, fill = value)) +
 
 # Print the heatmap
 print(heatmap_plot)
-ggsave("../output/RCM_fagales.pdf", width = 3.7, height = 5)
+ggsave("../output/rcm/RCM_fagales.pdf", width = 3.7, height = 5)
 ```
 
 
@@ -320,10 +322,10 @@ matrix_rcm <- matrix(values, ncol = 14, byrow = TRUE)
 # If you need to manipulate or analyze the matrix, you can do so here.
 
 # Optionally, write the matrix to a new CSV file if needed
-write.csv(matrix_rcm, "../output/vitales_matrix_output.csv", row.names = FALSE)
+write.csv(matrix_rcm, "../output/rcm/vitales_matrix_output.csv", row.names = FALSE)
 
 ```
-####Plot the RCM plot for XL
+####Plot the RCM plot for vitales
 
 ```{r}
 # Load required libraries
@@ -384,99 +386,6 @@ heatmap_plot <- ggplot(matrix_melted, aes(variable, Row, fill = value)) +
 
 # Print the heatmap
 print(heatmap_plot)
-ggsave("../output/RCM_Vitales.pdf", width = 3.7, height = 5)
-```
-
-
-####Load RCM output matrix for Rosales
-
-```{r}
-# Load necessary library
-library(reshape2)
-
-# Read the data from the file
-file_path <- "../input/Pmira.txt" # Replace path_to_your_file with the actual path
-rcm <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
-
-# Convert the data frame to a vector of values
-values <- as.numeric(unlist(rcm))
-
-# Ensure the length of values is compatible with a 14x28 matrix
-if (length(values) != 14*28) {
-  stop("The number of values in the file does not match the expected size of a 14x28 matrix.")
-}
-
-# Reshape the vector into a matrix
-matrix_rcm <- matrix(values, ncol = 14, byrow = TRUE)
-
-# If you need to manipulate or analyze the matrix, you can do so here.
-
-# Optionally, write the matrix to a new CSV file if needed
-write.csv(matrix_rcm, "../output/Rosales_matrix_output.csv", row.names = FALSE)
-
-```
-
-####Plot the RCM plot for Rosales
-
-```{r}
-# Load required libraries
-library(ggplot2)
-library(reshape2)  # For melt function
-library(paletteer)
-
-# Read the matrix data
-matrix_rcm <- read.csv("../output/Rosales_matrix_output.csv", header = TRUE)
-
-# Create a new column 'Row' to preserve the row index before melting
-matrix_rcm$Row <- seq_len(nrow(matrix_rcm))
-
-# Melt the data for use with ggplot, with 'Row' as the id variable
-matrix_melted <- melt(matrix_rcm, id.vars = 'Row')
-
-# Define the color scale with blue for minimum and yellow for maximum
-#blue_yellow_scale <- scale_fill_gradient2(low = "blue", mid = "green", high = "yellow", midpoint = 4, space = "Lab", transform = "identity")
-
-# Create the heatmap
-heatmap_plot <- ggplot(matrix_melted, aes(variable, Row, fill = value)) +
-   geom_raster(interpolate = TRUE) +
-  geom_tile(color = "darkgrey") +
-  #blue_yellow_scale+
-  #paletteer::scale_fill_paletteer_c("ggthemes::Orange-Blue Diverging", direction = -1) +
-  #paletteer::scale_fill_paletteer_c("grDevices::RdYlBu", direction = -1) +
-  #paletteer::scale_fill_paletteer_c("grDevices::Spectral", direction = -1) +
- # paletteer::scale_fill_paletteer_c("oompaBase::blueyellow", direction = 1) +
-  #paletteer::scale_fill_paletteer_c("grDevices::topo.colors", direction = 1) +
-  #paletteer::scale_fill_paletteer_c("grDevices::Plasma", direction = 1) +  # this is good
-   #paletteer::scale_fill_paletteer_c("grDevices::ag_Sunset", direction = 1) +  # this is good
-  # paletteer::scale_fill_paletteer_c("grDevices::YlOrRd", direction = 1) + # this is good
-  #paletteer::scale_fill_paletteer_c("grDevices::YlGnBu", direction = 1) + # this is good
-    #paletteer::scale_fill_paletteer_c("oompaBase::jetColors", direction = 1) + # this is perfect
-    #paletteer::scale_fill_paletteer_c("pals::kovesi.linear_bgy_10_95_c74", direction = 1) + # this is okay
-  paletteer::scale_fill_paletteer_c("viridis::viridis", direction = 1) + # this is perfect
-  scale_x_discrete(expand = c(0, 0)) + # No space for X axis
-  scale_y_continuous(trans = 'reverse', breaks = 1:28, labels = 1:28, expand = c(0, 0)) + # No space for Y axis
-  geom_vline(xintercept = 6.5, size = 0.7, color = "black") + # Thick line between V6 and V7
-  geom_vline(xintercept = 12.5, size = 0.7, color = "black") + # Thick line between V13 and V14
-  #coord_fixed(ratio = 1) + # This ensures that tiles are square if that's desired
-  theme_classic() + # Use a minimal theme
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1), # Adjust the angle of x axis labels if needed
-    axis.text.y = element_text(angle = 0), # Adjust the angle of y axis labels if needed
-    panel.grid.major = element_blank(), # Remove major grid lines
-    panel.grid.minor = element_blank(), # Remove minor grid lines
-    panel.border = element_blank(), # Remove panel border
-    plot.background = element_blank(), # Remove plot background
-    panel.background = element_blank(), # Remove panel background
-        legend.position = "bottom", # Move legend to bottom
-    legend.direction = "horizontal" # Horizontal legend
-  ) +
-  labs(x = " ", y = "LRR", fill = "Conservation score") # Label for the legend
-    #axis.ticks = element_blank() # Remove axis ticks
-   
-  #labs(title = "Heatmap with Custom Color Gradient", x = "Column", y = "Row", fill = "Value")
-
-# Print the heatmap
-print(heatmap_plot)
-ggsave("../output/RCM_Rosales.pdf", width = 3.7, height = 5)
+ggsave("../output/rcm/RCM_Vitales.pdf", width = 3.7, height = 5)
 ```
 
