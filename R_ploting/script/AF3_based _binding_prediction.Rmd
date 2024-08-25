@@ -103,8 +103,7 @@ library(dplyr)
 library(tidyr)
 
 # Load and prepare the data
-data <- read.csv("../input/af3/ipTM_ploting.csv") %>%
-  filter(flg22_variants != "csp22")  # Remove csp22 right after loading the data
+data <- read.csv("../input/af3/ipTM_ploting_subset.csv") 
 
 data_processed <- data %>%
   mutate(
@@ -113,7 +112,7 @@ data_processed <- data %>%
     Type_1_Error = ifelse(Average_ipTM >= 0.83 & Known_outcome == "No perception", 1, 0),
     Type_2_Error = ifelse(Average_ipTM < 0.83 & Known_outcome == "Perception", 1, 0)
   ) %>%
-  group_by(flg22_variants) %>%
+  group_by(ligand_name) %>%
   summarise(
     Accuracy_Percentage = mean(Accuracy) * 100,
     Type_1_Error_Percentage = mean(Type_1_Error) * 100,
@@ -132,15 +131,15 @@ data_long <- data_processed %>%
 
 # Set the order of flg22 variants as in the similarity matrix
 variant_order <- c("Paeflg22", "Atuflg22", "Rrhflg22","Rso_1flg22", "Rso_2flg22","Ddaflg22", "Eamflg22", "Pviflg22", "Xfrflg22", "Xorflg22")
-data_long$flg22_variants <- factor(data_long$flg22_variants, levels = rev(variant_order))
+data_long$ligand_name <- factor(data_long$ligand_name, levels = rev(variant_order))
 data_long$Metric <- factor(data_long$Metric, levels = c("Type_1_Error", "Type_2_Error", "Accuracy"))
 
 # Prepare similarity data
 similarity_data <- data.frame(
-  flg22_variants = variant_order,
+  ligand_name = variant_order,
   sim = c(100, 50, 36.4, 59.1, 68.2, 63.6, 63.6, 31.8, 59.1, 59.1)
 )
-similarity_data$flg22_variants <- factor(similarity_data$flg22_variants, levels = variant_order)
+similarity_data$ligand_name <- factor(similarity_data$ligand_name, levels = variant_order)
 
 my_ggplot_theme <- theme_classic() +
   theme(text = element_text(size = 16),
@@ -150,7 +149,7 @@ my_ggplot_theme <- theme_classic() +
         axis.text.y = element_text(size = 14, color = "black"),
         axis.ticks = element_line(size = 0.8))
 # Plot
-stacked_plot <- ggplot(data_long, aes(x = flg22_variants, y = Percentage, fill = Metric)) +
+stacked_plot <- ggplot(data_long, aes(x = ligand_name, y = Percentage, fill = Metric)) +
   geom_bar(stat = "identity", position = "stack") +
   coord_flip() +  # This flips the plot to vertical orientation
   scale_fill_manual(values = c("Accuracy" = "#4477aa", "Type_1_Error" = "#ee6677", "Type_2_Error" = "#ccbb44")) +
@@ -169,9 +168,9 @@ stacked_plot <- ggplot(data_long, aes(x = flg22_variants, y = Percentage, fill =
 
 # Add similarity data as a line plot over the bars
 final_plot <- stacked_plot +
-  geom_line(data = similarity_data, aes(x = flg22_variants, y = sim, group = 1), 
+  geom_line(data = similarity_data, aes(x = ligand_name, y = sim, group = 1), 
             color = "black", size = 1.2, inherit.aes = FALSE, alpha = 0.7) +
-  geom_point(data = similarity_data, aes(x = flg22_variants, y = sim), 
+  geom_point(data = similarity_data, aes(x = ligand_name, y = sim), 
              color = "black", size = 4, inherit.aes = FALSE, 
              shape = 21, fill = "grey", stroke = 1)  # Increased size and added border
 
@@ -225,7 +224,7 @@ plot <- ggplot(accuracy_data, aes(x = Known_outcome, y = Accuracy_Percentage, fi
   my_ggplot_theme +
   theme(legend.position = "none")+
   ylim(0, 100)+
-  scale_fill_manual(values = c("#ccbb44", "#4477aa"))  # Color aesthetic based on the experimental result
+  scale_fill_manual(values = c("#ed7117", "#4477aa"))  # Color aesthetic based on the experimental result
 
 ggsave("../output/af3/accuracy_on_experimental_data.pdf", plot, width = 4, height = 5)
 ```
@@ -280,12 +279,12 @@ my_ggplot_theme <- theme_classic() +
 # Plot the ROC curves using ggplot2
 roc_plot <- ggplot() +
   geom_line(data = coords_all_df, aes(x = 1 - specificity, y = sensitivity), color = "#4477aa", size = 1.2) +
-  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#ccbb44", size = 1.2) +
+  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "orange", size = 1.2) +
   geom_line(data = coords_no_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#117733", size = 1.2) +
   geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "navy") +
   annotate("text", x = 0.95, y = 0.05, label = sprintf("AUC (Non-AtFLS2): %.2f", auc_no_AtFLS2), color = "#117733", hjust = 1, vjust = 0, size = 7) +
-  annotate("text", x = 0.95, y = 0.19, label = sprintf("AUC (AtFLS2): %.2f", auc_AtFLS2), color = "#ccbb44", hjust = 1, vjust = 0, size = 7) +
-  annotate("text", x = 0.95, y = 0.12, label = sprintf("AUC (All): %.2f", auc_all), color = "#4477aa", hjust = 1, vjust = 0, size = 7) +
+  annotate("text", x = 0.95, y = 0.19, label = sprintf("AUC (AtFLS2): %.2f", auc_AtFLS2), color = "orange", hjust = 1, vjust = 0, size = 7) +
+  annotate("text", x = 0.95, y = 0.12, label = sprintf("AUC (All data): %.2f", auc_all), color = "#4477aa", hjust = 1, vjust = 0, size = 7) +
   scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
   labs(title = "ROC Curves for Different Receptor Subsets", 
@@ -391,11 +390,11 @@ print(paste("P-value:", p_value))
 # Creating the raincloud plot without p-value display
 ggplot(data, aes(x = Known_outcome, y = Average_ipTM, fill = Known_outcome)) +
   geom_violin(trim = FALSE, alpha = 0.5, color = NA, show.legend = FALSE) +  # Density plot
-  geom_boxplot(width = 0.03, outlier.shape = NA, alpha = 0.5, show.legend = FALSE) +  # Boxplot inside the violin
-  geom_jitter(size = 1, alpha = 0.8, color = "black", width = 0.1, show.legend = FALSE) +  # Points with jitter
+  geom_boxplot(width = 0.03, outlier.shape = NA, show.legend = FALSE) +  # Boxplot inside the violin
+  geom_jitter(size = 1, alpha = 0.5, color = "black", width = 0.1, show.legend = FALSE) +  # Points with jitter
    annotate("text", x = 1.5, y = max(data$Average_ipTM) + 0.1, 
            label = expression(italic(p) < "0.0001"), size = 7, hjust = 0.5) +  # Add italic p-value text above violins
-  scale_fill_manual(values = c("#ccbb44", "#4477aa")) +  # Custom colors for each experimental result
+  scale_fill_manual(values = c("#ed7117", "#4477aa")) +  # Custom colors for each experimental result
   labs(title = "Raincloud Plot of Average ipTM by Experimental Result",
        x = "Experimental Result",
        y = "Average ipTM") +
@@ -403,54 +402,5 @@ ggplot(data, aes(x = Known_outcome, y = Average_ipTM, fill = Known_outcome)) +
 
 # Optionally, you can save the plot to a file
 ggsave("../output/af3/raincloud.pdf", width = 6.5, height = 6, dpi = 300)
-
-```
-
-
-```{r}
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(readr)  # Ensure read_csv is available
-
-# Read the data
-data <- read_csv("../input/af3/ipTM_ploting.csv")
-
-# Apply cutoff to 'Average_ipTM' to get predictions
-data$Predicted_Result <- ifelse(data$Average_ipTM >= 0.83, "Perception", "No Perception")
-
-# Adjust experimental result for consistent labeling
-data$Known_outcome <- ifelse(data$Known_outcome == "Perception", "Perception", "No Perception")
-
-# Calculate the confusion matrix
-table_data <- table(Actual = data$Known_outcome, Predicted = data$Predicted_Result)
-
-# Normalize the confusion matrix by actual outcomes
-table_data_normalized <- prop.table(table_data, 1)
-
-# Convert the matrix to a dataframe for ggplot, including actual counts
-df_cm <- as.data.frame(table_data)
-names(df_cm) <- c("Actual", "Predicted", "Count")
-df_cm$Freq <- as.vector(table_data_normalized)
-
-# Plotting
-ggplot(data = df_cm, aes(x = Predicted, y = Actual, fill = Freq)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = sprintf("%.2f\n(%d)", Freq, Count), color = ifelse(Freq > 0.7, "white", "black")),
-            vjust = 0.5, hjust = 0.5, size = 7) +  # Center text and increase size
-  scale_fill_gradient(low = "#f7fbff", high = "#08306b") +  # Using a blue gradient from light to dark
-  scale_color_identity() +  # Allow direct color specification in geom_text
-  labs(title = "Normalized Confusion Matrix for ipTM Predictions", x = "Predicted Label", y = "Actual Label") +
-  theme_void() +
-  theme(text = element_text(size = 14),
-        axis.title.x = element_text(size = 18, color = "black"),
-        axis.title.y = element_text(size = 18, color = "black", angle = 90),
-        axis.text.x = element_text(size = 18, color = "black"),
-        axis.text.y = element_text(size = 18, color = "black"),
-#        axis.ticks = element_line(size = 0.8),
-        legend.position = "none")
-
-# Save the plot
-ggsave("../output/af3/confusion_matrix.pdf", width = 7, height = 6, dpi = 300)
 
 ```

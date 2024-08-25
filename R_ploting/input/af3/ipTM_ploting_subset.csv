@@ -1,0 +1,101 @@
+﻿receptor,ligand_name,Average_ipTM,Average_pTM,Known_outcome
+NbFLS2-1,Paeflg22,0.85,0.9,Perception
+NbFLS2-1,Atuflg22,0.81,0.9,No perception
+NbFLS2-1,Rrhflg22,0.79,0.89,No perception
+NbFLS2-1,Rso_1flg22,0.75,0.89,No perception
+NbFLS2-1,Rso_2flg22,0.54,0.88,No perception
+NbFLS2-1,Ddaflg22,0.56,0.89,No perception
+NbFLS2-1,Eamflg22,0.6,0.89,No perception
+NbFLS2-1,Pviflg22,0.85,0.89,No perception
+NbFLS2-1,Xfrflg22,0.45,0.88,No perception
+NbFLS2-1,Xorflg22,0.4,0.88,No perception
+FLS2XL,Paeflg22,0.92,0.89,Perception
+FLS2XL,Atuflg22,0.88,0.89,Perception
+FLS2XL,Rrhflg22,0.63,0.88,Perception
+FLS2XL,Rso_1flg22,0.91,0.89,No perception
+FLS2XL,Rso_2flg22,0.8,0.89,No perception
+FLS2XL,Ddaflg22,0.69,0.89,No perception
+FLS2XL,Eamflg22,0.65,0.89,Perception
+FLS2XL,Pviflg22,0.89,0.89,No perception
+FLS2XL,Xfrflg22,0.45,0.88,No perception
+FLS2XL,Xorflg22,0.54,0.88,No perception
+QvFLS2,Paeflg22,0.86,0.89,Perception
+QvFLS2,Atuflg22,0.82,0.89,Perception
+QvFLS2,Rrhflg22,0.67,0.88,No perception
+QvFLS2,Rso_1flg22,0.8,0.89,Perception
+QvFLS2,Rso_2flg22,0.83,0.88,Perception
+QvFLS2,Ddaflg22,0.8,0.88,Perception
+QvFLS2,Eamflg22,0.57,0.88,No perception
+QvFLS2,Pviflg22,0.83,0.89,Perception
+QvFLS2,Xfrflg22,0.5,0.87,No perception
+QvFLS2,Xorflg22,0.48,0.88,No perception
+TjFLS2,Paeflg22,0.88,0.89,Perception
+TjFLS2,Atuflg22,0.54,0.88,Perception
+TjFLS2,Rrhflg22,0.55,0.88,Perception
+TjFLS2,Rso_1flg22,0.81,0.89,Perception
+TjFLS2,Rso_2flg22,0.77,0.89,Perception
+TjFLS2,Ddaflg22,0.78,0.89,Perception
+TjFLS2,Eamflg22,0.47,0.88,No perception
+TjFLS2,Pviflg22,0.81,0.9,No perception
+TjFLS2,Xfrflg22,0.43,0.88,No perception
+TjFLS2,Xorflg22,0.49,0.88,No perception
+HlFLS2_LRR,Paeflg22,0.57,0.88,Perception
+HlFLS2_LRR,Atuflg22,0.66,0.88,No perception
+HlFLS2_LRR,Rrhflg22,0.55,0.87,No perception
+HlFLS2_LRR,Rso_1flg22,0.61,0.88,No perception
+HlFLS2_LRR,Rso_2flg22,0.56,0.88,No perception
+HlFLS2_LRR,Ddaflg22,0.8,0.88,No perception
+HlFLS2_LRR,Eamflg22,0.46,0.88,No perception
+HlFLS2_LRR,Pviflg22,0.82,0.89,No perception
+HlFLS2_LRR,Xfrflg22,0.42,0.88,No perception
+HlFLS2_LRR,Xorflg22,0.48,0.88,No perception
+MdFLS2_LRR,Paeflg22,0.88,0.89,Perception
+MdFLS2_LRR,Atuflg22,0.6,0.88,No perception
+MdFLS2_LRR,Rrhflg22,0.67,0.89,No perception
+MdFLS2_LRR,Rso_1flg22,0.69,0.89,No perception
+MdFLS2_LRR,Rso_2flg22,0.82,0.89,No perception
+MdFLS2_LRR,Ddaflg22,0.77,0.89,No perception
+MdFLS2_LRR,Eamflg22,0.74,0.89,No perception
+MdFLS2_LRR,Pviflg22,0.78,0.89,No perception
+MdFLS2_LRR,Xfrflg22,0.47,0.88,No perception
+MdFLS2_LRR,Xorflg22,0.47,0.88,No perception
+VrFLS2,Paeflg22,0.83,0.89,Perception
+VrFLS2,Atuflg22,0.64,0.89,No perception
+VrFLS2,Rrhflg22,0.64,0.88,No perception
+VrFLS2,Rso_1flg22,0.77,0.88,No perception
+VrFLS2,Rso_2flg22,0.76,0.88,No perception
+VrFLS2,Ddaflg22,0.75,0.88,Perception
+VrFLS2,Eamflg22,0.7,0.89,Perception
+VrFLS2,Pviflg22,0.88,0.88,No perception
+VrFLS2,Xfrflg22,0.47,0.88,No perception
+VrFLS2,Xorflg22,0.54,0.88,No perception
+FcFLS2,Paeflg22,0.85,0.88,Perception
+FcFLS2,Atuflg22,0.57,0.88,No perception
+FcFLS2,Rrhflg22,0.74,0.88,No perception
+FcFLS2,Rso_1flg22,0.84,0.88,No perception
+FcFLS2,Rso_2flg22,0.69,0.88,No perception
+FcFLS2,Ddaflg22,0.81,0.88,No perception
+FcFLS2,Eamflg22,0.72,0.88,No perception
+FcFLS2,Pviflg22,0.82,0.89,No perception
+FcFLS2,Xfrflg22,0.41,0.88,No perception
+FcFLS2,Xorflg22,0.5,0.88,No perception
+SlFLS2,Paeflg22,0.91,0.89,Perception
+SlFLS2,Atuflg22,0.79,0.89,No perception
+SlFLS2,Rrhflg22,0.76,0.89,No perception
+SlFLS2,Rso_1flg22,0.85,0.89,No perception
+SlFLS2,Rso_2flg22,0.85,0.89,No perception
+SlFLS2,Ddaflg22,0.8,0.89,Perception
+SlFLS2,Eamflg22,0.79,0.89,Perception
+SlFLS2,Pviflg22,0.79,0.89,No perception
+SlFLS2,Xfrflg22,0.42,0.87,No perception
+SlFLS2,Xorflg22,0.43,0.88,No perception
+AtFLS2,Paeflg22,0.84,0.9,Perception
+AtFLS2,Atuflg22,0.7,0.88,No perception
+AtFLS2,Rrhflg22,0.49,0.87,No perception
+AtFLS2,Rso_1flg22,0.81,0.89,No perception
+AtFLS2,Rso_2flg22,0.78,0.88,No perception
+AtFLS2,Ddaflg22,0.84,0.89,No perception
+AtFLS2,Eamflg22,0.66,0.88,No perception
+AtFLS2,Pviflg22,0.78,0.89,No perception
+AtFLS2,Xfrflg22,0.44,0.87,No perception
+AtFLS2,Xorflg22,0.42,0.88,No perception
