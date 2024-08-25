@@ -212,7 +212,7 @@ ggsave("../output/omega/raw_omega_region_2.pdf",  width = 5.5, height = 3)
 library(reshape2)
 
 # Read the data from the file
-file_path <- "../input/fagales_RCM_43FLS2.txt" # Replace path_to_your_file with the actual path
+file_path <- "../input/rcm/fagales_RCM_43FLS2.txt" # Replace path_to_your_file with the actual path
 rcm_fagales <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
@@ -305,7 +305,7 @@ ggsave("../output/rcm/RCM_fagales.pdf", width = 3.7, height = 5)
 library(reshape2)
 
 # Read the data from the file
-file_path <- "../input/26_Vitales_order_RCM_txt" # Replace path_to_your_file with the actual path
+file_path <- "../input/rcm/26_Vitales_order_RCM_txt" # Replace path_to_your_file with the actual path
 rcm_vitales <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
