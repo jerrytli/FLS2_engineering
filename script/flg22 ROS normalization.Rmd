@@ -141,7 +141,7 @@ print(xx)
 
 # Save the plot to a file
 
-ggsave(filename = "../output/Vr-XL.pdf", width = 6.5, height = 3.4, bg = "transparent")
+ggsave(filename = "../output/ros/Vr-XL.pdf", width = 6.5, height = 3.4, bg = "transparent")
 
 ```
 
