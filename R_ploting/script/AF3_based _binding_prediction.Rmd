@@ -81,10 +81,10 @@ ggplot() +
   geom_line(data = accuracy_AtFLS2, aes(x = Cutoff, y = Accuracy, color = "AtFLS2"), size = 1) +
   geom_line(data = accuracy_non_AtFLS2, aes(x = Cutoff, y = Accuracy, color = "Non-AtFLS2"), size = 1) +
   geom_vline(xintercept = optimal_cutoff_all, linetype = "dashed", color = "#4477aa", size = 1) +
-  geom_vline(xintercept = optimal_cutoff_AtFLS2, linetype = "dashed", color = "#ccbb44", size = 1) +
+  geom_vline(xintercept = optimal_cutoff_AtFLS2, linetype = "dashed", color = "#5dc4c9", size = 1) +
   geom_vline(xintercept = optimal_cutoff_non_AtFLS2, linetype = "dashed", color = "#117733", size = 1, alpha = 0.5) +
   scale_color_manual(values = c("All Data" = "#4477aa",
-                                "AtFLS2" = "#ccbb44",
+                                "AtFLS2" = "#5dc4c9",
                                 "Non-AtFLS2" = "#117733")) +
   scale_y_continuous(limits = c(0.4, 1), breaks = seq(0, 1, by = 0.1)) +
   labs(x = "Average ipTM Cutoff", y = "Accuracy", title = "AF3 Accuracy Curves by Receptor Subset") +
@@ -224,7 +224,7 @@ plot <- ggplot(accuracy_data, aes(x = Known_outcome, y = Accuracy_Percentage, fi
   my_ggplot_theme +
   theme(legend.position = "none")+
   ylim(0, 100)+
-  scale_fill_manual(values = c("#ed7117", "#4477aa"))  # Color aesthetic based on the experimental result
+  scale_fill_manual(values = c("#fd5901", "#4477aa"))  # Color aesthetic based on the experimental result
 
 ggsave("../output/af3/accuracy_on_experimental_data.pdf", plot, width = 4, height = 5)
 ```
@@ -279,11 +279,11 @@ my_ggplot_theme <- theme_classic() +
 # Plot the ROC curves using ggplot2
 roc_plot <- ggplot() +
   geom_line(data = coords_all_df, aes(x = 1 - specificity, y = sensitivity), color = "#4477aa", size = 1.2) +
-  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "orange", size = 1.2) +
+  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#5dc4c9", size = 1.2) +
   geom_line(data = coords_no_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#117733", size = 1.2) +
   geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "navy") +
   annotate("text", x = 0.95, y = 0.05, label = sprintf("AUC (Non-AtFLS2): %.2f", auc_no_AtFLS2), color = "#117733", hjust = 1, vjust = 0, size = 7) +
-  annotate("text", x = 0.95, y = 0.19, label = sprintf("AUC (AtFLS2): %.2f", auc_AtFLS2), color = "orange", hjust = 1, vjust = 0, size = 7) +
+  annotate("text", x = 0.95, y = 0.19, label = sprintf("AUC (AtFLS2): %.2f", auc_AtFLS2), color = "#5dc4c9", hjust = 1, vjust = 0, size = 7) +
   annotate("text", x = 0.95, y = 0.12, label = sprintf("AUC (All data): %.2f", auc_all), color = "#4477aa", hjust = 1, vjust = 0, size = 7) +
   scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
@@ -394,13 +394,13 @@ ggplot(data, aes(x = Known_outcome, y = Average_ipTM, fill = Known_outcome)) +
   geom_jitter(size = 1, alpha = 0.5, color = "black", width = 0.1, show.legend = FALSE) +  # Points with jitter
    annotate("text", x = 1.5, y = max(data$Average_ipTM) + 0.1, 
            label = expression(italic(p) < "0.0001"), size = 7, hjust = 0.5) +  # Add italic p-value text above violins
-  scale_fill_manual(values = c("#ed7117", "#4477aa")) +  # Custom colors for each experimental result
+  scale_fill_manual(values = c("#fd5901", "#4477aa")) +  # Custom colors for each experimental result
   labs(title = "Raincloud Plot of Average ipTM by Experimental Result",
        x = "Experimental Result",
        y = "Average ipTM") +
   my_ggplot_theme
 
 # Optionally, you can save the plot to a file
-ggsave("../output/af3/raincloud.pdf", width = 6.5, height = 6, dpi = 300)
+ggsave("../output/af3/raincloud.pdf", width = 6, height = 6, dpi = 300)
 
 ```
