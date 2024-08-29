@@ -13,7 +13,7 @@ library(readr)
 library(ggplot2)
 library(dplyr)
 
-setwd("~/R/FLS2_engineering/R_ploting/script/")
+setwd("~/FLS2_engineering/R_ploting/script/")
 
 # Load the data
 fagales_data <- read.csv("../input/omega/fagales_M8_omega.csv")
@@ -43,12 +43,12 @@ my_ggplot_theme <- theme_classic() +
 
 
 # Define the regions for each dataset (add an upper bound to the last region based on your data)
-fagales_regions <- c(72, 96, 120, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360, 384, 408, 432, 456, 480, 504, 528, 552, 576, 602, 626, 650, 675, 699, 723, max(fagales_data$pos) + 1)
+fagales_regions <- c(71, 95, 119, 143, 167, 191, 215, 239, 263, 287, 311, 335, 359, 383, 407, 431, 455, 479, 503, 527, 551, 575, 601, 625, 649, 674, 698, 722, max(fagales_data$pos) + 1)
 
 
-rosales_regions <- c(74, 98, 122, 146, 170, 194, 218, 242, 266, 290, 314, 338, 362, 386, 410, 434, 458, 482, 506, 530, 554, 578, 604, 628, 652, 677, 701, 726, max(rosales_data$pos) + 1)
+rosales_regions <- c(73, 97, 121, 145, 169, 193, 217, 241, 265, 289, 313, 337, 361, 385, 409, 433, 457, 481, 505, 529, 553, 577, 603, 627, 651, 676, 700, 725, max(rosales_data$pos) + 1)
 
-brassicales_regions <- c(74, 98, 122, 146, 170, 194, 218, 242, 266, 290, 314, 338, 362, 386, 409, 433, 457, 481, 505, 529, 553, 577, 603, 627, 651, 678, 703, 727, max(brassicales_data$pos) + 1)
+brassicales_regions <- c(73, 97, 121, 145, 169, 193, 217, 241, 265, 289, 313, 337, 361, 385, 408, 432, 456, 480, 504, 528, 552, 576, 602, 626, 650, 677, 702, 726, max(brassicales_data$pos) + 1)
 
 # Calculate distributions
 fagales_dist <- calculate_distribution(fagales_data, fagales_regions)
@@ -75,7 +75,7 @@ distribution <- ggplot() +
             # aes(x = regions, y = average_dist), color = "black", size = 2) +
   labs(x = "LRR", y = "Proportion of residues with omega > 1") +
   scale_x_discrete(breaks = regions) +
-  scale_y_continuous(expand = c(0, 0))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.15))+
   scale_fill_manual(values = c("fagales_dist" = "#EF797E", "rosales_dist" = "#8DA0CB", "brassicales_dist" = "#FDCCA5")) +
   my_ggplot_theme 
 
@@ -106,9 +106,9 @@ brassicales_data$Group <- 'Brassicales'
 rosales_data$Group <- 'Rosales'
 
 # Define ranges for each group
-fagales_range <- c(216, 263)
-brassicales_range <- c(218, 265)
-rosales_range <- c(218, 265)
+fagales_range <- c(215, 262)
+brassicales_range <- c(217, 264)
+rosales_range <- c(217, 264)
 
 # Function to extract data for a specified range and group
 extract_data <- function(data, group_name, start_pos, end_pos) {
@@ -160,9 +160,9 @@ ggsave("../output/omega/raw_omega_region_1.pdf", width = 5.5, height = 3)
 ####Plot raw dN/dS at region 2 LRR 16 & 17
 ```{r}
 # Define ranges for each group
-fagales_range <- c(432, 479)
-brassicales_range <- c(433, 480)
-rosales_range <- c(434, 481)
+fagales_range <- c(431, 478)
+brassicales_range <- c(432, 479)
+rosales_range <- c(433, 480)
 
 
 # Extract data for each range
@@ -212,7 +212,7 @@ ggsave("../output/omega/raw_omega_region_2.pdf",  width = 5.5, height = 3)
 library(reshape2)
 
 # Read the data from the file
-file_path <- "../input/rcm/fagales_RCM_43FLS2.txt" # Replace path_to_your_file with the actual path
+file_path <- "../input/rcm/42_fagales_rcm_score" # Replace path_to_your_file with the actual path
 rcm_fagales <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
@@ -242,7 +242,7 @@ library(reshape2)  # For melt function
 library(paletteer)
 
 # Read the matrix data
-matrix_rcm_fagales <- read.csv("../output/rcm_qv_matrix_output.csv", header = TRUE)
+matrix_rcm_fagales <- read.csv("../output//rcm/fagales_matrix_output.csv", header = TRUE)
 
 # Create a new column 'Row' to preserve the row index before melting
 matrix_rcm_fagales$Row <- seq_len(nrow(matrix_rcm_fagales))
@@ -272,7 +272,7 @@ heatmap_plot <- ggplot(matrix_rcm_fagales_melted, aes(variable, Row, fill = valu
   paletteer::scale_fill_paletteer_c("viridis::viridis", direction = 1) + # this is perfect
   scale_x_discrete(expand = c(0, 0)) + # No space for X axis
   scale_y_continuous(trans = 'reverse', breaks = 1:28, labels = 1:28, expand = c(0, 0)) + # No space for Y axis
-  geom_vline(xintercept = 6.5, size = 0.7, color = "black") + # Thick line between V6 and V7
+  geom_vline(xintercept = 5.5, size = 0.7, color = "black") + # Thick line between V5 and V6
   geom_vline(xintercept = 12.5, size = 0.7, color = "black") + # Thick line between V13 and V14
   #coord_fixed(ratio = 1) + # This ensures that tiles are square if that's desired
   theme_classic() + # Use a minimal theme
@@ -305,7 +305,7 @@ ggsave("../output/rcm/RCM_fagales.pdf", width = 3.7, height = 5)
 library(reshape2)
 
 # Read the data from the file
-file_path <- "../input/rcm/26_Vitales_order_RCM_txt" # Replace path_to_your_file with the actual path
+file_path <- "../input/rcm/26_Vitales_rcm_score" # Replace path_to_your_file with the actual path
 rcm_vitales <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
@@ -334,7 +334,7 @@ library(reshape2)  # For melt function
 library(paletteer)
 
 # Read the matrix data
-matrix_rcm <- read.csv("../output/vitales_matrix_output.csv", header = TRUE)
+matrix_rcm <- read.csv("../output/rcm/vitales_matrix_output.csv", header = TRUE)
 
 # Create a new column 'Row' to preserve the row index before melting
 matrix_rcm$Row <- seq_len(nrow(matrix_rcm))
@@ -364,7 +364,7 @@ heatmap_plot <- ggplot(matrix_melted, aes(variable, Row, fill = value)) +
   paletteer::scale_fill_paletteer_c("viridis::viridis", direction = 1) + # this is perfect
   scale_x_discrete(expand = c(0, 0)) + # No space for X axis
   scale_y_continuous(trans = 'reverse', breaks = 1:28, labels = 1:28, expand = c(0, 0)) + # No space for Y axis
-  geom_vline(xintercept = 6.5, size = 0.7, color = "black") + # Thick line between V6 and V7
+  geom_vline(xintercept = 5.5, size = 0.7, color = "black") + # Thick line between V5 and V6
   geom_vline(xintercept = 12.5, size = 0.7, color = "black") + # Thick line between V13 and V14
   #coord_fixed(ratio = 1) + # This ensures that tiles are square if that's desired
   theme_classic() + # Use a minimal theme
