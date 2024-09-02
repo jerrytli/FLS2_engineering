@@ -8,7 +8,9 @@ Tianrun (Jerry) Li<sup>1</sup>, Danielle M. Stevens<sup>1,2</sup>, and Gitta Coa
 **Purpose:** This repo hold the scripts and some metadata for the following:
 1. to analyze flagellin monomers their encoded epitopes,
 2. the chemistry between eptiopes and associated receptor sequences, and
-3. Alphafold modeling
+3. Alphafold modeling and comparisons
+4. FLS2 selection analysis
+5. Immune output assays data and plots
 
 If you have any questions or concerns, please feel free to contact us at: <br/>
 Tianrun Li: jexli@ucdavis.edu <br/>
