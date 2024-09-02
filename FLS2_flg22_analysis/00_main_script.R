@@ -76,10 +76,11 @@ source("./02_flagellin_tree.R")
 # determine which chemical property leads to greatest degree of seperation
 source("./03_FLS2_rank_properies.R")
 
-
 # determine base values along the LRR of top two chemistries - bulkiness and charge
 source("./04_FLS2_top_properties_heatmap.R")
 
+# show shifts in bulkiness and charge for syn variants 
+source("./05_synFLS2_properties")
 
 
 #########################################################
