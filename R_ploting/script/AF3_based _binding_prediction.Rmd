@@ -9,12 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+
+### Accuracy curves on receptor
 ```{r}
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 
-setwd("~/R/FLS2_engineering/R_ploting/script/")
+setwd("~/FLS2_engineering/R_ploting/script/")
 
 # Define your customized ggplot theme
 my_ggplot_theme <- theme_classic() +
@@ -96,7 +99,7 @@ ggsave("../output/af3/AF3_accuracy_by_receptor.pdf", dpi = 300, width = 7, heigh
 
 ```
 
-
+### Accuracy on flg22 variants
 ```{r}
 library(ggplot2)
 library(dplyr)
@@ -181,7 +184,7 @@ print(final_plot)
 ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 4.2, height = 6)
 ```
 
-
+### Accuracy on experimental data
 ```{r}
 library(ggplot2)
 library(dplyr)
@@ -230,7 +233,7 @@ ggsave("../output/af3/accuracy_on_experimental_data.pdf", plot, width = 4, heigh
 ```
 
 
-###Scatterplot, ipTM and pTM
+###ROC curves
 ```{r}
 # Load necessary libraries
 library(ggplot2)
