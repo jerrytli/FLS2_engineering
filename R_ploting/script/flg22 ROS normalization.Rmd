@@ -83,7 +83,7 @@ xx <- ggplot(pcm, aes(x = Receptor, y = variable)) +
 print(xx)
 
 # Save the plot
-ggsave(filename = "../output/Figure_1_All_FLS2_bubble.pdf", width = 5.6, height = 5)
+ggsave(filename = "../output/ros/Figure_1_All_FLS2_bubble.pdf", width = 4.9, height = 5)
 
 
 ```

@@ -89,7 +89,7 @@ ggplot() +
   my_ggplot_theme
 
 # Save the plot
-ggsave("../output/af3/AF3_accuracy_by_receptor.pdf", dpi = 300, width = 7, height = 6)
+ggsave("../output/af3/AF3_accuracy_by_receptor.pdf", dpi = 300, width = 6.6, height = 6)
 
 
 ```
@@ -216,15 +216,15 @@ accuracy_data <- data %>%
 # Plotting the bar graph
 plot <- ggplot(accuracy_data, aes(x = Known_outcome, y = Accuracy_Percentage, fill = Known_outcome)) +
   geom_bar(stat = "identity", alpha = 0.7) +
-  labs(title = "Accuracy Rate by Experimental Result at ipTM Cutoff = 0.83",
+  labs(title = "",
        x = "Experimental Result",
-       y = "Accuracy Percentage (%)") +
+       y = "% Accuracy (ipTM threshold = 0.83)") +
   my_ggplot_theme +
   theme(legend.position = "none")+
   ylim(0, 100)+
   scale_fill_manual(values = c("#fd5901", "#4477aa"))  # Color aesthetic based on the experimental result
 
-ggsave("../output/af3/accuracy_on_experimental_data.pdf", plot, width = 4, height = 5)
+ggsave("../output/af3/accuracy_on_experimental_data.pdf", plot, width = 4, height = 6)
 ```
 
 
@@ -354,6 +354,6 @@ ggplot(data, aes(x = Known_outcome, y = Average_ipTM, fill = Known_outcome)) +
   my_ggplot_theme
 
 # Optionally, you can save the plot to a file
-ggsave("../output/af3/raincloud.pdf", width = 6, height = 6, dpi = 300)
+ggsave("../output/af3/raincloud.pdf", width = 6, height = 5.7, dpi = 300)
 
 ```
