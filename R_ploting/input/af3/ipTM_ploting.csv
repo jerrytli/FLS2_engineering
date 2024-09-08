@@ -1,222 +1,222 @@
-﻿receptor,ligand_name,Average_ipTM,Average_pTM,Known_outcome
-NbFLS2-1,Paeflg22,0.85,0.9,Perception
-NbFLS2-1,Atuflg22,0.81,0.9,No perception
-NbFLS2-1,Rrhflg22,0.79,0.89,No perception
-NbFLS2-1,Rso_1flg22,0.75,0.89,No perception
-NbFLS2-1,Rso_2flg22,0.54,0.88,No perception
-NbFLS2-1,Ddaflg22,0.56,0.89,No perception
-NbFLS2-1,Eamflg22,0.6,0.89,No perception
-NbFLS2-1,Pviflg22,0.85,0.89,No perception
-NbFLS2-1,Xfrflg22,0.45,0.88,No perception
-NbFLS2-1,Xorflg22,0.4,0.88,No perception
-FLS2XL,Paeflg22,0.92,0.89,Perception
-FLS2XL,Atuflg22,0.88,0.89,Perception
-FLS2XL,Rrhflg22,0.63,0.88,Perception
-FLS2XL,Rso_1flg22,0.91,0.89,No perception
-FLS2XL,Rso_2flg22,0.8,0.89,No perception
-FLS2XL,Ddaflg22,0.69,0.89,No perception
-FLS2XL,Eamflg22,0.65,0.89,Perception
-FLS2XL,Pviflg22,0.89,0.89,No perception
-FLS2XL,Xfrflg22,0.45,0.88,No perception
-FLS2XL,Xorflg22,0.54,0.88,No perception
-QvFLS2,Paeflg22,0.86,0.89,Perception
-QvFLS2,Atuflg22,0.82,0.89,Perception
-QvFLS2,Rrhflg22,0.67,0.88,No perception
-QvFLS2,Rso_1flg22,0.8,0.89,Perception
-QvFLS2,Rso_2flg22,0.83,0.88,Perception
-QvFLS2,Ddaflg22,0.8,0.88,Perception
-QvFLS2,Eamflg22,0.57,0.88,No perception
-QvFLS2,Pviflg22,0.83,0.89,Perception
-QvFLS2,Xfrflg22,0.5,0.87,No perception
-QvFLS2,Xorflg22,0.48,0.88,No perception
-TjFLS2,Paeflg22,0.88,0.89,Perception
-TjFLS2,Atuflg22,0.54,0.88,Perception
-TjFLS2,Rrhflg22,0.55,0.88,Perception
-TjFLS2,Rso_1flg22,0.81,0.89,Perception
-TjFLS2,Rso_2flg22,0.77,0.89,Perception
-TjFLS2,Ddaflg22,0.78,0.89,Perception
-TjFLS2,Eamflg22,0.47,0.88,No perception
-TjFLS2,Pviflg22,0.81,0.9,No perception
-TjFLS2,Xfrflg22,0.43,0.88,No perception
-TjFLS2,Xorflg22,0.49,0.88,No perception
-HlFLS2,Paeflg22,0.57,0.88,Perception
-HlFLS2,Atuflg22,0.66,0.88,No perception
-HlFLS2,Rrhflg22,0.55,0.87,No perception
-HlFLS2,Rso_1flg22,0.61,0.88,No perception
-HlFLS2,Rso_2flg22,0.56,0.88,No perception
-HlFLS2,Ddaflg22,0.8,0.88,No perception
-HlFLS2,Eamflg22,0.46,0.88,No perception
-HlFLS2,Pviflg22,0.82,0.89,No perception
-HlFLS2,Xfrflg22,0.42,0.88,No perception
-HlFLS2,Xorflg22,0.48,0.88,No perception
-MdFLS2,Paeflg22,0.88,0.89,Perception
-MdFLS2,Atuflg22,0.6,0.88,No perception
-MdFLS2,Rrhflg22,0.67,0.89,No perception
-MdFLS2,Rso_1flg22,0.69,0.89,No perception
-MdFLS2,Rso_2flg22,0.82,0.89,No perception
-MdFLS2,Ddaflg22,0.77,0.89,No perception
-MdFLS2,Eamflg22,0.74,0.89,No perception
-MdFLS2,Pviflg22,0.78,0.89,No perception
-MdFLS2,Xfrflg22,0.47,0.88,No perception
-MdFLS2,Xorflg22,0.47,0.88,No perception
-GmFLS2a,Paeflg22,0.6,0.89,Perception
-GmFLS2a,Rso_1flg22,0.63,0.88,Perception
-GmFLS2b,Paeflg22,0.62,0.89,Perception
-GmFLS2b,Rso_1flg22,0.9,0.89,Perception
-VrFLS2,Paeflg22,0.83,0.89,Perception
-VrFLS2,Atuflg22,0.64,0.89,No perception
-VrFLS2,Rrhflg22,0.64,0.88,No perception
-VrFLS2,Rso_1flg22,0.77,0.88,No perception
-VrFLS2,Rso_2flg22,0.76,0.88,No perception
-VrFLS2,Ddaflg22,0.77,0.88,Perception
-VrFLS2,Eamflg22,0.7,0.89,Perception
-VrFLS2,Pviflg22,0.88,0.88,No perception
-VrFLS2,Xfrflg22,0.47,0.88,No perception
-VrFLS2,Xorflg22,0.54,0.88,No perception
-FcFLS2,Paeflg22,0.85,0.88,Perception
-FcFLS2,Atuflg22,0.57,0.88,No perception
-FcFLS2,Rrhflg22,0.74,0.88,No perception
-FcFLS2,Rso_1flg22,0.84,0.88,No perception
-FcFLS2,Rso_2flg22,0.69,0.88,No perception
-FcFLS2,Ddaflg22,0.81,0.88,No perception
-FcFLS2,Eamflg22,0.72,0.88,No perception
-FcFLS2,Pviflg22,0.82,0.89,No perception
-FcFLS2,Xfrflg22,0.41,0.88,No perception
-FcFLS2,Xorflg22,0.5,0.88,No perception
-SlFLS2,Paeflg22,0.91,0.89,Perception
-SlFLS2,Atuflg22,0.79,0.89,No perception
-SlFLS2,Rrhflg22,0.76,0.89,No perception
-SlFLS2,Rso_1flg22,0.85,0.89,No perception
-SlFLS2,Rso_2flg22,0.85,0.89,No perception
-SlFLS2,Ddaflg22,0.8,0.89,Perception
-SlFLS2,Eamflg22,0.79,0.89,Perception
-SlFLS2,Pviflg22,0.79,0.89,No perception
-SlFLS2,Xfrflg22,0.42,0.87,No perception
-SlFLS2,Xorflg22,0.43,0.88,No perception
-phaseolus_vulgaris,Wu_Atuflg22,0.41,0.88,No perception
-populus_trichocarpa,Wu_Atuflg22,0.49,0.88,No perception
-malus_halliana,Wu_Atuflg22,0.63,0.89,No perception
-prunus_yedoensis,Wu_Atuflg22,0.78,0.89,No perception
-populus_trichocarpa,Paeflg22,0.83,0.88,Perception
-prunus_mume,Paeflg22,0.86,0.89,Perception
-malus_halliana,Paeflg22,0.88,0.9,Perception
-populus_davidiana,Wu_Atuflg22,0.58,0.89,No perception
-prunus_persica,Paeflg22,0.85,0.89,Perception
-TjFLS2,Wu_Atuflg22,0.54,0.88,No perception
-zanthoxylum_bungeanum,Wu_Atuflg22,0.76,0.89,No perception
-salix_suchowensis,Paeflg22,0.65,0.88,Perception
-prunus_persica,Wu_Atuflg22,0.77,0.89,No perception
-morus_alba,Wu_Atuflg22,0.71,0.87,No perception
-fragaria_x_ananassa,Wu_Atuflg22,0.52,0.88,No perception
-camellia_sinensis,Wu_Atuflg22,0.64,0.89,No perception
-rosa_chinensis,Paeflg22,0.87,0.89,Perception
-rosa_chinensis,Wu_Atuflg22,0.64,0.88,No perception
-populus_deltoides,Wu_Atuflg22,0.41,0.87,No perception
-morus_alba,Paeflg22,0.47,0.87,Perception
-zanthoxylum_bungeanum,Paeflg22,0.84,0.89,Perception
-phaseolus_vulgaris,Paeflg22,0.87,0.89,Perception
-prunus_yedoensis,Paeflg22,0.83,0.89,Perception
-camellia_sinensis,Paeflg22,0.82,0.9,Perception
-fragaria_x_ananassa,Paeflg22,0.83,0.89,Perception
-salix_suchowensis,Wu_Atuflg22,0.67,0.89,No perception
-prunus_mume,Wu_Atuflg22,0.86,0.89,No perception
-populus_deltoides,Paeflg22,0.84,0.88,Perception
-populus_davidiana,Paeflg22,0.66,0.88,Perception
-malus_domestica,Wu_Atuflg22,0.6,0.89,No perception
-AtFLS2,Colaianni_1,0.88,0.89,Perception
-AtFLS2,Colaianni_2,0.85,0.89,Perception
-AtFLS2,Colaianni_3,0.85,0.89,Perception
-AtFLS2,Colaianni_4,0.84,0.89,Perception
-AtFLS2,Colaianni_5,0.85,0.89,Perception
-AtFLS2,Colaianni_6,0.84,0.89,Perception
-AtFLS2,Colaianni_7,0.84,0.89,Perception
-AtFLS2,Colaianni_8,0.85,0.88,Perception
-AtFLS2,Colaianni_9,0.87,0.89,Perception
-AtFLS2,Colaianni_10,0.82,0.89,Perception
-AtFLS2,Colaianni_11,0.84,0.88,Perception
-AtFLS2,Colaianni_12,0.85,0.89,Perception
-AtFLS2,Colaianni_13,0.86,0.89,Perception
-AtFLS2,Colaianni_14,0.85,0.89,Perception
-AtFLS2,Colaianni_15,0.87,0.89,Perception
-AtFLS2,Colaianni_16,0.86,0.89,Perception
-AtFLS2,Colaianni_17,0.88,0.88,Perception
-AtFLS2,Colaianni_18,0.87,0.88,Perception
-AtFLS2,Colaianni_19,0.86,0.89,Perception
-AtFLS2,Colaianni_20,0.83,0.88,Perception
-AtFLS2,Colaianni_21,0.85,0.89,Perception
-AtFLS2,Colaianni_22,0.77,0.89,Perception
-AtFLS2,Colaianni_23,0.81,0.88,Perception
-AtFLS2,Colaianni_24,0.74,0.89,No perception
-AtFLS2,Colaianni_25,0.54,0.88,No perception
-AtFLS2,Colaianni_26,0.54,0.88,No perception
-AtFLS2,Colaianni_27,0.58,0.88,No perception
-AtFLS2,Colaianni_28,0.54,0.88,No perception
-AtFLS2,Colaianni_29,0.5,0.88,No perception
-AtFLS2,Colaianni_30,0.66,0.89,No perception
-AtFLS2,Colaianni_31,0.57,0.88,No perception
-AtFLS2,Colaianni_32,0.56,0.88,No perception
-AtFLS2,Colaianni_33,0.69,0.88,No perception
-AtFLS2,Colaianni_34,0.62,0.88,No perception
-AtFLS2,Colaianni_35,0.6,0.89,No perception
-AtFLS2,Colaianni_36,0.44,0.87,No perception
-AtFLS2,Colaianni_37,0.51,0.88,No perception
-AtFLS2,Colaianni_38,0.53,0.87,No perception
-AtFLS2,Colaianni_39,0.45,0.87,No perception
-AtFLS2,Colaianni_40,0.59,0.88,No perception
-AtFLS2,Colaianni_41,0.55,0.88,No perception
-AtFLS2,Colaianni_42,0.62,0.88,No perception
-AtFLS2,Colaianni_43,0.51,0.88,No perception
-AtFLS2,Colaianni_44,0.57,0.88,No perception
-AtFLS2,Colaianni_45,0.75,0.88,No perception
-AtFLS2,Colaianni_46,0.63,0.88,No perception
-AtFLS2,Colaianni_47,0.55,0.88,No perception
-AtFLS2,Colaianni_48,0.54,0.87,No perception
-AtFLS2,Colaianni_49,0.48,0.87,No perception
-AtFLS2,Colaianni_50,0.64,0.88,No perception
-AtFLS2,Colaianni_51,0.54,0.88,No perception
-AtFLS2,Colaianni_52,0.54,0.88,No perception
-AtFLS2,Colaianni_53,0.62,0.88,No perception
-AtFLS2,Colaianni_54,0.65,0.88,No perception
-AtFLS2,Colaianni_55,0.61,0.88,No perception
-AtFLS2,Colaianni_56,0.61,0.88,No perception
-AtFLS2,Colaianni_57,0.62,0.88,No perception
-AtFLS2,Colaianni_58,0.5,0.87,No perception
-AtFLS2,Colaianni_59,0.52,0.87,No perception
-AtFLS2,Colaianni_60,0.64,0.88,No perception
-AtFLS2,Colaianni_61,0.41,0.87,No perception
-AtFLS2,Colaianni_62,0.31,0.87,No perception
-AtFLS2,Colaianni_63,0.46,0.87,No perception
-AtFLS2,Colaianni_64,0.58,0.88,No perception
-AtFLS2,Colaianni_65,0.52,0.87,No perception
-AtFLS2,Colaianni_66,0.57,0.88,No perception
-AtFLS2,Colaianni_67,0.62,0.88,No perception
-AtFLS2,Colaianni_68,0.5,0.87,No perception
-AtFLS2,Colaianni_69,0.71,0.88,No perception
-AtFLS2,Colaianni_70,0.62,0.88,No perception
-AtFLS2,Colaianni_71,0.52,0.87,No perception
-AtFLS2,Colaianni_72,0.75,0.89,No perception
-AtFLS2,Colaianni_73,0.79,0.89,No perception
-AtFLS2,Colaianni_74,0.48,0.87,No perception
-AtFLS2,Colaianni_75,0.76,0.89,No perception
-AtFLS2,Colaianni_76,0.7,0.88,No perception
-AtFLS2,Colaianni_77,0.52,0.87,No perception
-AtFLS2,Colaianni_78,0.59,0.88,No perception
-AtFLS2,Colaianni_79,0.65,0.88,No perception
-AtFLS2,Colaianni_80,0.74,0.89,No perception
-AtFLS2,Colaianni_81,0.74,0.89,No perception
-AtFLS2,Colaianni_82,0.74,0.89,No perception
-AtFLS2,Colaianni_83,0.78,0.88,No perception
-AtFLS2,Chen_1,0.89,0.89,Perception
-AtFLS2,Chen_2,0.87,0.88,Perception
-AtFLS2,Chen_3,0.67,0.88,No perception
-AtFLS2,Chen_4,0.81,0.88,No perception
-AtFLS2,Paeflg22,0.84,0.9,Perception
-AtFLS2,Atuflg22,0.7,0.88,No perception
-AtFLS2,Rrhflg22,0.49,0.87,No perception
-AtFLS2,Rso_1flg22,0.82,0.89,No perception
-AtFLS2,Rso_2flg22,0.78,0.88,No perception
-AtFLS2,Ddiflg22,0.82,0.89,No perception
-AtFLS2,Eamflg22,0.66,0.88,No perception
-AtFLS2,Pviflg22,0.78,0.89,No perception
-AtFLS2,Xfrflg22,0.44,0.87,No perception
-AtFLS2,Xorflg22,0.42,0.88,No perception
+﻿receptor,ligand_name,Average_ipTM,Average_pTM,Known_outcome,,,,,,,
+NbFLS2-1,Paeflg22,0.85,0.90,Perception,,,,,,,
+NbFLS2-1,Atuflg22,0.81,0.90,No perception,,,,,,,
+NbFLS2-1,Rrhflg22,0.79,0.89,No perception,,,,,,,
+NbFLS2-1,Rso_1flg22,0.75,0.89,No perception,,,,,,,
+NbFLS2-1,Rso_2flg22,0.54,0.88,No perception,,,,,,,
+NbFLS2-1,Ddiflg22,0.56,0.89,No perception,,,,,,,
+NbFLS2-1,Eamflg22,0.60,0.89,No perception,,,,,,,
+NbFLS2-1,Pviflg22,0.85,0.89,No perception,,,,,,,
+NbFLS2-1,Xfrflg22,0.45,0.88,No perception,,,,,,,
+NbFLS2-1,Xorflg22,0.40,0.88,No perception,,,,,,,
+FLS2XL,Paeflg22,0.92,0.89,Perception,,,,,,,
+FLS2XL,Atuflg22,0.88,0.89,Perception,,,,,,,
+FLS2XL,Rrhflg22,0.63,0.88,Perception,,,,,,,
+FLS2XL,Rso_1flg22,0.91,0.89,No perception,,,,,,,
+FLS2XL,Rso_2flg22,0.80,0.89,No perception,,,,,,,
+FLS2XL,Ddiflg22,0.69,0.89,No perception,,,,,,,
+FLS2XL,Eamflg22,0.65,0.89,Perception,,,,,,,
+FLS2XL,Pviflg22,0.89,0.89,No perception,,,,,,,
+FLS2XL,Xfrflg22,0.45,0.88,No perception,,,,,,,
+FLS2XL,Xorflg22,0.54,0.88,No perception,,,,,,,
+QvFLS2,Paeflg22,0.86,0.89,Perception,,,,,,,
+QvFLS2,Atuflg22,0.82,0.89,Perception,,,,,,,
+QvFLS2,Rrhflg22,0.67,0.88,No perception,,,,,,,
+QvFLS2,Rso_1flg22,0.80,0.89,Perception,,,,,,,
+QvFLS2,Rso_2flg22,0.83,0.88,Perception,,,,,,,
+QvFLS2,Ddiflg22,0.80,0.88,Perception,,,,,,,
+QvFLS2,Eamflg22,0.57,0.88,No perception,,,,,,,
+QvFLS2,Pviflg22,0.83,0.89,Perception,,,,,,,
+QvFLS2,Xfrflg22,0.50,0.87,No perception,,,,,,,
+QvFLS2,Xorflg22,0.48,0.88,No perception,,,,,,,
+TjFLS2,Paeflg22,0.88,0.89,Perception,,,,,,,
+TjFLS2,Atuflg22,0.54,0.88,Perception,,,,,,,
+TjFLS2,Rrhflg22,0.55,0.88,Perception,,,,,,,
+TjFLS2,Rso_1flg22,0.81,0.89,Perception,,,,,,,
+TjFLS2,Rso_2flg22,0.77,0.89,Perception,,,,,,,
+TjFLS2,Ddiflg22,0.78,0.89,Perception,,,,,,,
+TjFLS2,Eamflg22,0.47,0.88,No perception,,,,,,,
+TjFLS2,Pviflg22,0.81,0.90,No perception,,,,,,,
+TjFLS2,Xfrflg22,0.43,0.88,No perception,,,,,,,
+TjFLS2,Xorflg22,0.49,0.88,No perception,,,,,,,
+HlFLS2,Paeflg22,0.57,0.88,Perception,,,,,,,
+HlFLS2,Atuflg22,0.66,0.88,No perception,,,,,,,
+HlFLS2,Rrhflg22,0.55,0.87,No perception,,,,,,,
+HlFLS2,Rso_1flg22,0.61,0.88,No perception,,,,,,,
+HlFLS2,Rso_2flg22,0.56,0.88,No perception,,,,,,,
+HlFLS2,Ddiflg22,0.80,0.88,No perception,,,,,,,
+HlFLS2,Eamflg22,0.46,0.88,No perception,,,,,,,
+HlFLS2,Pviflg22,0.82,0.89,No perception,,,,,,,
+HlFLS2,Xfrflg22,0.42,0.88,No perception,,,,,,,
+HlFLS2,Xorflg22,0.48,0.88,No perception,,,,,,,
+MdFLS2,Paeflg22,0.88,0.89,Perception,,,,,,,
+MdFLS2,Atuflg22,0.60,0.88,No perception,,,,,,,
+MdFLS2,Rrhflg22,0.67,0.89,No perception,,,,,,,
+MdFLS2,Rso_1flg22,0.69,0.89,No perception,,,,,,,
+MdFLS2,Rso_2flg22,0.82,0.89,No perception,,,,,,,
+MdFLS2,Ddiflg22,0.77,0.89,No perception,,,,,,,
+MdFLS2,Eamflg22,0.74,0.89,No perception,,,,,,,
+MdFLS2,Pviflg22,0.78,0.89,No perception,,,,,,,
+MdFLS2,Xfrflg22,0.47,0.88,No perception,,,,,,,
+MdFLS2,Xorflg22,0.47,0.88,No perception,,,,,,,
+GmFLS2a,Paeflg22,0.60,0.89,Perception,,,,,,,
+GmFLS2a,Rso_1flg22,0.63,0.88,Perception,,,,,,,
+GmFLS2b,Paeflg22,0.62,0.89,Perception,,,,,,,
+GmFLS2b,Rso_1flg22,0.90,0.89,Perception,,,,,,,
+VrFLS2,Paeflg22,0.83,0.89,Perception,,,,,,,
+VrFLS2,Atuflg22,0.64,0.89,No perception,,,,,,,
+VrFLS2,Rrhflg22,0.64,0.88,No perception,,,,,,,
+VrFLS2,Rso_1flg22,0.77,0.88,No perception,,,,,,,
+VrFLS2,Rso_2flg22,0.76,0.88,No perception,,,,,,,
+VrFLS2,Ddiflg22,0.77,0.88,Perception,,,,,,,
+VrFLS2,Eamflg22,0.70,0.89,Perception,,,,,,,
+VrFLS2,Pviflg22,0.88,0.88,No perception,,,,,,,
+VrFLS2,Xfrflg22,0.47,0.88,No perception,,,,,,,
+VrFLS2,Xorflg22,0.54,0.88,No perception,,,,,,,
+FcFLS2,Paeflg22,0.85,0.88,Perception,,,,,,,
+FcFLS2,Atuflg22,0.57,0.88,No perception,,,,,,,
+FcFLS2,Rrhflg22,0.74,0.88,No perception,,,,,,,
+FcFLS2,Rso_1flg22,0.84,0.88,No perception,,,,,,,
+FcFLS2,Rso_2flg22,0.69,0.88,No perception,,,,,,,
+FcFLS2,Ddiflg22,0.81,0.88,No perception,,,,,,,
+FcFLS2,Eamflg22,0.72,0.88,No perception,,,,,,,
+FcFLS2,Pviflg22,0.82,0.89,No perception,,,,,,,
+FcFLS2,Xfrflg22,0.41,0.88,No perception,,,,,,,
+FcFLS2,Xorflg22,0.50,0.88,No perception,,,,,,,
+SlFLS2,Paeflg22,0.91,0.89,Perception,,,,,,,
+SlFLS2,Atuflg22,0.79,0.89,No perception,,,,,,,
+SlFLS2,Rrhflg22,0.76,0.89,No perception,,,,,,,
+SlFLS2,Rso_1flg22,0.85,0.89,No perception,,,,,,,
+SlFLS2,Rso_2flg22,0.85,0.89,No perception,,,,,,,
+SlFLS2,Ddiflg22,0.80,0.89,Perception,,,,,,,
+SlFLS2,Eamflg22,0.79,0.89,Perception,,,,,,,
+SlFLS2,Pviflg22,0.79,0.89,No perception,,,,,,,
+SlFLS2,Xfrflg22,0.42,0.87,No perception,,,,,,,
+SlFLS2,Xorflg22,0.43,0.88,No perception,,,,,,,
+phaseolus_vulgaris,Wu_Atuflg22,0.41,0.88,No perception,,,,,,,
+populus_trichocarpa,Wu_Atuflg22,0.49,0.88,No perception,,,,,,,
+malus_halliana,Wu_Atuflg22,0.63,0.89,No perception,,,,,,,
+prunus_yedoensis,Wu_Atuflg22,0.78,0.89,No perception,,,,,,,
+populus_trichocarpa,Paeflg22,0.83,0.88,Perception,,,,,,,
+prunus_mume,Paeflg22,0.86,0.89,Perception,,,,,,,
+malus_halliana,Paeflg22,0.88,0.90,Perception,,,,,,,
+populus_davidiana,Wu_Atuflg22,0.58,0.89,No perception,,,,,,,
+prunus_persica,Paeflg22,0.85,0.89,Perception,,,,,,,
+TjFLS2,Wu_Atuflg22,0.54,0.88,No perception,,,,,,,
+zanthoxylum_bungeanum,Wu_Atuflg22,0.76,0.89,No perception,,,,,,,
+salix_suchowensis,Paeflg22,0.65,0.88,Perception,,,,,,,
+prunus_persica,Wu_Atuflg22,0.77,0.89,No perception,,,,,,,
+morus_alba,Wu_Atuflg22,0.71,0.87,No perception,,,,,,,
+fragaria_x_ananassa,Wu_Atuflg22,0.52,0.88,No perception,,,,,,,
+camellia_sinensis,Wu_Atuflg22,0.64,0.89,No perception,,,,,,,
+rosa_chinensis,Paeflg22,0.87,0.89,Perception,,,,,,,
+rosa_chinensis,Wu_Atuflg22,0.64,0.88,No perception,,,,,,,
+populus_deltoides,Wu_Atuflg22,0.41,0.87,No perception,,,,,,,
+morus_alba,Paeflg22,0.47,0.87,Perception,,,,,,,
+zanthoxylum_bungeanum,Paeflg22,0.84,0.89,Perception,,,,,,,
+phaseolus_vulgaris,Paeflg22,0.87,0.89,Perception,,,,,,,
+prunus_yedoensis,Paeflg22,0.83,0.89,Perception,,,,,,,
+camellia_sinensis,Paeflg22,0.82,0.90,Perception,,,,,,,
+fragaria_x_ananassa,Paeflg22,0.83,0.89,Perception,,,,,,,
+salix_suchowensis,Wu_Atuflg22,0.67,0.89,No perception,,,,,,,
+prunus_mume,Wu_Atuflg22,0.86,0.89,No perception,,,,,,,
+populus_deltoides,Paeflg22,0.84,0.88,Perception,,,,,,,
+populus_davidiana,Paeflg22,0.66,0.88,Perception,,,,,,,
+malus_domestica,Wu_Atuflg22,0.60,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_1,0.88,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_2,0.85,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_3,0.85,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_4,0.84,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_5,0.85,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_6,0.84,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_7,0.84,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_8,0.85,0.88,Perception,,,,,,,
+AtFLS2,Colaianni_9,0.87,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_10,0.82,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_11,0.84,0.88,Perception,,,,,,,
+AtFLS2,Colaianni_12,0.85,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_13,0.86,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_14,0.85,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_15,0.87,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_16,0.86,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_17,0.88,0.88,Perception,,,,,,,
+AtFLS2,Colaianni_18,0.87,0.88,Perception,,,,,,,
+AtFLS2,Colaianni_19,0.86,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_20,0.83,0.88,Perception,,,,,,,
+AtFLS2,Colaianni_21,0.85,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_22,0.77,0.89,Perception,,,,,,,
+AtFLS2,Colaianni_23,0.81,0.88,Perception,,,,,,,
+AtFLS2,Colaianni_24,0.74,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_25,0.54,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_26,0.54,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_27,0.58,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_28,0.54,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_29,0.50,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_30,0.66,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_31,0.57,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_32,0.56,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_33,0.69,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_34,0.62,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_35,0.60,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_36,0.44,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_37,0.51,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_38,0.53,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_39,0.45,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_40,0.59,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_41,0.55,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_42,0.62,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_43,0.51,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_44,0.57,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_45,0.75,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_46,0.63,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_47,0.67,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_48,0.56,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_49,0.57,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_50,0.58,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_51,0.64,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_52,0.55,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_53,0.55,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_54,0.65,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_55,0.61,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_56,0.61,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_57,0.62,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_58,0.50,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_59,0.52,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_60,0.64,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_61,0.41,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_62,0.31,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_63,0.46,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_64,0.58,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_65,0.52,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_66,0.57,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_67,0.62,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_68,0.50,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_69,0.71,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_70,0.62,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_71,0.52,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_72,0.75,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_73,0.79,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_74,0.48,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_75,0.76,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_76,0.70,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_77,0.52,0.87,No perception,,,,,,,
+AtFLS2,Colaianni_78,0.59,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_79,0.65,0.88,No perception,,,,,,,
+AtFLS2,Colaianni_80,0.74,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_81,0.74,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_82,0.74,0.89,No perception,,,,,,,
+AtFLS2,Colaianni_83,0.78,0.88,No perception,,,,,,,
+AtFLS2,Chen_1,0.89,0.89,Perception,,,,,,,
+AtFLS2,Chen_2,0.87,0.88,Perception,,,,,,,
+AtFLS2,Chen_3,0.67,0.88,No perception,,,,,,,
+AtFLS2,Chen_4,0.81,0.88,No perception,,,,,,,
+AtFLS2,Paeflg22,0.84,0.90,Perception,,,,,,,
+AtFLS2,Atuflg22,0.70,0.88,No perception,,,,,,,
+AtFLS2,Rrhflg22,0.49,0.87,No perception,,,,,,,
+AtFLS2,Rso_1flg22,0.82,0.89,No perception,,,,,,,
+AtFLS2,Rso_2flg22,0.78,0.88,No perception,,,,,,,
+AtFLS2,Ddiflg22,0.82,0.88,No perception,,,,,,,
+AtFLS2,Eamflg22,0.66,0.88,No perception,,,,,,,
+AtFLS2,Pviflg22,0.78,0.89,No perception,,,,,,,
+AtFLS2,Xfrflg22,0.44,0.87,No perception,,,,,,,
+AtFLS2,Xorflg22,0.42,0.88,No perception,,,,,,,
