@@ -12,7 +12,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 
-setwd("~/R/FLS2_engineering/R_ploting/script/")
+setwd("~/FLS2_engineering/R_ploting/script/")
 
 # Define your customized ggplot theme
 my_ggplot_theme <- theme_classic() +
@@ -85,7 +85,7 @@ ggplot() +
                                 "AtFLS2" = "#5dc4c9",
                                 "Non-AtFLS2" = "#117733")) +
   scale_y_continuous(limits = c(0.4, 1), breaks = seq(0, 1, by = 0.1)) +
-  labs(x = "Average ipTM Cutoff", y = "Accuracy", title = "AF3 Accuracy Curves by Receptor Subset") +
+  labs(x = "Average ipTM Threshold", y = "Accuracy", title = "AF3 Accuracy Curves by Receptor Subset") +
   my_ggplot_theme
 
 # Save the plot
