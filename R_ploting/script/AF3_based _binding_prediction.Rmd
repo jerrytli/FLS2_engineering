@@ -14,7 +14,7 @@ library(tidyr)
 
 setwd("~/FLS2_engineering/R_ploting/script/")
 
-# Define your customized ggplot theme
+# Define customized ggplot theme
 my_ggplot_theme <- theme_classic() +
   theme(text = element_text(size = 16),
         axis.title.x = element_text(size = 20, color = "black"),
@@ -236,7 +236,7 @@ library(pROC)
 library(readr)  # Use read_csv from readr
 
 # Read the data from the CSV file
-data <- read_csv("../input/af3/ipTM_ploting.csv")  # Ensure the correct path and file extension
+data <- read_csv("../input/af3/ipTM_ploting.csv")  
 
 # Ensure the experimental results are properly formatted
 data$Known_outcome <- as.factor(data$Known_outcome)
@@ -353,7 +353,6 @@ ggplot(data, aes(x = Known_outcome, y = Average_ipTM, fill = Known_outcome)) +
        y = "Average ipTM") +
   my_ggplot_theme
 
-# Optionally, you can save the plot to a file
 ggsave("../output/af3/raincloud.pdf", width = 6, height = 5.7, dpi = 300)
 
 ```

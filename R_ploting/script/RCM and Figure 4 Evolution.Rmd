@@ -6,7 +6,7 @@ library(reshape2)
 library(readr)
 ```
 
-
+# Evolution
 
 ```{r}
 # Load necessary libraries
@@ -42,7 +42,7 @@ my_ggplot_theme <- theme_classic() +
         axis.ticks = element_line(size = 0.8))
 
 
-# Define the regions for each dataset (add an upper bound to the last region based on your data)
+# Define the regions for each dataset (add an upper bound to the last region based on data)
 fagales_regions <- c(71, 95, 119, 143, 167, 191, 215, 239, 263, 287, 311, 335, 359, 383, 407, 431, 455, 479, 503, 527, 551, 575, 601, 625, 649, 674, 698, 722, max(fagales_data$pos) + 1)
 
 
@@ -205,6 +205,8 @@ ggsave("../output/omega/raw_omega_region_2.pdf",  width = 5.5, height = 3)
 
 ```
 
+#RCM
+
 ####Load RCM output matrix for fagales
 
 ```{r}
@@ -212,7 +214,7 @@ ggsave("../output/omega/raw_omega_region_2.pdf",  width = 5.5, height = 3)
 library(reshape2)
 
 # Read the data from the file
-file_path <- "../input/rcm/42_fagales_rcm_score" # Replace path_to_your_file with the actual path
+file_path <- "../input/rcm/42_fagales_rcm_score" 
 rcm_fagales <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
@@ -305,7 +307,7 @@ ggsave("../output/rcm/RCM_fagales.pdf", width = 3.7, height = 5)
 library(reshape2)
 
 # Read the data from the file
-file_path <- "../input/rcm/26_Vitales_rcm_score" # Replace path_to_your_file with the actual path
+file_path <- "../input/rcm/26_Vitales_rcm_score" 
 rcm_vitales <- read.csv(file_path, header = FALSE, sep = ",", strip.white = TRUE)
 
 # Convert the data frame to a vector of values
@@ -319,12 +321,12 @@ if (length(values) != 14*28) {
 # Reshape the vector into a matrix
 matrix_rcm <- matrix(values, ncol = 14, byrow = TRUE)
 
-# If you need to manipulate or analyze the matrix, you can do so here.
 
 # Optionally, write the matrix to a new CSV file if needed
 write.csv(matrix_rcm, "../output/rcm/vitales_matrix_output.csv", row.names = FALSE)
 
 ```
+
 ####Plot the RCM plot for vitales
 
 ```{r}

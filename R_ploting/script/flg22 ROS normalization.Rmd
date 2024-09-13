@@ -4,39 +4,15 @@ output: html_document
 date: "2023-01-27"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
 ```{R}
 library(reshape2)
 library(ggplot2)
 library(dplyr)
 ```
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
+#### Fig.1
 ```{r}
-library(ggplot2)
-library(reshape2)
-library(dplyr)
+
 
 setwd("~/R/FLS2_engineering/R_ploting/script/")
 
@@ -89,10 +65,10 @@ ggsave(filename = "../output/ros/Figure_1_All_FLS2_bubble.pdf", width = 4.9, hei
 ```
 
 
-Grey bubble for Vr-XLFLS2 group
+#### Fig.3
 ```{r}
 
-# Read in your csv data
+# Read in csv data
 pc <- read.csv("../input/ros/Vr-XL.csv", header = TRUE)
 
 # Melt the data
@@ -147,7 +123,7 @@ ggsave(filename = "../output/ros/Vr-XL.pdf", width = 6.5, height = 3.4, bg = "tr
 
 ```
 
-Grey bubble for Qv-FcFLS2 group
+#### Fig.2
 ```{r}
 pc = read.csv("../input/ros/Fc-Qv.csv", header = TRUE)
 # Melt the data
