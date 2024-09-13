@@ -430,3 +430,351 @@ print(ggplot)
 ggsave("../output/af3/scatter.pdf", width = 7, height = 6, dpi = 300)
 
 ```
+
+
+
+ 
+```{r}
+library(ggplot2)
+library(zoo)
+```
+
+
+### Normalized Shanon Entropy calculated using Sr33 Sr50 paper's code
+```{r}
+
+entropy <- read.table('../input/entropylist.tsv',sep = '\t', header = TRUE)
+```
+
+```{r}
+# Define the custom ggplot theme
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 14, color = "black"),
+        axis.title.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_text(size = 14, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"),
+        axis.ticks = element_line(size = 0.8))
+
+
+# Create the plot with vertical lines at specified positions and apply the custom theme
+p <- ggplot(filter(entropy, Order == "Rosales"), aes(x = Position, y = Entropy, color = Order)) +
+    geom_line(size = 1.0) + # Adjust this value to make the line thicker
+    #geom_smooth(se = FALSE, method = "loess", span = 0.1, color = "black") + # Add a smooth curve (change span for smoothness)
+    geom_vline(xintercept = c(247, 391, 412, 439, 460), color = "red", alpha = 0.3) +
+    geom_hline(yintercept = (1.5/log2(20)), col = "red") +
+    my_ggplot_theme +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 0.8)) + # Set y-axis max to 9
+    scale_x_continuous(expand = c(0, 0), breaks = seq(100, 700, by = 100)) + # Set x-axis breaks at every 100 units
+    labs(title = "Fagales",
+         x = "Amino Acid Position",
+         y = "Normalized Shannon Entropy")
+
+# Save the plot to a file
+ggsave("../output/Fagales_entropy.pdf", plot = p, width = 10, height = 5, dpi = 300)
+
+# Print the plot to the R console
+print(p)
+
+```
+
+
+####Plot dN/dS at region 1
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Read the data
+entropy <- read.table('../input/entropylist.tsv',sep = '\t', header = TRUE)
+
+# Function to extract data for a specified range and group
+extract_entropy <- function(data, group_name, start_pos, end_pos) {
+  data %>%
+    filter(Order == group_name & Position >= start_pos & Position <= end_pos) %>%
+    mutate(relative_pos = Position - start_pos + 1) # Create a new column for relative position (1 to 24)
+}
+
+# Define ranges for each group
+fagales_range <- c(216, 263)
+brassicales_range <- c(219, 266)
+rosales_range <- c(216, 263)
+
+# Extract data for each range
+fagales_entropy_region_1 <- extract_entropy(entropy, "Fagales", fagales_range[1], fagales_range[2])
+brassicales_entropy_region_1 <- extract_entropy(entropy, "brassicales", brassicales_range[1], brassicales_range[2])
+rosales_entropy_region_1 <- extract_entropy(entropy, "Rosales", rosales_range[1], rosales_range[2])
+
+# Combine extracted data and set custom colors
+combined_data <- rbind(
+  fagales_entropy_region_1 %>% mutate(Order = "Fagales"),
+  brassicales_entropy_region_1 %>% mutate(Order = "Brassicales"),
+  rosales_entropy_region_1 %>% mutate(Order = "Rosales")
+) %>% 
+  mutate(color = ifelse(`Entropy` > 0.347, case_when(
+    Order == "Brassicales" ~ "#66C2A5",
+    Order == "Fagales" ~ "#C84D4C",
+    Order == "Rosales" ~ "#8DA0CB"
+  ), case_when(
+    Order == "Brassicales" ~ "gray75",
+    Order == "Fagales" ~ "gray73",
+    Order == "Rosales" ~ "gray77"
+  )))
+
+# Plot with custom color rules and a red line for entropy = 0.347
+ggplot(combined_data, aes(x = relative_pos, y = `Entropy`, fill = color)) +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.85) +
+  geom_hline(yintercept = 0.347, color = "red", linetype = "dashed") +
+  scale_fill_identity() + # Use the actual colors specified in the data frame
+  scale_x_continuous(expand = c(0, 0), breaks = c(0, 11, 25, 35, 48), labels = c("0"," ", "25", " ", "48")) +
+  scale_y_continuous(expand = c(0, 0)) + # Remove padding in y-axis
+  labs(x = "Amino Acid Position", y = "Normalized Shannon Entropy" )+
+  theme_classic() +
+   theme(legend.position = "right",
+         axis.text.x = element_text(size = 15, color = "black"),
+        axis.text.y = element_text(size = 15, color = "black"),
+        axis.title.y = element_text(size = 15, color = "black"),
+        axis.title.x = element_blank())
+ggsave("../output/entropy_region_1.pdf", width = 6, height = 3)
+
+```
+
+Map entropy score to LRR 1 to 28, concave surface exposed residues (no backbone hydrophobic residues)
+```{r}
+library(dplyr)
+library(readr)
+library(tidyr)
+
+# Read the entropy scores file
+entropy_scores <- read_delim("../input/entropylist.tsv", delim = "\t")
+
+# Function to process each dataset
+process_dataset <- function(coordinates_path, order) {
+  # Read coordinates file
+  coordinates <- read_csv(coordinates_path, show_col_types = FALSE)
+  
+  # Check and adjust column names if necessary
+  if (!"LRR" %in% names(coordinates)) {
+    names(coordinates)[1] <- "LRR"  # Assuming the first column is the LRR column
+  }
+  
+  # Reshape coordinates to long format
+  coordinates_long <- pivot_longer(coordinates, cols = -LRR, names_to = "residue", values_to = "Position")
+  
+  # Filter entropy scores for the specific order and join
+  entropy_scores_filtered <- filter(entropy_scores, Order == order)
+  joined_data <- left_join(coordinates_long, entropy_scores_filtered, by = "Position")
+  
+  # Reshape back to wide format
+  entropy_table <- pivot_wider(joined_data, names_from = "residue", values_from = "Entropy", id_cols = "LRR")
+  
+  # Calculate the average entropy for each LRR
+  entropy_table$Average_Entropy <- rowMeans(entropy_table[,-1], na.rm = TRUE)  # Excluding the LRR column from average calculation
+
+  # Output the modified table with average entropy column
+  write_csv(entropy_table, paste0("../output/", order, "_entropy_scores.csv"))
+}
+
+# Apply the function to each dataset
+process_dataset("../input/fagales_LRRexposed_residue_coordinates.csv", "Fagales")
+process_dataset("../input/rosales_LRRexposed_residue_coordinates.csv", "Rosales")
+process_dataset("../input/brassicales_LRRexposed_residue_coordinates.csv", "Brassicales")
+
+```
+
+Take a look of the curves
+
+```{r}
+library(ggplot2)
+library(readr)
+
+# Load the data
+lrr_entropy <- read_csv("../output/LRR_entropy.csv")
+
+# Creating the plot
+plot <- ggplot(lrr_entropy, aes(x = LRR)) +
+  geom_line(aes(y = Brassicales, color = "Brassicales"), size = 1) +
+  geom_point(aes(y = Brassicales, color = "Brassicales")) +
+  geom_line(aes(y = Fagales, color = "Fagales"), size = 1) +
+  geom_point(aes(y = Fagales, color = "Fagales")) +
+  geom_line(aes(y = Rosales, color = "Rosales"), size = 1) +
+  geom_point(aes(y = Rosales, color = "Rosales")) +
+  labs(title = "Average Entropy Scores of Concave Surface Exposed Residues Across LRR Repeats",
+       x = "LRR Repeat",
+       y = "Entropy Score") +
+  scale_color_manual(values = c("Brassicales" = "#6a3d9a", "Fagales" = "#33a02c", "Rosales" = "#ff7f00")) +
+  theme_classic()
+
+# Display the plot
+print(plot)
+
+```
+
+Calcium ploting:
+
+
+```{r}
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+
+# Read the CSV file
+pc <- read.csv("../input/Fig1_Calcium.csv")
+
+# Melt the data frame
+pcm <- melt(pc, id = c("Receptor"))
+
+new_order_vector <- c("flg22Pae", "flg22Agro", "flg22.002", "flg22.006", "flg22.007", "flg22.001", "flg22.004", "flg22.005", "flg22.008" , "flg22.009")
+
+# Ensure Receptor is a factor with the correct levels
+pcm$Receptor <- factor(pcm$Receptor, levels = c("NbFLS2", "FLS2XL", "TjFLS2", "QvFLS2"))
+
+# Create a new column 'Color' with the default colors based on 'Receptor'
+pcm$Color <- case_when(
+  pcm$Receptor == "FLS2XL" & pcm$value >= 10 ~ "#6B6ACF",
+  pcm$Receptor == "QvFLS2" & pcm$value >= 10 ~ "#C84D4C",
+  pcm$Receptor == "TjFLS2" & pcm$value >= 10 ~ "#679289",
+  pcm$Receptor == "NbFLS2" & pcm$value >= 10 ~ "#3a3b3c",
+  pcm$value < 10 ~ "lightgrey", # Apply light gray color when value is less than 10
+  TRUE ~ NA_character_ # For unexpected cases
+)
+
+# Proceed with the ggplot
+xx <- ggplot(pcm, aes(x = Receptor, y = variable)) + 
+  geom_point(aes(size = value, fill = Color), alpha = 0.75, shape = 21) + 
+  scale_size_continuous(limits = c(0, 160), range = c(1, 16), breaks = c(25, 50, 75, 100, 160)) + 
+  labs(x = "", y = "", size = "Normalized Ca2+ (%)", fill = "") + 
+  theme_classic() +
+  theme(
+    legend.key = element_blank(), 
+    axis.text.y = element_text(colour = "black", size = 14, face = "bold"), 
+    axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", size = 14, face = "bold", vjust = 1), 
+    legend.text = element_text(size = 10, face = "bold", colour = "black"), 
+    legend.title = element_text(size = 12, face = "bold"), 
+    legend.position = "right",
+    panel.grid.major = element_line(colour = "lightgrey", linewidth = 0.5),
+    panel.grid.minor = element_blank()
+  ) +
+  scale_fill_identity(guide = FALSE) +  # Use colors directly from the Color column
+  scale_y_discrete(limits = rev(new_order_vector))  # Set x-axis labels and order
+
+print(xx)
+
+# Save the plot
+ggsave(filename = "../output/Figure_1_All_FLS2_Calcium_bubble.pdf", width = 5.6, height = 5)
+
+
+```
+
+
+Grey bubble for Vr-XLFLS2 group
+```{r}
+
+# Read in your csv data
+pc <- read.csv("../input/Vr-XL.csv", header = TRUE)
+
+# Melt the data
+pcm <- melt(pc, id = c("Receptor"))
+
+# Step 1: Specify the order of the x-axis
+new_order_vector <- c("flg22Pae", "flg22Agro", "flg22.002", "flg22.006", "flg22.007", "flg22.001", "flg22.004")
+
+# Step 2: Rename the x-axis columns according to the mapping
+labels_vector <- c("Pae", "Atu", "Rrh", "Rals_1", "Rals_2", "Dic", "Eam")
+
+
+# Ensure Receptor order is as in the raw dataset
+pcm$Receptor <- factor(pcm$Receptor, levels = unique(pc$Receptor))
+
+
+# Create a new column 'Color' with the default colors based on 'Receptor'
+pcm$Color <- case_when(
+  pcm$Receptor == "FLS2XL" & pcm$value >= 10 ~ "#6B6ACF",
+  pcm$Receptor == "VrFLS2" & pcm$value >= 10 ~ "#cdcdd5",
+  pcm$Receptor == "SynVrFLS2 V1" & pcm$value >= 10 ~ "#8987d2",
+  pcm$Receptor == "SynVrFLS2 V4" & pcm$value >= 10 ~ "#a09ed4",
+  pcm$Receptor == "SynVrFLS2 V2" & pcm$value >= 10 ~ "#bebdd5",
+  pcm$value < 10 ~ "white", # Apply light gray color when value is less than 10
+  TRUE ~ NA_character_ # For unexpected cases
+)
+
+
+# Generate the plot
+xx <- ggplot(pcm, aes(y = Receptor, x = variable)) + 
+  geom_point(aes(size = value, fill = Color), alpha = 0.85, shape = 21) + 
+  scale_size_continuous(limits = c(0, 160), range = c(1, 14), breaks = c(25, 50, 75, 140)) + 
+  labs(y = "", x = "", size = "Normalized ROS (%)", fill = "")  + 
+  theme_classic() +
+  theme(
+    legend.key = element_blank(), 
+    axis.text.y = element_text(colour = "black", size = 14, face = "bold"), 
+    axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", size = 14, face = "bold", vjust = 1), 
+    legend.text = element_text(size = 10, face = "bold", colour = "black"), 
+    legend.title = element_text(size = 12, face = "bold"), 
+    legend.position = "right",
+    panel.grid.major = element_line(colour = "lightgrey", linewidth = 0.5),
+    panel.grid.minor = element_blank()
+  ) +
+  scale_fill_identity(guide = FALSE) +  # Use colors directly from the Color column
+ scale_x_discrete(limits = new_order_vector, labels = labels_vector) + # Set x-axis labels and order
+  scale_y_discrete(limits = rev(levels(pcm$Receptor))) # Ensure Y axis order is as in the raw dataset
+
+# Print the plot
+print(xx)
+
+# Save the plot to a file
+
+ggsave(filename = "../output/Vr-XL.pdf", width = 7, height = 3.4, bg = "transparent")
+
+```
+
+Grey bubble for Qv-FcFLS2 group
+```{r}
+pc = read.csv("../input/Fc-Qv.csv", header = TRUE)
+# Melt the data
+pcm <- melt(pc, id = c("Receptor"))
+
+# Step 1: Specify the order of the x-axis
+new_order_vector <- c("flg22Pae", "flg22Agro", "flg22.006", "flg22.007", "flg22.001", "flg22.005")
+
+# Step 2: Rename the x-axis columns according to the mapping
+labels_vector <- c("Pae", "Atu", "Rals_1", "Rals_2", "Dic", "Pal")
+
+# Ensure Receptor order is as in the raw dataset
+pcm$Receptor <- factor(pcm$Receptor, levels = unique(pc$Receptor))
+
+# Ensure Receptor is a factor with the correct levels
+#pcm$Receptor <- factor(pcm$Receptor, levels = c("NbFLS2", "FLS2XL", "TjFLS2", "QvFLS2"))
+
+# Create a new column 'Color' with the default colors based on 'Receptor'
+pcm$Color <- case_when(
+  pcm$Receptor == "QvFLS2" & pcm$value >= 10 ~ "#C84D4C",
+  pcm$Receptor == "FcFLS2" & pcm$value >= 10 ~ "#c5bebe",
+  pcm$Receptor == "SynFcFLS2 V1" & pcm$value >= 10 ~ "#cd7573",
+  pcm$Receptor == "SynFcFLS2 V3" & pcm$value >= 10 ~ "#cc9a99",
+  pcm$Receptor == "SynFcFLS2 V2" & pcm$value >= 10 ~ "#c7b6b6",
+  pcm$value < 10 ~ "white", # Apply light gray color when value is less than 10
+  TRUE ~ NA_character_ # For unexpected cases
+)
+xx <- ggplot(pcm, aes(y = Receptor, x = variable)) + 
+  geom_point(aes(size = value, fill = Color), alpha = 0.85, shape = 21) + 
+  scale_size_continuous(limits = c(0, 160), range = c(1, 14), breaks = c(25, 50, 75, 140)) + 
+  labs(y = "", x = "", size = "Normalized ROS (%)", fill = "")  + 
+  theme_classic() +
+  theme(
+    legend.key = element_blank(), 
+    axis.text.y = element_text(colour = "black", size = 14, face = "bold"), 
+    axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", size = 14, face = "bold", vjust = 1), 
+    legend.text = element_text(size = 10, face = "bold", colour = "black"), 
+    legend.title = element_text(size = 12, face = "bold"), 
+    legend.position = "right",
+    panel.grid.major = element_line(colour = "lightgrey", linewidth = 0.5),
+    panel.grid.minor = element_blank()
+  ) +
+  scale_fill_identity(guide = FALSE) +  # Use colors directly from the Color column
+ scale_x_discrete(limits = new_order_vector, labels = labels_vector) + # Set x-axis labels and order
+  scale_y_discrete(limits = rev(levels(pcm$Receptor))) # Ensure Y axis order is as in the raw dataset 
+print(xx)
+ggsave(filename = "../output/Qv-Fc.pdf", width = 7, height = 3.4)
+
+```
