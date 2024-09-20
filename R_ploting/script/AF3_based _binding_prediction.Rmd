@@ -5,6 +5,135 @@ date: "2024-07-29"
 output: html_document
 ---
 
+### Raincloud plot panel A
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(readr)  # For reading the CSV file
+
+# Read the data from a CSV file
+data <- read_csv("../input/af3/ipTM_ploting.csv")
+
+# Assuming the data has columns 'Known_outcome' and 'Average_ipTM'
+data <- data %>%
+  mutate(Known_outcome = factor(Known_outcome))
+
+# Assess normality using Shapiro-Wilk test
+shapiro_results <- data %>%
+  group_by(Known_outcome) %>%
+  summarise(shapiro_p_value = shapiro.test(Average_ipTM)$p.value)
+
+print("Shapiro-Wilk Test for Normality:")
+print(shapiro_results)
+
+# If p-value < 0.05, data is not normally distributed
+if(any(shapiro_results$shapiro_p_value < 0.05)) {
+  test_method <- "wilcox.test"
+  test_name <- "Wilcoxon rank-sum test"
+  # Perform Wilcoxon rank-sum test
+  wilcox_test <- wilcox.test(Average_ipTM ~ Known_outcome, data = data)
+  p_value <- wilcox_test$p.value
+} else {
+  test_method <- "t.test"
+  test_name <- "t-test"
+  # Perform t-test
+  t_test <- t.test(Average_ipTM ~ Known_outcome, data = data)
+  p_value <- t_test$p.value
+}
+
+# Print the selected test method and p-value
+print(paste("Selected test:", test_name))
+print(paste("P-value:", p_value))
+
+# Creating the raincloud plot without p-value display
+ggplot(data, aes(x = Known_outcome, y = Average_ipTM, fill = Known_outcome)) +
+  geom_violin(trim = FALSE, alpha = 0.5, color = NA, show.legend = FALSE) +  # Density plot
+  geom_boxplot(width = 0.03, outlier.shape = NA, show.legend = FALSE) +  # Boxplot inside the violin
+  geom_jitter(size = 1, alpha = 0.5, color = "black", width = 0.1, show.legend = FALSE) +  # Points with jitter
+   annotate("text", x = 1.5, y = max(data$Average_ipTM) + 0.1, 
+           label = expression(italic(p) < "0.0001"), size = 7, hjust = 0.5) +  # Add italic p-value text above violins
+  scale_fill_manual(values = c("#fd5901", "#4477aa")) +  # Custom colors for each experimental result
+  labs(title = "Raincloud Plot of Average ipTM by Experimental Result",
+       x = "Experimental Result",
+       y = "Average ipTM") +
+  my_ggplot_theme
+
+ggsave("../output/af3/raincloud.pdf", width = 6, height = 5.7, dpi = 300)
+
+```
+
+
+###ROC curves
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(pROC)
+library(readr)  # Use read_csv from readr
+
+# Read the data from the CSV file
+data <- read_csv("../input/af3/ipTM_ploting.csv")  
+
+# Ensure the experimental results are properly formatted
+data$Known_outcome <- as.factor(data$Known_outcome)
+
+# Subset data for the three groups
+data_all <- data
+data_AtFLS2 <- data[data$receptor == "AtFLS2", ]
+data_no_AtFLS2 <- data[data$receptor != "AtFLS2", ]
+
+# Calculate ROC curves for each subset
+roc_all <- roc(response = data_all$Known_outcome, predictor = data_all$Average_ipTM)
+roc_AtFLS2 <- roc(response = data_AtFLS2$Known_outcome, predictor = data_AtFLS2$Average_ipTM)
+roc_no_AtFLS2 <- roc(response = data_no_AtFLS2$Known_outcome, predictor = data_no_AtFLS2$Average_ipTM)
+
+# Extract AUC values
+auc_all <- auc(roc_all)
+auc_AtFLS2 <- auc(roc_AtFLS2)
+auc_no_AtFLS2 <- auc(roc_no_AtFLS2)
+
+# Extract coordinates for the ROC curves
+coords_all <- coords(roc_all, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
+coords_AtFLS2 <- coords(roc_AtFLS2, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
+coords_no_AtFLS2 <- coords(roc_no_AtFLS2, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
+
+# Convert to data frames for ggplot
+coords_all_df <- as.data.frame(coords_all)
+coords_AtFLS2_df <- as.data.frame(coords_AtFLS2)
+coords_no_AtFLS2_df <- as.data.frame(coords_no_AtFLS2)
+
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"),
+        axis.text.x = element_text(size = 20, color = "black"),
+        axis.text.y = element_text(size = 20, color = "black"),
+        axis.ticks = element_line(size = 0.8))
+
+# Plot the ROC curves using ggplot2
+roc_plot <- ggplot() +
+  geom_line(data = coords_all_df, aes(x = 1 - specificity, y = sensitivity), color = "#4477aa", size = 1.2) +
+  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#5dc4c9", size = 1.2) +
+  geom_line(data = coords_no_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#117733", size = 1.2) +
+  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "navy") +
+  annotate("text", x = 0.95, y = 0.05, label = sprintf("AUC (Non-AtFLS2): %.2f", auc_no_AtFLS2), color = "#117733", hjust = 1, vjust = 0, size = 7) +
+  annotate("text", x = 0.95, y = 0.19, label = sprintf("AUC (AtFLS2): %.2f", auc_AtFLS2), color = "#5dc4c9", hjust = 1, vjust = 0, size = 7) +
+  annotate("text", x = 0.95, y = 0.12, label = sprintf("AUC (All data): %.2f", auc_all), color = "#4477aa", hjust = 1, vjust = 0, size = 7) +
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  labs(title = "ROC Curves for Different Receptor Subsets", 
+       x = "False Positive Rate", y = "True Positive Rate") +
+  my_ggplot_theme
+
+# Print the plot
+print(roc_plot)
+
+# Save the plot
+ggsave("../output/af3/ROC_multiple_curves.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+
+
+```
+
 
 ### Accuracy curves on receptor
 ```{r}
@@ -94,6 +223,55 @@ ggsave("../output/af3/AF3_accuracy_by_receptor.pdf", dpi = 300, width = 6.6, hei
 
 ```
 
+### Accuracy on experimental data
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Load the data
+data <- read.csv("../input/af3/ipTM_ploting.csv")
+
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 14, color = "black"),
+        axis.title.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_text(size = 14, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"),
+        axis.ticks = element_line(size = 0.8))
+
+# Define the cutoff
+cutoff <- 0.83
+
+# Calculate accuracy based on the cutoff
+data <- data %>%
+  mutate(
+    Accurate = ifelse((Average_ipTM >= cutoff & Known_outcome == "Perception") | 
+                      (Average_ipTM < cutoff & Known_outcome == "No perception"), 1, 0)
+  )
+
+# Group by Known_outcome and calculate accuracy percentage
+accuracy_data <- data %>%
+  group_by(Known_outcome) %>%
+  summarise(
+    Accuracy_Percentage = mean(Accurate) * 100,
+    .groups = 'drop'
+  )
+
+# Plotting the bar graph
+plot <- ggplot(accuracy_data, aes(x = Known_outcome, y = Accuracy_Percentage, fill = Known_outcome)) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  labs(title = "",
+       x = "Experimental Result",
+       y = "% Accuracy (ipTM threshold = 0.83)") +
+  my_ggplot_theme +
+  theme(legend.position = "none")+
+  ylim(0, 100)+
+  scale_fill_manual(values = c("#fd5901", "#4477aa"))  # Color aesthetic based on the experimental result
+
+ggsave("../output/af3/accuracy_on_experimental_data.pdf", plot, width = 4, height = 6)
+```
+
+
 ### Accuracy on flg22 variants
 ```{r}
 library(ggplot2)
@@ -177,182 +355,4 @@ print(final_plot)
 
 # Optionally, save the plot
 ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 4.2, height = 6)
-```
-
-### Accuracy on experimental data
-```{r}
-library(ggplot2)
-library(dplyr)
-
-# Load the data
-data <- read.csv("../input/af3/ipTM_ploting.csv")
-
-my_ggplot_theme <- theme_classic() +
-  theme(text = element_text(size = 16),
-        axis.title.x = element_text(size = 14, color = "black"),
-        axis.title.y = element_text(size = 14, color = "black"),
-        axis.text.x = element_text(size = 14, color = "black"),
-        axis.text.y = element_text(size = 14, color = "black"),
-        axis.ticks = element_line(size = 0.8))
-
-# Define the cutoff
-cutoff <- 0.83
-
-# Calculate accuracy based on the cutoff
-data <- data %>%
-  mutate(
-    Accurate = ifelse((Average_ipTM >= cutoff & Known_outcome == "Perception") | 
-                      (Average_ipTM < cutoff & Known_outcome == "No perception"), 1, 0)
-  )
-
-# Group by Known_outcome and calculate accuracy percentage
-accuracy_data <- data %>%
-  group_by(Known_outcome) %>%
-  summarise(
-    Accuracy_Percentage = mean(Accurate) * 100,
-    .groups = 'drop'
-  )
-
-# Plotting the bar graph
-plot <- ggplot(accuracy_data, aes(x = Known_outcome, y = Accuracy_Percentage, fill = Known_outcome)) +
-  geom_bar(stat = "identity", alpha = 0.7) +
-  labs(title = "",
-       x = "Experimental Result",
-       y = "% Accuracy (ipTM threshold = 0.83)") +
-  my_ggplot_theme +
-  theme(legend.position = "none")+
-  ylim(0, 100)+
-  scale_fill_manual(values = c("#fd5901", "#4477aa"))  # Color aesthetic based on the experimental result
-
-ggsave("../output/af3/accuracy_on_experimental_data.pdf", plot, width = 4, height = 6)
-```
-
-
-###ROC curves
-```{r}
-# Load necessary libraries
-library(ggplot2)
-library(pROC)
-library(readr)  # Use read_csv from readr
-
-# Read the data from the CSV file
-data <- read_csv("../input/af3/ipTM_ploting.csv")  
-
-# Ensure the experimental results are properly formatted
-data$Known_outcome <- as.factor(data$Known_outcome)
-
-# Subset data for the three groups
-data_all <- data
-data_AtFLS2 <- data[data$receptor == "AtFLS2", ]
-data_no_AtFLS2 <- data[data$receptor != "AtFLS2", ]
-
-# Calculate ROC curves for each subset
-roc_all <- roc(response = data_all$Known_outcome, predictor = data_all$Average_ipTM)
-roc_AtFLS2 <- roc(response = data_AtFLS2$Known_outcome, predictor = data_AtFLS2$Average_ipTM)
-roc_no_AtFLS2 <- roc(response = data_no_AtFLS2$Known_outcome, predictor = data_no_AtFLS2$Average_ipTM)
-
-# Extract AUC values
-auc_all <- auc(roc_all)
-auc_AtFLS2 <- auc(roc_AtFLS2)
-auc_no_AtFLS2 <- auc(roc_no_AtFLS2)
-
-# Extract coordinates for the ROC curves
-coords_all <- coords(roc_all, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
-coords_AtFLS2 <- coords(roc_AtFLS2, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
-coords_no_AtFLS2 <- coords(roc_no_AtFLS2, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
-
-# Convert to data frames for ggplot
-coords_all_df <- as.data.frame(coords_all)
-coords_AtFLS2_df <- as.data.frame(coords_AtFLS2)
-coords_no_AtFLS2_df <- as.data.frame(coords_no_AtFLS2)
-
-my_ggplot_theme <- theme_classic() +
-  theme(text = element_text(size = 16),
-        axis.title.x = element_text(size = 20, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
-        axis.text.x = element_text(size = 20, color = "black"),
-        axis.text.y = element_text(size = 20, color = "black"),
-        axis.ticks = element_line(size = 0.8))
-
-# Plot the ROC curves using ggplot2
-roc_plot <- ggplot() +
-  geom_line(data = coords_all_df, aes(x = 1 - specificity, y = sensitivity), color = "#4477aa", size = 1.2) +
-  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#5dc4c9", size = 1.2) +
-  geom_line(data = coords_no_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#117733", size = 1.2) +
-  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "navy") +
-  annotate("text", x = 0.95, y = 0.05, label = sprintf("AUC (Non-AtFLS2): %.2f", auc_no_AtFLS2), color = "#117733", hjust = 1, vjust = 0, size = 7) +
-  annotate("text", x = 0.95, y = 0.19, label = sprintf("AUC (AtFLS2): %.2f", auc_AtFLS2), color = "#5dc4c9", hjust = 1, vjust = 0, size = 7) +
-  annotate("text", x = 0.95, y = 0.12, label = sprintf("AUC (All data): %.2f", auc_all), color = "#4477aa", hjust = 1, vjust = 0, size = 7) +
-  scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
-  labs(title = "ROC Curves for Different Receptor Subsets", 
-       x = "False Positive Rate", y = "True Positive Rate") +
-  my_ggplot_theme
-
-# Print the plot
-print(roc_plot)
-
-# Save the plot
-ggsave("../output/af3/ROC_multiple_curves.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
-
-
-```
-
-
-
-```{r}
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(readr)  # For reading the CSV file
-
-# Read the data from a CSV file
-data <- read_csv("../input/af3/ipTM_ploting.csv")
-
-# Assuming the data has columns 'Known_outcome' and 'Average_ipTM'
-data <- data %>%
-  mutate(Known_outcome = factor(Known_outcome))
-
-# Assess normality using Shapiro-Wilk test
-shapiro_results <- data %>%
-  group_by(Known_outcome) %>%
-  summarise(shapiro_p_value = shapiro.test(Average_ipTM)$p.value)
-
-print("Shapiro-Wilk Test for Normality:")
-print(shapiro_results)
-
-# If p-value < 0.05, data is not normally distributed
-if(any(shapiro_results$shapiro_p_value < 0.05)) {
-  test_method <- "wilcox.test"
-  test_name <- "Wilcoxon rank-sum test"
-  # Perform Wilcoxon rank-sum test
-  wilcox_test <- wilcox.test(Average_ipTM ~ Known_outcome, data = data)
-  p_value <- wilcox_test$p.value
-} else {
-  test_method <- "t.test"
-  test_name <- "t-test"
-  # Perform t-test
-  t_test <- t.test(Average_ipTM ~ Known_outcome, data = data)
-  p_value <- t_test$p.value
-}
-
-# Print the selected test method and p-value
-print(paste("Selected test:", test_name))
-print(paste("P-value:", p_value))
-
-# Creating the raincloud plot without p-value display
-ggplot(data, aes(x = Known_outcome, y = Average_ipTM, fill = Known_outcome)) +
-  geom_violin(trim = FALSE, alpha = 0.5, color = NA, show.legend = FALSE) +  # Density plot
-  geom_boxplot(width = 0.03, outlier.shape = NA, show.legend = FALSE) +  # Boxplot inside the violin
-  geom_jitter(size = 1, alpha = 0.5, color = "black", width = 0.1, show.legend = FALSE) +  # Points with jitter
-   annotate("text", x = 1.5, y = max(data$Average_ipTM) + 0.1, 
-           label = expression(italic(p) < "0.0001"), size = 7, hjust = 0.5) +  # Add italic p-value text above violins
-  scale_fill_manual(values = c("#fd5901", "#4477aa")) +  # Custom colors for each experimental result
-  labs(title = "Raincloud Plot of Average ipTM by Experimental Result",
-       x = "Experimental Result",
-       y = "Average ipTM") +
-  my_ggplot_theme
-
-ggsave("../output/af3/raincloud.pdf", width = 6, height = 5.7, dpi = 300)
-
 ```
