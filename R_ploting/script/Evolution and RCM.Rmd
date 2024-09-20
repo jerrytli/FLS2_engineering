@@ -87,12 +87,6 @@ ggsave("../output/omega/omega_distribution_plot.pdf", plot = distribution, width
 ```
 
 
-
-```{r}
-write.csv(omega_data_combined, file = "../output/omega/combined_omega.csv")
-```
-
-
 ####Plot raw dN/dS at region 1 LRR 7 & 8
 ```{r}
 # Load data from CSV files
