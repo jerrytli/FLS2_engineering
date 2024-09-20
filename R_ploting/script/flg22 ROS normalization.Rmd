@@ -65,6 +65,57 @@ ggsave(filename = "../output/ros/Figure_1_All_FLS2_bubble.pdf", width = 4.9, hei
 ```
 
 
+#### Fig.2
+```{r}
+pc = read.csv("../input/ros/Fc-Qv.csv", header = TRUE)
+# Melt the data
+pcm <- melt(pc, id = c("Receptor"))
+
+# Step 1: Specify the order of the x-axis
+new_order_vector <- c("Pae", "Atu", "Rso_1", "Rso_2", "Ddi", "Pvi")
+
+
+# Ensure Receptor order is as in the raw dataset
+pcm$Receptor <- factor(pcm$Receptor, levels = unique(pc$Receptor))
+
+# Ensure Receptor is a factor with the correct levels
+#pcm$Receptor <- factor(pcm$Receptor, levels = c("NbFLS2", "FLS2XL", "TjFLS2", "QvFLS2"))
+
+# Create a new column 'Color' with the default colors based on 'Receptor'
+pcm$Color <- case_when(
+  pcm$Receptor == "QvFLS2" & pcm$value >= 10 ~ "#C84D4C",
+  pcm$Receptor == "FcFLS2" & pcm$value >= 10 ~ "#c5bebe",
+  pcm$Receptor == "SynFcFLS2 V1" & pcm$value >= 10 ~ "#cd7573",
+  pcm$Receptor == "SynFcFLS2 V3" & pcm$value >= 10 ~ "#cc9a99",
+  pcm$Receptor == "SynFcFLS2 V2" & pcm$value >= 10 ~ "#c7b6b6",
+  pcm$value < 10 ~ "white", # Apply light gray color when value is less than 10
+  TRUE ~ NA_character_ # For unexpected cases
+)
+xx <- ggplot(pcm, aes(y = Receptor, x = variable)) + 
+  geom_point(aes(size = value, fill = Color), alpha = 0.85, shape = 21) + 
+  scale_size_continuous(limits = c(0, 160), range = c(1, 14), breaks = c(25, 50, 75, 140)) + 
+  labs(y = "", x = "", size = "Normalized ROS (%)", fill = "")  + 
+  theme_classic() +
+  theme(
+    legend.key = element_blank(), 
+    axis.text.y = element_text(colour = "black", size = 14, face = "bold"), 
+    axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", size = 14, face = "bold", vjust = 1), 
+    legend.text = element_text(size = 10, face = "bold", colour = "black"), 
+    legend.title = element_text(size = 12, face = "bold"), 
+    legend.position = "right",
+    panel.grid.major = element_line(colour = "lightgrey", linewidth = 0.5),
+    panel.grid.minor = element_blank()
+  ) +
+  scale_fill_identity(guide = FALSE) +  # Use colors directly from the Color column
+ scale_x_discrete(limits = new_order_vector) + # Set x-axis labels and order
+  scale_y_discrete(limits = rev(levels(pcm$Receptor))) # Ensure Y axis order is as in the raw dataset 
+print(xx)
+ggsave(filename = "../output/Qv-Fc.pdf", width = 7, height = 3.4)
+
+```
+
+
+
 #### Fig.3
 ```{r}
 
@@ -120,54 +171,5 @@ print(xx)
 # Save the plot to a file
 
 ggsave(filename = "../output/ros/Vr-XL.pdf", width = 6.5, height = 3.4, bg = "transparent")
-
-```
-
-#### Fig.2
-```{r}
-pc = read.csv("../input/ros/Fc-Qv.csv", header = TRUE)
-# Melt the data
-pcm <- melt(pc, id = c("Receptor"))
-
-# Step 1: Specify the order of the x-axis
-new_order_vector <- c("Pae", "Atu", "Rso_1", "Rso_2", "Ddi", "Pvi")
-
-
-# Ensure Receptor order is as in the raw dataset
-pcm$Receptor <- factor(pcm$Receptor, levels = unique(pc$Receptor))
-
-# Ensure Receptor is a factor with the correct levels
-#pcm$Receptor <- factor(pcm$Receptor, levels = c("NbFLS2", "FLS2XL", "TjFLS2", "QvFLS2"))
-
-# Create a new column 'Color' with the default colors based on 'Receptor'
-pcm$Color <- case_when(
-  pcm$Receptor == "QvFLS2" & pcm$value >= 10 ~ "#C84D4C",
-  pcm$Receptor == "FcFLS2" & pcm$value >= 10 ~ "#c5bebe",
-  pcm$Receptor == "SynFcFLS2 V1" & pcm$value >= 10 ~ "#cd7573",
-  pcm$Receptor == "SynFcFLS2 V3" & pcm$value >= 10 ~ "#cc9a99",
-  pcm$Receptor == "SynFcFLS2 V2" & pcm$value >= 10 ~ "#c7b6b6",
-  pcm$value < 10 ~ "white", # Apply light gray color when value is less than 10
-  TRUE ~ NA_character_ # For unexpected cases
-)
-xx <- ggplot(pcm, aes(y = Receptor, x = variable)) + 
-  geom_point(aes(size = value, fill = Color), alpha = 0.85, shape = 21) + 
-  scale_size_continuous(limits = c(0, 160), range = c(1, 14), breaks = c(25, 50, 75, 140)) + 
-  labs(y = "", x = "", size = "Normalized ROS (%)", fill = "")  + 
-  theme_classic() +
-  theme(
-    legend.key = element_blank(), 
-    axis.text.y = element_text(colour = "black", size = 14, face = "bold"), 
-    axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", size = 14, face = "bold", vjust = 1), 
-    legend.text = element_text(size = 10, face = "bold", colour = "black"), 
-    legend.title = element_text(size = 12, face = "bold"), 
-    legend.position = "right",
-    panel.grid.major = element_line(colour = "lightgrey", linewidth = 0.5),
-    panel.grid.minor = element_blank()
-  ) +
-  scale_fill_identity(guide = FALSE) +  # Use colors directly from the Color column
- scale_x_discrete(limits = new_order_vector) + # Set x-axis labels and order
-  scale_y_discrete(limits = rev(levels(pcm$Receptor))) # Ensure Y axis order is as in the raw dataset 
-print(xx)
-ggsave(filename = "../output/Qv-Fc.pdf", width = 7, height = 3.4)
 
 ```
