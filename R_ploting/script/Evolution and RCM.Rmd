@@ -88,7 +88,7 @@ ggsave("../output/omega/omega_distribution_plot.pdf", plot = distribution, width
 ```
 
 
-####Plot raw dN/dS at region 1 LRR 7 & 8
+#### Plot raw dN/dS at region 1 LRR 7 & 8
 ```{r}
 # Load data from CSV files
 fagales_data <- read_csv("../input/omega/fagales_M8_omega.csv")
@@ -152,7 +152,7 @@ ggsave("../output/omega/raw_omega_region_1.pdf", width = 5.5, height = 3)
 
 ```
 
-####Plot raw dN/dS at region 2 LRR 16 & 17
+#### Plot raw dN/dS at region 2 LRR 16 & 17
 ```{r}
 # Define ranges for each group
 fagales_range <- c(431, 478)
@@ -202,7 +202,7 @@ ggsave("../output/omega/raw_omega_region_2.pdf",  width = 5.5, height = 3)
 
 #RCM
 
-####Load RCM output matrix for fagales
+#### Load RCM output matrix for fagales
 
 ```{r}
 # Load necessary library
@@ -230,7 +230,7 @@ write.csv(matrix_rcm_fagales, "../output/rcm/fagales_matrix_output.csv", row.nam
 
 ```
 
-####Plot the RCM plot for Fagales order
+#### Plot the RCM plot for Fagales order
 
 ```{r}
 # Load required libraries
@@ -295,7 +295,7 @@ ggsave("../output/rcm/RCM_fagales.pdf", width = 3.7, height = 5)
 ```
 
 
-####Load RCM output matrix for Vitales
+#### Load RCM output matrix for Vitales
 
 ```{r}
 # Load necessary library
@@ -322,7 +322,7 @@ write.csv(matrix_rcm, "../output/rcm/vitales_matrix_output.csv", row.names = FAL
 
 ```
 
-####Plot the RCM plot for vitales
+#### Plot the RCM plot for vitales
 
 ```{r}
 # Load required libraries
