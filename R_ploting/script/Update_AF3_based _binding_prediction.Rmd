@@ -99,7 +99,7 @@ auc_values <- sapply(roc_results, auc)
 
 # Assign specific colors for each metric
 color_matrix <- c(
-  "ipTM flg22_FLS2" = "#4477aa",
+  "ipTM flg22_FLS2" = "#845ec2",
   "ipTM_flg22_coreceptor" = "#5dc4c9",
   "Pae min flg22_FLS2" = "#117733",
   "Pae min flg22_coreceptor" = "#ddcc77"
@@ -152,6 +152,75 @@ print(roc_plot)
 # Save the plot
 ggsave("../output/af3/ROC_multiple_metrics.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
 ```
+### ROC curves on different receptor subset
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(pROC)
+library(readr)  # Use read_csv from readr
+
+# Read the data from the CSV file
+data <- read_csv("../input/af3/af3_fullcomplex.csv")  
+
+# Ensure the experimental results are properly formatted
+data$Known_outcome <- as.factor(data$Known_outcome)
+
+# Subset data for the three groups
+data_all <- data
+data_AtFLS2 <- data[data$receptor == "AtFLS2", ]
+data_no_AtFLS2 <- data[data$receptor != "AtFLS2", ]
+
+# Calculate ROC curves for each subset
+roc_all <- roc(response = data_all$Known_outcome, predictor = data_all$"ipTM flg22_FLS2")
+roc_AtFLS2 <- roc(response = data_AtFLS2$Known_outcome, predictor = data_AtFLS2$"ipTM flg22_FLS2")
+roc_no_AtFLS2 <- roc(response = data_no_AtFLS2$Known_outcome, predictor = data_no_AtFLS2$"ipTM flg22_FLS2")
+
+# Extract AUC values
+auc_all <- auc(roc_all)
+auc_AtFLS2 <- auc(roc_AtFLS2)
+auc_no_AtFLS2 <- auc(roc_no_AtFLS2)
+
+# Extract coordinates for the ROC curves
+coords_all <- coords(roc_all, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
+coords_AtFLS2 <- coords(roc_AtFLS2, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
+coords_no_AtFLS2 <- coords(roc_no_AtFLS2, "all", ret = c("threshold", "sensitivity", "specificity", "accuracy"))
+
+# Convert to data frames for ggplot
+coords_all_df <- as.data.frame(coords_all)
+coords_AtFLS2_df <- as.data.frame(coords_AtFLS2)
+coords_no_AtFLS2_df <- as.data.frame(coords_no_AtFLS2)
+
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"),
+        axis.text.x = element_text(size = 20, color = "black"),
+        axis.text.y = element_text(size = 20, color = "black"),
+        axis.ticks = element_line(size = 0.8))
+
+# Plot the ROC curves using ggplot2
+roc_plot <- ggplot() +
+  geom_line(data = coords_all_df, aes(x = 1 - specificity, y = sensitivity), color = "#4477aa", size = 1.2) +
+  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#5dc4c9", size = 1.2) +
+  geom_line(data = coords_no_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#117733", size = 1.2) +
+  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "navy") +
+  annotate("text", x = 0.95, y = 0.05, label = sprintf("AUC (Non-AtFLS2): %.2f", auc_no_AtFLS2), color = "#117733", hjust = 1, vjust = 0, size = 7) +
+  annotate("text", x = 0.95, y = 0.19, label = sprintf("AUC (AtFLS2): %.2f", auc_AtFLS2), color = "#5dc4c9", hjust = 1, vjust = 0, size = 7) +
+  annotate("text", x = 0.95, y = 0.12, label = sprintf("AUC (All data): %.2f", auc_all), color = "#4477aa", hjust = 1, vjust = 0, size = 7) +
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  labs(title = "ROC Curves for Different Receptor Subsets", 
+       x = "False Positive Rate", y = "True Positive Rate") +
+  my_ggplot_theme
+
+# Print the plot
+print(roc_plot)
+
+# Save the plot
+ggsave("../output/af3/ROC_multiple_curves.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+
+
+```
 
 
 ### Accuracy curves on receptor
@@ -160,7 +229,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 
-setwd("~/FLS2_engineering/R_ploting/script/")
+#setwd("~/FLS2_engineering/R_ploting/script/")
 
 # Define customized ggplot theme
 my_ggplot_theme <- theme_classic() +
@@ -176,7 +245,7 @@ my_ggplot_theme <- theme_classic() +
         legend.text = element_text(size = 14))
 
 # Read and prepare the data
-data <- read.csv("../input/af3/ipTM_ploting.csv")
+data <- read.csv("../input/af3/af3_fullcomplex.csv")
 
 # Define the range of cutoffs
 cutoffs <- seq(0.7, 0.9, by = 0.01)
@@ -187,8 +256,8 @@ calculate_accuracy <- function(data_subset) {
     crossing(Cutoff = cutoffs) %>% 
     mutate(
       Cutoff = as.numeric(Cutoff),
-      Accurate = ifelse(Average_ipTM >= Cutoff & Known_outcome == "Perception" |
-                        Average_ipTM < Cutoff & Known_outcome == "No perception", 1, 0)
+      Accurate = ifelse(ipTM.flg22_FLS2 >= Cutoff & Known_outcome == "Perception" |
+                        ipTM.flg22_FLS2 < Cutoff & Known_outcome == "No perception", 1, 0)
     ) %>% 
     group_by(Cutoff) %>% 
     summarise(
@@ -298,14 +367,14 @@ library(dplyr)
 library(tidyr)
 
 # Load and prepare the data
-data <- read.csv("../input/af3/ipTM_ploting_subset.csv") 
+data <- read.csv("../input/af3/af3_fullcomplex.csv") 
 
 data_processed <- data %>%
   mutate(
-    Accuracy = ifelse((Average_ipTM >= 0.83 & Known_outcome == "Perception") | 
-                      (Average_ipTM < 0.83 & Known_outcome == "No perception"), 1, 0),
-    Type_1_Error = ifelse(Average_ipTM >= 0.83 & Known_outcome == "No perception", 1, 0),
-    Type_2_Error = ifelse(Average_ipTM < 0.83 & Known_outcome == "Perception", 1, 0)
+    Accuracy = ifelse((ipTM.flg22_FLS2 >= 0.83 & Known_outcome == "Perception") | 
+                      (ipTM.flg22_FLS2 < 0.83 & Known_outcome == "No perception"), 1, 0),
+    Type_1_Error = ifelse(ipTM.flg22_FLS2 >= 0.83 & Known_outcome == "No perception", 1, 0),
+    Type_2_Error = ifelse(ipTM.flg22_FLS2 < 0.83 & Known_outcome == "Perception", 1, 0)
   ) %>%
   group_by(ligand_name) %>%
   summarise(
