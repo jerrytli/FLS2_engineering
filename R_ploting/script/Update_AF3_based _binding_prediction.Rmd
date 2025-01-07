@@ -1,0 +1,377 @@
+---
+title: "AF_based_binding_prediction"
+author: "Jerry Li"
+date: "2024-07-29"
+output: html_document
+---
+
+### Raincloud plot panel A
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(readr)  # For reading the CSV file
+
+# Read the data from a CSV file
+data <- read_csv("../input/af3/af3_fullcomplex.csv")
+
+# Assuming the data has columns 'Known_outcome' and 'ipTM flg22_FLS2'
+data <- data %>%
+  mutate(Known_outcome = factor(Known_outcome))
+
+# Assess normality using Shapiro-Wilk test
+shapiro_results <- data %>%
+  group_by(Known_outcome) %>%
+  summarise(shapiro_p_value = shapiro.test(`ipTM flg22_FLS2`)$p.value)
+
+print("Shapiro-Wilk Test for Normality:")
+print(shapiro_results)
+
+# If p-value < 0.05, data is not normally distributed
+if(any(shapiro_results$shapiro_p_value < 0.05)) {
+  test_method <- "wilcox.test"
+  test_name <- "Wilcoxon rank-sum test"
+  # Perform Wilcoxon rank-sum test
+  wilcox_test <- wilcox.test(`ipTM flg22_FLS2` ~ Known_outcome, data = data)
+  p_value <- wilcox_test$p.value
+} else {
+  test_method <- "t.test"
+  test_name <- "t-test"
+  # Perform t-test
+  t_test <- t.test(`ipTM flg22_FLS2` ~ Known_outcome, data = data)
+  p_value <- t_test$p.value
+}
+
+# Print the selected test method and p-value
+print(paste("Selected test:", test_name))
+print(paste("P-value:", p_value))
+
+# Creating the raincloud plot without p-value display
+ggplot(data, aes(x = Known_outcome, y = `ipTM flg22_FLS2`, fill = Known_outcome)) +
+  geom_violin(trim = FALSE, alpha = 0.5, color = NA, show.legend = FALSE) +  # Density plot
+  geom_boxplot(width = 0.03, outlier.shape = NA, show.legend = FALSE) +  # Boxplot inside the violin
+  geom_jitter(size = 1, alpha = 0.5, color = "black", width = 0.1, show.legend = FALSE) +  # Points with jitter
+   annotate("text", x = 1.5, y = max(data$`ipTM flg22_FLS2`) + 0.1, 
+           label = expression(italic(p) < "0.0001"), size = 7, hjust = 0.5) +  # Add italic p-value text above violins
+  scale_fill_manual(values = c("#fd5901", "#4477aa")) +  # Custom colors for each experimental result
+  labs(title = "Raincloud Plot of ipTM flg22_FLS2 by Experimental Result",
+       x = "Experimental Result",
+       y = "ipTM flg22_FLS2") +
+  my_ggplot_theme
+
+ggsave("../output/af3/raincloud.pdf", width = 6, height = 5.7, dpi = 300)
+
+
+```
+
+
+###ROC curves using different metrics
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(pROC)
+library(readr)  # Use read_csv from readr
+
+# Read the data from the CSV file
+data <- read_csv("../input/af3/af3_fullcomplex.csv")
+
+# Ensure the experimental results are properly formatted
+data$Known_outcome <- as.factor(data$Known_outcome)
+
+# Transform PAE data by adding a negative sign before analysis
+data$`Pae min flg22_FLS2` <- -data$`Pae min flg22_FLS2`
+data$`Pae min flg22_coreceptor` <- -data$`Pae min flg22_coreceptor`
+
+# Define predictive metrics for analysis
+predictive_metrics <- c("ipTM flg22_FLS2", "ipTM_flg22_coreceptor", 
+                        "Pae min flg22_FLS2", "Pae min flg22_coreceptor")
+
+# Initialize a list to store ROC results
+roc_results <- list()
+
+# Calculate ROC curves and AUC for each predictive metric
+for (metric in predictive_metrics) {
+  roc_results[[metric]] <- roc(response = data$Known_outcome, predictor = data[[metric]])
+}
+
+# Extract AUC values for each metric
+auc_values <- sapply(roc_results, auc)
+
+# Assign specific colors for each metric
+color_matrix <- c(
+  "ipTM flg22_FLS2" = "#4477aa",
+  "ipTM_flg22_coreceptor" = "#5dc4c9",
+  "Pae min flg22_FLS2" = "#117733",
+  "Pae min flg22_coreceptor" = "#ddcc77"
+)
+
+# Order metrics by AUC values
+ordered_metrics <- names(sort(auc_values, decreasing = FALSE))
+
+# Prepare data for plotting
+roc_coords <- lapply(roc_results, function(roc_obj) {
+  coords(roc_obj, "all", ret = c("specificity", "sensitivity"))
+})
+
+# Combine ROC coordinates into a single data frame for ggplot
+roc_data <- do.call(rbind, lapply(ordered_metrics, function(metric) {
+  data.frame(
+    Metric = metric,
+    Specificity = 1 - roc_coords[[metric]]$specificity,
+    Sensitivity = roc_coords[[metric]]$sensitivity
+  )
+}))
+
+# Custom theme for ggplot
+my_ggplot_theme <- theme_classic() +
+  theme(
+    text = element_text(size = 16),
+    axis.title.x = element_text(size = 20, color = "black"),
+    axis.title.y = element_text(size = 20, color = "black"),
+    axis.text.x = element_text(size = 20, color = "black"),
+    axis.text.y = element_text(size = 20, color = "black"),
+    axis.ticks = element_line(size = 0.8)
+  )
+
+# Plot the ROC curves using ggplot2
+roc_plot <- ggplot(roc_data, aes(x = Specificity, y = Sensitivity, color = Metric)) +
+  geom_line(size = 1, show.legend = FALSE) +
+  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "gray") +
+  scale_color_manual(values = color_matrix) +
+  annotate("text", x = 0.95, y = seq(0.1, 0.3, length.out = length(ordered_metrics)), 
+           label = paste(ordered_metrics, "AUC:", round(auc_values[ordered_metrics], 2)),
+           color = unname(color_matrix[ordered_metrics]), hjust = 1, size = 6) +
+  labs(title = "ROC Curves for Predictive Metrics", x = "False Positive Rate", y = "True Positive Rate") +
+    scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  my_ggplot_theme
+
+# Print the plot
+print(roc_plot)
+
+# Save the plot
+ggsave("../output/af3/ROC_multiple_metrics.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+```
+
+
+### Accuracy curves on receptor
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+setwd("~/FLS2_engineering/R_ploting/script/")
+
+# Define customized ggplot theme
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 20, color = "black"),
+        axis.title.y = element_text(size = 20, color = "black"),
+        axis.text.x = element_text(size = 20, color = "black"),
+        axis.text.y = element_text(size = 20, color = "black"),
+        axis.ticks = element_line(size = 0.8),
+        legend.position = c(0.85, 0.2), # Adjust position to bottom right above x-axis
+        legend.background = element_rect(fill = "white", color = "black"),
+        legend.title = element_blank(), # Remove the legend title for a cleaner look
+        legend.text = element_text(size = 14))
+
+# Read and prepare the data
+data <- read.csv("../input/af3/ipTM_ploting.csv")
+
+# Define the range of cutoffs
+cutoffs <- seq(0.7, 0.9, by = 0.01)
+
+# Function to calculate accuracy for a given subset of data
+calculate_accuracy <- function(data_subset) {
+  expanded_data <- data_subset %>% 
+    crossing(Cutoff = cutoffs) %>% 
+    mutate(
+      Cutoff = as.numeric(Cutoff),
+      Accurate = ifelse(Average_ipTM >= Cutoff & Known_outcome == "Perception" |
+                        Average_ipTM < Cutoff & Known_outcome == "No perception", 1, 0)
+    ) %>% 
+    group_by(Cutoff) %>% 
+    summarise(
+      Accuracy = mean(Accurate),
+      .groups = 'drop'
+    )
+  return(expanded_data)
+}
+
+# Calculate accuracy for all data, only AtFLS2, and non-AtFLS2
+accuracy_all <- calculate_accuracy(data)
+accuracy_AtFLS2 <- calculate_accuracy(data[data$receptor == "AtFLS2", ])
+accuracy_non_AtFLS2 <- calculate_accuracy(data[data$receptor != "AtFLS2", ])
+
+# Find the optimal cutoff where accuracy is maximum for each group
+optimal_cutoff_all <- accuracy_all$Cutoff[which.max(accuracy_all$Accuracy)]
+max_accuracy_all <- max(accuracy_all$Accuracy)
+
+optimal_cutoff_AtFLS2 <- accuracy_AtFLS2$Cutoff[which.max(accuracy_AtFLS2$Accuracy)]
+max_accuracy_AtFLS2 <- max(accuracy_AtFLS2$Accuracy)
+
+optimal_cutoff_non_AtFLS2 <- accuracy_non_AtFLS2$Cutoff[which.max(accuracy_non_AtFLS2$Accuracy)]
+max_accuracy_non_AtFLS2 <- max(accuracy_non_AtFLS2$Accuracy)
+
+# Output results
+cat("All Data - Optimal ipTM Cutoff:", optimal_cutoff_all, "\n")
+cat("All Data - Highest Accuracy:", max_accuracy_all * 100, "%\n")
+cat("AtFLS2 - Optimal ipTM Cutoff:", optimal_cutoff_AtFLS2, "\n")
+cat("AtFLS2 - Highest Accuracy:", max_accuracy_AtFLS2 * 100, "%\n")
+cat("Non-AtFLS2 - Optimal ipTM Cutoff:", optimal_cutoff_non_AtFLS2, "\n")
+cat("Non-AtFLS2 - Highest Accuracy:", max_accuracy_non_AtFLS2 * 100, "%\n")
+
+# Plotting
+ggplot() +
+  geom_line(data = accuracy_all, aes(x = Cutoff, y = Accuracy, color = "All Data"), size = 1) +
+  geom_line(data = accuracy_AtFLS2, aes(x = Cutoff, y = Accuracy, color = "AtFLS2"), size = 1) +
+  geom_line(data = accuracy_non_AtFLS2, aes(x = Cutoff, y = Accuracy, color = "Non-AtFLS2"), size = 1) +
+  geom_vline(xintercept = optimal_cutoff_all, linetype = "dashed", color = "#4477aa", size = 1) +
+  geom_vline(xintercept = optimal_cutoff_AtFLS2, linetype = "dashed", color = "#5dc4c9", size = 1) +
+  geom_vline(xintercept = optimal_cutoff_non_AtFLS2, linetype = "dashed", color = "#117733", size = 1, alpha = 0.5) +
+  scale_color_manual(values = c("All Data" = "#4477aa",
+                                "AtFLS2" = "#5dc4c9",
+                                "Non-AtFLS2" = "#117733")) +
+  scale_y_continuous(limits = c(0.4, 1), breaks = seq(0, 1, by = 0.1)) +
+  labs(x = "Average ipTM Threshold", y = "Accuracy", title = "AF3 Accuracy Curves by Receptor Subset") +
+  my_ggplot_theme
+
+# Save the plot
+ggsave("../output/af3/AF3_accuracy_by_receptor.pdf", dpi = 300, width = 6.6, height = 6)
+
+
+```
+
+### Accuracy on experimental data
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Load the data
+data <- read.csv("../input/af3/ipTM_ploting.csv")
+
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 14, color = "black"),
+        axis.title.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_text(size = 14, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"),
+        axis.ticks = element_line(size = 0.8))
+
+# Define the cutoff
+cutoff <- 0.83
+
+# Calculate accuracy based on the cutoff
+data <- data %>%
+  mutate(
+    Accurate = ifelse((Average_ipTM >= cutoff & Known_outcome == "Perception") | 
+                      (Average_ipTM < cutoff & Known_outcome == "No perception"), 1, 0)
+  )
+
+# Group by Known_outcome and calculate accuracy percentage
+accuracy_data <- data %>%
+  group_by(Known_outcome) %>%
+  summarise(
+    Accuracy_Percentage = mean(Accurate) * 100,
+    .groups = 'drop'
+  )
+
+# Plotting the bar graph
+plot <- ggplot(accuracy_data, aes(x = Known_outcome, y = Accuracy_Percentage, fill = Known_outcome)) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  labs(title = "",
+       x = "Experimental Result",
+       y = "% Accuracy (ipTM threshold = 0.83)") +
+  my_ggplot_theme +
+  theme(legend.position = "none")+
+  ylim(0, 100)+
+  scale_fill_manual(values = c("#fd5901", "#4477aa"))  # Color aesthetic based on the experimental result
+
+ggsave("../output/af3/accuracy_on_experimental_data.pdf", plot, width = 4, height = 6)
+```
+
+
+### Accuracy on flg22 variants
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# Load and prepare the data
+data <- read.csv("../input/af3/ipTM_ploting_subset.csv") 
+
+data_processed <- data %>%
+  mutate(
+    Accuracy = ifelse((Average_ipTM >= 0.83 & Known_outcome == "Perception") | 
+                      (Average_ipTM < 0.83 & Known_outcome == "No perception"), 1, 0),
+    Type_1_Error = ifelse(Average_ipTM >= 0.83 & Known_outcome == "No perception", 1, 0),
+    Type_2_Error = ifelse(Average_ipTM < 0.83 & Known_outcome == "Perception", 1, 0)
+  ) %>%
+  group_by(ligand_name) %>%
+  summarise(
+    Accuracy_Percentage = mean(Accuracy) * 100,
+    Type_1_Error_Percentage = mean(Type_1_Error) * 100,
+    Type_2_Error_Percentage = mean(Type_2_Error) * 100,
+    .groups = 'drop'
+  )
+
+# Correctly pivot the data
+data_long <- data_processed %>%
+  pivot_longer(
+    cols = c("Accuracy_Percentage", "Type_1_Error_Percentage", "Type_2_Error_Percentage"),
+    names_to = "Metric",
+    values_to = "Percentage"
+  ) %>%
+  mutate(Metric = gsub("_Percentage$", "", Metric))
+
+# Set the order of flg22 variants as in the similarity matrix
+variant_order <- c("Paeflg22", "Atuflg22", "Rrhflg22","Rso_1flg22", "Rso_2flg22","Ddiflg22", "Eamflg22", "Pviflg22", "Xfrflg22", "Xorflg22")
+data_long$ligand_name <- factor(data_long$ligand_name, levels = rev(variant_order))
+data_long$Metric <- factor(data_long$Metric, levels = c("Type_1_Error", "Type_2_Error", "Accuracy"))
+
+# Prepare similarity data
+similarity_data <- data.frame(
+  ligand_name = variant_order,
+  sim = c(100, 50, 36.4, 59.1, 68.2, 63.6, 63.6, 31.8, 59.1, 59.1)
+)
+similarity_data$ligand_name <- factor(similarity_data$ligand_name, levels = variant_order)
+
+my_ggplot_theme <- theme_classic() +
+  theme(text = element_text(size = 16),
+        axis.title.x = element_text(size = 14, color = "black"),
+        axis.title.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_text(size = 14, color = "black"),
+        axis.text.y = element_text(size = 14, color = "black"),
+        axis.ticks = element_line(size = 0.8))
+# Plot
+stacked_plot <- ggplot(data_long, aes(x = ligand_name, y = Percentage, fill = Metric)) +
+  geom_bar(stat = "identity", position = "stack") +
+  coord_flip() +  # This flips the plot to vertical orientation
+  scale_fill_manual(values = c("Accuracy" = "#4477aa", "Type_1_Error" = "#ee6677", "Type_2_Error" = "#ccbb44")) +
+  labs(title = "Metric at ipTM Cutoff 0.83",
+       x = "flg22 Variants", y = "Percentage") +
+  my_ggplot_theme +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 105)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom",  # Moves legend to the bottom
+        legend.title = element_blank(),  # Optionally remove the legend title
+        legend.box = "horizontal",  # Horizontal layout for the legend items
+        legend.box.background = element_rect(color="black", size=0.5),  # Adds a box around the legend with a border
+        legend.text = element_text(size = 8),  # Adjust text size for better fit
+        legend.key.size = unit(0.3, "cm"))  # Adjusts the size of the legend keys
+
+# Add similarity data as a line plot over the bars
+final_plot <- stacked_plot +
+  geom_line(data = similarity_data, aes(x = ligand_name, y = sim, group = 1), 
+            color = "black", size = 1.2, inherit.aes = FALSE, alpha = 0.7) +
+  geom_point(data = similarity_data, aes(x = ligand_name, y = sim), 
+             color = "black", size = 4, inherit.aes = FALSE, 
+             shape = 21, fill = "grey", stroke = 1)  # Increased size and added border
+
+# Display the combined plot
+print(final_plot)
+
+# Optionally, save the plot
+ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 4.2, height = 6)
+```
