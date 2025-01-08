@@ -106,7 +106,7 @@ color_matrix <- c(
 )
 
 # Order metrics by AUC values
-ordered_metrics <- names(sort(auc_values, decreasing = FALSE))
+ordered_metrics <- names(sort(auc_values, decreasing = TRUE))
 
 # Prepare data for plotting
 roc_coords <- lapply(roc_results, function(roc_obj) {
@@ -130,19 +130,20 @@ my_ggplot_theme <- theme_classic() +
     axis.title.y = element_text(size = 20, color = "black"),
     axis.text.x = element_text(size = 20, color = "black"),
     axis.text.y = element_text(size = 20, color = "black"),
-    axis.ticks = element_line(size = 0.8)
+    axis.ticks = element_line(size = 0.8),
+    legend.position = c(0.66, 0.15),  # Position the legend inside the plot, above X-axis
+    legend.title = element_blank(),
+    legend.text = element_text(size = 14)
   )
 
 # Plot the ROC curves using ggplot2
 roc_plot <- ggplot(roc_data, aes(x = Specificity, y = Sensitivity, color = Metric)) +
-  geom_line(size = 1, show.legend = FALSE) +
-  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "gray") +
-  scale_color_manual(values = color_matrix) +
-  annotate("text", x = 0.95, y = seq(0.1, 0.3, length.out = length(ordered_metrics)), 
-           label = paste(ordered_metrics, "AUC:", round(auc_values[ordered_metrics], 2)),
-           color = unname(color_matrix[ordered_metrics]), hjust = 1, size = 6) +
+  geom_line(size = 1, show.legend = TRUE) +
+  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "darkgrey") +
+  scale_color_manual(values = color_matrix, 
+                     labels = paste(ordered_metrics, "(AUC:", round(auc_values[ordered_metrics], 3), ")")) +
   labs(title = "ROC Curves for Predictive Metrics", x = "False Positive Rate", y = "True Positive Rate") +
-    scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
   my_ggplot_theme
 
@@ -151,7 +152,9 @@ print(roc_plot)
 
 # Save the plot
 ggsave("../output/af3/ROC_multiple_metrics.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+
 ```
+
 ### ROC curves on different receptor subset
 ```{r}
 # Load necessary libraries
@@ -191,26 +194,37 @@ coords_AtFLS2_df <- as.data.frame(coords_AtFLS2)
 coords_no_AtFLS2_df <- as.data.frame(coords_no_AtFLS2)
 
 my_ggplot_theme <- theme_classic() +
-  theme(text = element_text(size = 16),
-        axis.title.x = element_text(size = 20, color = "black"),
-        axis.title.y = element_text(size = 20, color = "black"),
-        axis.text.x = element_text(size = 20, color = "black"),
-        axis.text.y = element_text(size = 20, color = "black"),
-        axis.ticks = element_line(size = 0.8))
+  theme(
+    text = element_text(size = 16),
+    axis.title.x = element_text(size = 20, color = "black"),
+    axis.title.y = element_text(size = 20, color = "black"),
+    axis.text.x = element_text(size = 20, color = "black"),
+    axis.text.y = element_text(size = 20, color = "black"),
+    axis.ticks = element_line(size = 0.8),
+    legend.position = c(0.66, 0.12),  # Position the legend inside the plot, above X-axis
+    legend.title = element_blank(),
+    legend.text = element_text(size = 14),
+  )
 
 # Plot the ROC curves using ggplot2
 roc_plot <- ggplot() +
-  geom_line(data = coords_all_df, aes(x = 1 - specificity, y = sensitivity), color = "#4477aa", size = 1.2) +
-  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#5dc4c9", size = 1.2) +
-  geom_line(data = coords_no_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity), color = "#117733", size = 1.2) +
-  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "navy") +
-  annotate("text", x = 0.95, y = 0.05, label = sprintf("AUC (Non-AtFLS2): %.2f", auc_no_AtFLS2), color = "#117733", hjust = 1, vjust = 0, size = 7) +
-  annotate("text", x = 0.95, y = 0.19, label = sprintf("AUC (AtFLS2): %.2f", auc_AtFLS2), color = "#5dc4c9", hjust = 1, vjust = 0, size = 7) +
-  annotate("text", x = 0.95, y = 0.12, label = sprintf("AUC (All data): %.2f", auc_all), color = "#4477aa", hjust = 1, vjust = 0, size = 7) +
+  geom_line(data = coords_all_df, aes(x = 1 - specificity, y = sensitivity, color = "All data"), size = 1.2) +
+  geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity, color = "AtFLS2"), size = 1.2) +
+  geom_line(data = coords_no_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity, color = "Non-AtFLS2"), size = 1.2) +
+  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "darkgrey") +
+  scale_color_manual(values = c(
+    "All data" = "#4477aa",
+    "AtFLS2" = "#5dc4c9",
+    "Non-AtFLS2" = "#117733"
+  ), labels = c(
+    paste("All data (AUC:", round(auc_all, 3), ")"),
+    paste("AtFLS2 (AUC:", round(auc_AtFLS2, 3), ")"),
+    paste("Non-AtFLS2 (AUC:", round(auc_no_AtFLS2, 3), ")")
+  )) +
+  labs(title = "ROC Curves for Different Receptor Subsets", 
+       x = "False Positive Rate", y = "True Positive Rate", color = NULL) +
   scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
-  labs(title = "ROC Curves for Different Receptor Subsets", 
-       x = "False Positive Rate", y = "True Positive Rate") +
   my_ggplot_theme
 
 # Print the plot
@@ -218,6 +232,7 @@ print(roc_plot)
 
 # Save the plot
 ggsave("../output/af3/ROC_multiple_curves.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+
 
 
 ```
