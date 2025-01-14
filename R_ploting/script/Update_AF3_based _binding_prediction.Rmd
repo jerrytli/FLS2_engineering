@@ -59,7 +59,7 @@ ggplot(data, aes(x = Known_outcome, y = `ipTM flg22_FLS2`, fill = Known_outcome)
        y = "ipTM flg22_FLS2") +
   my_ggplot_theme
 
-ggsave("../output/af3/raincloud.pdf", width = 6, height = 5.7, dpi = 300)
+ggsave("../output/af3/raincloud.pdf", width = 6, height = 6, dpi = 300)
 
 
 ```
@@ -384,12 +384,24 @@ library(tidyr)
 # Load and prepare the data
 data <- read.csv("../input/af3/af3_fullcomplex.csv") 
 
-data_processed <- data %>%
+# Define filters
+receptor_filter <- c("NbFLS2-1", "FLS2XL", "QvFLS2", "TjFLS2", "HlFLS2", 
+                     "MdFLS2", "VrFLS2", "FcFLS2", "SlFLS2", "AtFLS2")
+ligand_filter <- c("Paeflg22", "Atuflg22", "Rrhflg22", "Rso_1flg22", 
+                   "Rso_2flg22", "Ddiflg22", "Eamflg22", "Pviflg22", 
+                   "Xfrflg22", "Xorflg22")
+
+# Apply the filter
+filtered_data <- data %>%
+  filter(receptor %in% receptor_filter, ligand_name %in% ligand_filter)
+
+# Process the filtered data
+data_processed <- filtered_data %>%
   mutate(
-    Accuracy = ifelse((ipTM.flg22_FLS2 >= 0.83 & Known_outcome == "Perception") | 
-                      (ipTM.flg22_FLS2 < 0.83 & Known_outcome == "No perception"), 1, 0),
-    Type_1_Error = ifelse(ipTM.flg22_FLS2 >= 0.83 & Known_outcome == "No perception", 1, 0),
-    Type_2_Error = ifelse(ipTM.flg22_FLS2 < 0.83 & Known_outcome == "Perception", 1, 0)
+    Accuracy = ifelse((`ipTM.flg22_FLS2` >= 0.83 & Known_outcome == "Perception") | 
+                      (`ipTM.flg22_FLS2` < 0.83 & Known_outcome == "No perception"), 1, 0),
+    Type_1_Error = ifelse(`ipTM.flg22_FLS2` >= 0.83 & Known_outcome == "No perception", 1, 0),
+    Type_2_Error = ifelse(`ipTM.flg22_FLS2` < 0.83 & Known_outcome == "Perception", 1, 0)
   ) %>%
   group_by(ligand_name) %>%
   summarise(
@@ -409,7 +421,9 @@ data_long <- data_processed %>%
   mutate(Metric = gsub("_Percentage$", "", Metric))
 
 # Set the order of flg22 variants as in the similarity matrix
-variant_order <- c("Paeflg22", "Atuflg22", "Rrhflg22","Rso_1flg22", "Rso_2flg22","Ddiflg22", "Eamflg22", "Pviflg22", "Xfrflg22", "Xorflg22")
+variant_order <- c("Paeflg22", "Atuflg22", "Rrhflg22", "Rso_1flg22", 
+                   "Rso_2flg22", "Ddiflg22", "Eamflg22", "Pviflg22", 
+                   "Xfrflg22", "Xorflg22")
 data_long$ligand_name <- factor(data_long$ligand_name, levels = rev(variant_order))
 data_long$Metric <- factor(data_long$Metric, levels = c("Type_1_Error", "Type_2_Error", "Accuracy"))
 
@@ -427,6 +441,7 @@ my_ggplot_theme <- theme_classic() +
         axis.text.x = element_text(size = 14, color = "black"),
         axis.text.y = element_text(size = 14, color = "black"),
         axis.ticks = element_line(size = 0.8))
+
 # Plot
 stacked_plot <- ggplot(data_long, aes(x = ligand_name, y = Percentage, fill = Metric)) +
   geom_bar(stat = "identity", position = "stack") +
@@ -458,4 +473,5 @@ print(final_plot)
 
 # Optionally, save the plot
 ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 4.2, height = 6)
+
 ```

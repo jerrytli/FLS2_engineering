@@ -386,3 +386,43 @@ print(heatmap_plot)
 ggsave("../output/rcm/RCM_Vitales.pdf", width = 3.7, height = 5)
 ```
 
+```{r}
+# Load necessary libraries
+library(ggplot2)
+
+# Read the data from the CSV file
+data <- read.csv("../input/omega/QvFLS2_minimal_distances.csv")
+
+# Add a column to categorize the data for coloring
+data$category <- ifelse(
+  data$X_Residue %in% c(246, 390, 438, 459, 486), 
+  "Highlighted Residues", 
+  ifelse(data$dn.ds >= 1, "dn/ds >= 1", "dn/ds < 1")
+)
+
+# Create the scatter plot
+ggplot(data, aes(x = Distance, y = dn.ds)) +
+  # Points for dn/ds < 1
+  geom_point(data = subset(data, category == "dn/ds < 1"), color = "grey", size = 2) +
+  # Points for dn/ds >= 1
+  geom_point(data = subset(data, category == "dn/ds >= 1"), color = "deepskyblue4", size = 2) +
+  # Highlighted residues
+  geom_point(data = subset(data, category == "Highlighted Residues"), color = "red", size = 3) +
+  # Horizontal line at dn/ds = 1
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
+  # Customize labels and titles
+  labs(
+    title = "Scatter Plot of dN/dS vs Distance from the Sheet",
+    x = "Distance from the Sheet",
+    y = "dN/dS",
+    color = NULL
+  ) +
+  # Additional styling
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14),
+    axis.title = element_text(size = 12)
+  )
+
+
+```
