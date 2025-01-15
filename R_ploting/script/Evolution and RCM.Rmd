@@ -386,6 +386,9 @@ print(heatmap_plot)
 ggsave("../output/rcm/RCM_Vitales.pdf", width = 3.7, height = 5)
 ```
 
+
+
+###QvFLS2 Calpha distance 
 ```{r}
 # Load necessary libraries
 library(ggplot2)
@@ -403,26 +406,153 @@ data$category <- ifelse(
 # Create the scatter plot
 ggplot(data, aes(x = Distance, y = dn.ds)) +
   # Points for dn/ds < 1
-  geom_point(data = subset(data, category == "dn/ds < 1"), color = "grey", size = 2) +
+  geom_point(data = subset(data, category == "dn/ds < 1"), color = "grey", size = 1.5) +
   # Points for dn/ds >= 1
-  geom_point(data = subset(data, category == "dn/ds >= 1"), color = "deepskyblue4", size = 2) +
+  geom_point(data = subset(data, category == "dn/ds >= 1"), color = "deepskyblue4", size = 1.5) +
   # Highlighted residues
-  geom_point(data = subset(data, category == "Highlighted Residues"), color = "red", size = 3) +
+  geom_point(data = subset(data, category == "Highlighted Residues"), color = "red", size = 2) +
   # Horizontal line at dn/ds = 1
   geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
   # Customize labels and titles
   labs(
-    title = "Scatter Plot of dN/dS vs Distance from the Sheet",
-    x = "Distance from the Sheet",
+    title = "Distance from flg22, CA",
+    x = "MinimalDistance from flg22 (Å)",
     y = "dN/dS",
     color = NULL
   ) +
   # Additional styling
-  theme_minimal() +
+my_ggplot_theme
+ggsave("../output/omega/qvfls2_distance_from_flg22_CA.pdf", width = 6, height = 4.5)
+
+```
+
+###QvFLS2 all atom distance 
+```{r}
+# Load necessary libraries
+# Load necessary libraries
+library(ggplot2)
+
+# Read the data from the CSV file
+data <- read.csv("../input/omega/QvFLS2_minimal_distances_all_atoms.csv")
+
+# Add a column to categorize the data for coloring
+data$category <- ifelse(
+  data$X_Residue %in% c(246, 390, 438, 459, 486), 
+  "Highlighted Residues", 
+  ifelse(data$dn.ds >= 1, "dn/ds >= 1", "dn/ds < 1")
+)
+
+# Create the scatter plot
+ggplot(data, aes(x = Distance, y = dn.ds)) +
+  # Points for dn/ds < 1
+  geom_point(data = subset(data, category == "dn/ds < 1"), color = "grey", size = 1.5) +
+  # Points for dn/ds >= 1
+  geom_point(data = subset(data, category == "dn/ds >= 1"), color = "deepskyblue4", size = 1.5) +
+  # Highlighted residues
+  geom_point(data = subset(data, category == "Highlighted Residues"), color = "red", size = 2) +
+  # Horizontal line at dn/ds = 1
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
+  # Customize labels and titles
+  labs(
+    title = "Distance from flg22, all atoms",
+    x = "Minimal Distance from flg22 (Å)",
+    y = "dN/dS",
+    color = NULL
+  ) +
+  # Additional styling
+my_ggplot_theme
+ggsave("../output/omega/qvfls2_distance_from_flg22_all_atoms.pdf", width = 6, height = 4.5)
+
+```
+
+###QvFLS2 Ca distance from serk3
+```{r}
+# Load necessary libraries
+# Load necessary libraries
+library(ggplot2)
+
+# Read the data from the CSV file
+data <- read.csv("../input/omega/QvFLS2_minimal_distances_serk3.csv")
+
+# Add a column to categorize the data for coloring
+data$category <- ifelse(
+  data$X_Residue %in% c(246, 390, 438, 459, 486), 
+  "Highlighted Residues", 
+  ifelse(data$dn.ds >= 1, "dn/ds >= 1", "dn/ds < 1")
+)
+
+# Create the scatter plot
+ggplot(data, aes(x = Distance, y = dn.ds)) +
+  # Points for dn/ds < 1
+  geom_point(data = subset(data, category == "dn/ds < 1"), color = "grey", size = 1.5) +
+  # Points for dn/ds >= 1
+  geom_point(data = subset(data, category == "dn/ds >= 1"), color = "deepskyblue4", size = 1.5) +
+  # Highlighted residues
+  geom_point(data = subset(data, category == "Highlighted Residues"), color = "red", size = 2) +
+  # Horizontal line at dn/ds = 1
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
+  # Customize labels and titles
+  labs(
+    title = "Distance from SERK3, CA",
+    x = "Minimal Distance from SERK3 (Å)",
+    y = "dN/dS",
+    color = NULL
+  ) +
+  # Additional styling
+my_ggplot_theme
+ggsave("../output/omega/qvfls2_distance_from_SERK3_CA.pdf", width = 6, height = 4.5)
+
+```
+
+###QvFLS2 distance from serk3, all atoms
+```{r}
+# Load necessary libraries
+# Load necessary libraries
+library(ggplot2)
+
+# Read the data from the CSV file
+data <- read.csv("../input/omega/QvFLS2_minimal_distances_serk3_all_atoms.csv")
+
+# Custom theme for ggplot
+my_ggplot_theme <- theme_classic() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 14),
-    axis.title = element_text(size = 12)
+    text = element_text(size = 16),
+    axis.title.x = element_text(size = 20, color = "black"),
+    axis.title.y = element_text(size = 20, color = "black"),
+    axis.text.x = element_text(size = 20, color = "black"),
+    axis.text.y = element_text(size = 20, color = "black"),
+    axis.ticks = element_line(size = 0.8),
+    legend.position = c(0.66, 0.15),  # Position the legend inside the plot, above X-axis
+    legend.title = element_blank(),
+    legend.text = element_text(size = 14)
   )
 
+# Add a column to categorize the data for coloring
+data$category <- ifelse(
+  data$X_Residue %in% c(246, 390, 438, 459, 486), 
+  "Highlighted Residues", 
+  ifelse(data$dn.ds >= 1, "dn/ds >= 1", "dn/ds < 1")
+)
+
+# Create the scatter plot
+ggplot(data, aes(x = Distance, y = dn.ds)) +
+  # Points for dn/ds < 1
+  geom_point(data = subset(data, category == "dn/ds < 1"), color = "grey", size = 1.5) +
+  # Points for dn/ds >= 1
+  geom_point(data = subset(data, category == "dn/ds >= 1"), color = "deepskyblue4", size = 1.5) +
+  # Highlighted residues
+  geom_point(data = subset(data, category == "Highlighted Residues"), color = "red", size = 2) +
+  # Horizontal line at dn/ds = 1
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
+  # Customize labels and titles
+  labs(
+    title = "Distance from SERK3, all atoms",
+    x = "Minimal Distance from SERK3 (Å)",
+    y = "dN/dS",
+    color = NULL
+  ) +
+  # Additional styling
+  my_ggplot_theme 
+ggsave("../output/omega/qvfls2_distance_from_SERK3_all_atoms.pdf", width = 6, height = 4.5)
 
 ```
