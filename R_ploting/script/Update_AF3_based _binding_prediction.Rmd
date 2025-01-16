@@ -398,10 +398,10 @@ filtered_data <- data %>%
 # Process the filtered data
 data_processed <- filtered_data %>%
   mutate(
-    Accuracy = ifelse((`ipTM.flg22_FLS2` >= 0.83 & Known_outcome == "Perception") | 
-                      (`ipTM.flg22_FLS2` < 0.83 & Known_outcome == "No perception"), 1, 0),
-    Type_1_Error = ifelse(`ipTM.flg22_FLS2` >= 0.83 & Known_outcome == "No perception", 1, 0),
-    Type_2_Error = ifelse(`ipTM.flg22_FLS2` < 0.83 & Known_outcome == "Perception", 1, 0)
+    Accuracy = ifelse((`ipTM.flg22_FLS2` >= 0.82 & Known_outcome == "Perception") | 
+                      (`ipTM.flg22_FLS2` < 0.82 & Known_outcome == "No perception"), 1, 0),
+    Type_1_Error = ifelse(`ipTM.flg22_FLS2` >= 0.82 & Known_outcome == "No perception", 1, 0),
+    Type_2_Error = ifelse(`ipTM.flg22_FLS2` < 0.82 & Known_outcome == "Perception", 1, 0)
   ) %>%
   group_by(ligand_name) %>%
   summarise(
@@ -445,13 +445,13 @@ my_ggplot_theme <- theme_classic() +
 # Plot
 stacked_plot <- ggplot(data_long, aes(x = ligand_name, y = Percentage, fill = Metric)) +
   geom_bar(stat = "identity", position = "stack") +
-  coord_flip() +  # This flips the plot to vertical orientation
+  #coord_flip() +  # This flips the plot to vertical orientation
   scale_fill_manual(values = c("Accuracy" = "#4477aa", "Type_1_Error" = "#ee6677", "Type_2_Error" = "#ccbb44")) +
-  labs(title = "Metric at ipTM Cutoff 0.83",
+  labs(title = "Metric at ipTM Cutoff 0.82",
        x = "flg22 Variants", y = "Percentage") +
   my_ggplot_theme +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 105)) +
-  scale_x_discrete(expand = c(0, 0)) +
+  scale_x_discrete(expand = c(0, 0), limits = rev) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "bottom",  # Moves legend to the bottom
         legend.title = element_blank(),  # Optionally remove the legend title
@@ -472,6 +472,6 @@ final_plot <- stacked_plot +
 print(final_plot)
 
 # Optionally, save the plot
-ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 4.2, height = 6)
+ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 7, height = 5.5)
 
 ```
