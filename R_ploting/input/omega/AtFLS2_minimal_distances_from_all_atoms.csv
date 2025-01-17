@@ -1,4 +1,4 @@
-X_Residue,X_AminoAcid,dn/ds,Closest_Y_Residue,Y_AminoAcid,Distance,Closest_Z_Residue,Z_AminoAcid,Distance
+X_Residue,X_AminoAcid,dn/ds,Closest_Y_Residue,Y_AminoAcid,Distance_Y,Closest_Z_Residue,Z_AminoAcid,Distance_Z
 97,Y,0.499,68,S,18.78,86,M,46.18
 99,Q,0.077,68,S,13.1,86,M,40.66
 100,V,0.063,68,S,10.62,37,N,38.85
