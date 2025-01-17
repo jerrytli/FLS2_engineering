@@ -819,3 +819,232 @@ final_plot <- marginal_plot + scatter_plot +
 ggsave("../output/omega/combined_distances_plot.pdf", final_plot, width = 6, height = 4.5)
 
 ```
+
+
+### Combined plot for flg22 distance
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(patchwork)  # For combining plots
+
+# Define the receptor-specific parameters
+highlighted_residues <- list(
+  AtFLS2 = c(248, 371, 417, 533),
+  MdFLS2 = c(175, 247, 367, 433, 460, 462),
+  QvFLS2 = c(246, 390, 438, 459, 486)
+)
+
+# mark residues from LRR 8 - 18
+outline_ranges <- list(
+  AtFLS2 = c(265, 528),
+  MdFLS2 = c(241, 505),
+  QvFLS2 = c(239, 503)
+)
+
+# Read the CSV files and add receptor-specific labels
+files <- list(
+  AtFLS2 = "../input/omega/AtFLS2_minimal_distances_from_all_atoms.csv",
+  MdFLS2 = "../input/omega/MdFLS2_minimal_distances_all_atoms.csv",
+  QvFLS2 = "../input/omega/QvFLS2_minimal_distances_from_all_atoms.csv"
+)
+
+data_list <- lapply(names(files), function(receptor) {
+  # Read CSV without modifying column names
+  df <- read.csv(files[[receptor]], check.names = FALSE)
+  
+  # Add receptor and derived columns
+  df$Receptor <- receptor
+  df$highlight <- ifelse(
+    df$X_Residue %in% highlighted_residues[[receptor]],
+    "Highlighted Residues",
+    NA
+  )
+  df$has_outline <- with(df, X_Residue >= outline_ranges[[receptor]][1] &
+                             X_Residue < outline_ranges[[receptor]][2] &
+                             `dn/ds` > 1)
+  df
+})
+
+# Combine data into a single data frame
+data <- do.call(rbind, data_list)
+
+# Add category column for coloring
+data$category <- ifelse(
+  !is.na(data$highlight),
+  "Highlighted Residues",
+  ifelse(data$`dn/ds` >= 1, "dn/ds >= 1", "dn/ds < 1")
+)
+
+# Filter data for marginal plot (outlined residues only)
+marginal_data <- subset(data, has_outline)
+
+# Create the scatter plot
+scatter_plot <- ggplot(data, aes(x = Distance_Y, y = `dn/ds`)) +
+  # Points without outline
+  geom_point(
+    data = subset(data, !has_outline), 
+    aes(fill = category), 
+    shape = 21, size = 1.8, stroke = 0.001, color = "white"
+  ) +
+  # Points with outline
+  geom_point(
+    data = subset(data, has_outline), 
+    aes(fill = category), 
+    shape = 21, color = "black", size = 1.5, stroke = 0.5
+  ) +
+  # Horizontal line at dn/ds = 1
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
+  # Customize labels
+  scale_fill_manual(
+    values = c(
+      "dn/ds < 1" = "grey",
+      "dn/ds >= 1" = "deepskyblue4",
+      "Highlighted Residues" = "red"
+    ),
+    name = NULL
+  ) +
+  labs(
+    x = "Minimal Distance from ligand (\u00c5)",
+    y = "dN/dS"
+  ) +
+  # Apply original theme and axis settings
+  my_ggplot_theme +
+  theme(
+    legend.position = "none",
+    plot.title = element_blank()  # Remove title
+  ) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 2.5))
+
+# Create the marginal density plot
+marginal_plot <- ggplot(marginal_data, aes(x = Distance_Y)) +
+  geom_density(fill = "deepskyblue4", alpha = 0.5) +
+  # Align axes with scatter plot
+  scale_x_continuous(expand = c(0, 0), limits = c(min(data$Distance_Y), max(data$Distance_Y))) +
+  theme_void() +
+  theme(
+    plot.margin = margin(0, 0, 0, 0)  # Remove margins
+  )
+
+# Combine the marginal and scatter plots using patchwork
+final_plot <- marginal_plot + scatter_plot +
+  plot_layout(heights = c(1, 4))  # Adjust height ratio for marginal and scatter plots
+
+# Save the plot
+ggsave("../output/omega/combined_distances_plot_flg22.pdf", final_plot, width = 6, height = 4.5)
+
+```
+
+### Combined plot for SERK3 distance
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(patchwork)  # For combining plots
+
+# Define the receptor-specific parameters
+highlighted_residues <- list(
+  AtFLS2 = c(248, 371, 417, 533),
+  MdFLS2 = c(175, 247, 367, 433, 460, 462),
+  QvFLS2 = c(246, 390, 438, 459, 486)
+)
+
+# mark residues from LRR 8 - 18
+outline_ranges <- list(
+  AtFLS2 = c(265, 528),
+  MdFLS2 = c(241, 505),
+  QvFLS2 = c(239, 503)
+)
+
+# Read the CSV files and add receptor-specific labels
+files <- list(
+  AtFLS2 = "../input/omega/AtFLS2_minimal_distances_from_all_atoms.csv",
+  MdFLS2 = "../input/omega/MdFLS2_minimal_distances_all_atoms.csv",
+  QvFLS2 = "../input/omega/QvFLS2_minimal_distances_from_all_atoms.csv"
+)
+
+data_list <- lapply(names(files), function(receptor) {
+  # Read CSV without modifying column names
+  df <- read.csv(files[[receptor]], check.names = FALSE)
+  
+  # Add receptor and derived columns
+  df$Receptor <- receptor
+  df$highlight <- ifelse(
+    df$X_Residue %in% highlighted_residues[[receptor]],
+    "Highlighted Residues",
+    NA
+  )
+  df$has_outline <- with(df, X_Residue >= outline_ranges[[receptor]][1] &
+                             X_Residue < outline_ranges[[receptor]][2] &
+                             `dn/ds` > 1)
+  df
+})
+
+# Combine data into a single data frame
+data <- do.call(rbind, data_list)
+
+# Add category column for coloring
+data$category <- ifelse(
+  !is.na(data$highlight),
+  "Highlighted Residues",
+  ifelse(data$`dn/ds` >= 1, "dn/ds >= 1", "dn/ds < 1")
+)
+
+# Filter data for marginal plot (outlined residues only)
+marginal_data <- subset(data, has_outline)
+
+# Create the scatter plot
+scatter_plot <- ggplot(data, aes(x = Distance_Z, y = `dn/ds`)) +
+  # Points without outline
+  geom_point(
+    data = subset(data, !has_outline), 
+    aes(fill = category), 
+    shape = 21, size = 1.8, stroke = 0.001, color = "white"
+  ) +
+  # Points with outline
+  geom_point(
+    data = subset(data, has_outline), 
+    aes(fill = category), 
+    shape = 21, color = "black", size = 1.5, stroke = 0.5
+  ) +
+  # Horizontal line at dn/ds = 1
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
+  # Customize labels
+  scale_fill_manual(
+    values = c(
+      "dn/ds < 1" = "grey",
+      "dn/ds >= 1" = "deepskyblue4",
+      "Highlighted Residues" = "red"
+    ),
+    name = NULL
+  ) +
+  labs(
+    x = "Minimal Distance from SERK3 (\u00c5)",
+    y = "dN/dS"
+  ) +
+  # Apply original theme and axis settings
+  my_ggplot_theme +
+  theme(
+    legend.position = "none",
+    plot.title = element_blank()  # Remove title
+  ) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 2.5))
+
+# Create the marginal density plot
+marginal_plot <- ggplot(marginal_data, aes(x = Distance_Z)) +
+  geom_density(fill = "deepskyblue4", alpha = 0.5) +
+  # Align axes with scatter plot
+  scale_x_continuous(expand = c(0, 0), limits = c(min(data$Distance_Z), max(data$Distance_Z))) +
+  theme_void() +
+  theme(
+    plot.margin = margin(0, 0, 0, 0)  # Remove margins
+  )
+
+# Combine the marginal and scatter plots using patchwork
+final_plot <- marginal_plot + scatter_plot +
+  plot_layout(heights = c(1, 4))  # Adjust height ratio for marginal and scatter plots
+
+# Save the plot
+ggsave("../output/omega/combined_distances_plot_SERK3.pdf", final_plot, width = 6, height = 4.5)
+
+```
