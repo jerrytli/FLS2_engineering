@@ -429,7 +429,6 @@ ggsave("../output/omega/qvfls2_distance_from_flg22_CA.pdf", width = 6, height = 
 ###QvFLS2 all atom distance 
 ```{r}
 # Load necessary libraries
-# Load necessary libraries
 library(ggplot2)
 
 # Read the data from the CSV file
@@ -442,26 +441,50 @@ data$category <- ifelse(
   ifelse(data$dn.ds >= 1, "dn/ds >= 1", "dn/ds < 1")
 )
 
+# Add a column to determine whether the outline should be applied
+data$has_outline <- ifelse(
+  data$dn.ds > 1 & data$X_Residue >= 239 & data$X_Residue < 502,
+  TRUE,
+  FALSE
+)
+
 # Create the scatter plot
 ggplot(data, aes(x = Distance, y = dn.ds)) +
-  # Points for dn/ds < 1
-  geom_point(data = subset(data, category == "dn/ds < 1"), color = "grey", size = 1.5) +
-  # Points for dn/ds >= 1
-  geom_point(data = subset(data, category == "dn/ds >= 1"), color = "deepskyblue4", size = 1.5) +
-  # Highlighted residues
-  geom_point(data = subset(data, category == "Highlighted Residues"), color = "red", size = 2) +
+  # Points without outline
+  geom_point(
+    data = subset(data, !has_outline), 
+    aes(fill = category), 
+    shape = 21, size = 1.8, stroke = 0.001 , color = "white" # stroke = 0 ensures no outline
+  ) +
+  # Points with outline
+  geom_point(
+    data = subset(data, has_outline), 
+    aes(fill = category), 
+    shape = 21, color = "black", size = 1.5, stroke = 0.5  # stroke > 0 adds a black outline
+  ) +
   # Horizontal line at dn/ds = 1
   geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
   # Customize labels and titles
+  scale_fill_manual(
+    values = c(
+      "dn/ds < 1" = "grey",
+      "dn/ds >= 1" = "deepskyblue4",
+      "Highlighted Residues" = "red"
+    ),
+    name = NULL
+  ) +
   labs(
     title = "Distance from flg22, all atoms",
     x = "Minimal Distance from flg22 (Å)",
-    y = "dN/dS",
-    color = NULL
+    y = "dN/dS"
   ) +
   # Additional styling
-my_ggplot_theme
-ggsave("../output/omega/qvfls2_distance_from_flg22_all_atoms.pdf", width = 6, height = 4.5)
+  my_ggplot_theme+
+  theme(legend.position = "NONE")
+
+# Save the plot
+ggsave("../output/omega/qvfls2_distance_from_flg22_all_atoms_corrected.pdf", width = 6, height = 4.5)
+
 
 ```
 
@@ -554,5 +577,130 @@ ggplot(data, aes(x = Distance, y = dn.ds)) +
   # Additional styling
   my_ggplot_theme 
 ggsave("../output/omega/qvfls2_distance_from_SERK3_all_atoms.pdf", width = 6, height = 4.5)
+
+```
+
+
+###MdFLS2 all atom distance 
+```{r}
+# Load necessary libraries
+library(ggplot2)
+
+# Read the data from the CSV file
+data <- read.csv("../input/omega/MdFLS2_minimal_distances_all_atoms.csv")
+
+# Add a column to categorize the data for coloring
+data$category <- ifelse(
+  data$X_Residue %in% c(175, 247, 367,433, 460, 462), 
+  "Highlighted Residues", 
+  ifelse(data$dn.ds >= 1, "dn/ds >= 1", "dn/ds < 1")
+)
+
+# Add a column to determine whether the outline should be applied
+data$has_outline <- ifelse(
+  data$dn.ds > 1 & data$X_Residue >= 241 & data$X_Residue < 505,
+  TRUE,
+  FALSE
+)
+
+# Create the scatter plot
+ggplot(data, aes(x = Distance, y = dn.ds)) +
+  # Points without outline
+  geom_point(
+    data = subset(data, !has_outline), 
+    aes(fill = category), 
+    shape = 21, size = 1.8, stroke = 0.001 , color = "white" # stroke = 0 ensures no outline
+  ) +
+  # Points with outline
+  geom_point(
+    data = subset(data, has_outline), 
+    aes(fill = category), 
+    shape = 21, color = "black", size = 1.5, stroke = 0.5  # stroke > 0 adds a black outline
+  ) +
+  # Horizontal line at dn/ds = 1
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
+  # Customize labels and titles
+  scale_fill_manual(
+    values = c(
+      "dn/ds < 1" = "grey",
+      "dn/ds >= 1" = "deepskyblue4",
+      "Highlighted Residues" = "red"
+    ),
+    name = NULL
+  ) +
+  labs(
+    title = "MdFLS2 Distance from flg22, all atoms",
+    x = "Minimal Distance from flg22 (Å)",
+    y = "dN/dS"
+  ) +
+  # Additional styling
+  my_ggplot_theme+
+  theme(legend.position = "NONE")
+
+# Save the plot
+ggsave("../output/omega/Mdfls2_distance_from_flg22_all_atoms.pdf", width = 6, height = 4.5)
+
+
+```
+
+###AtFLS2 all atom distance 
+```{r}
+# Load necessary libraries
+library(ggplot2)
+
+# Read the data from the CSV file
+data <- read.csv("../input/omega/AtFLS2_minimal_distances_from_all_atoms.csv")
+
+# Add a column to categorize the data for coloring
+data$category <- ifelse(
+  data$X_Residue %in% c(248, 371, 417, 533), 
+  "Highlighted Residues", 
+  ifelse(data$dn.ds >= 1, "dn/ds >= 1", "dn/ds < 1")
+)
+
+# Add a column to determine whether the outline should be applied
+data$has_outline <- ifelse(
+  data$dn.ds > 1 & data$X_Residue >= 241 & data$X_Residue < 505,
+  TRUE,
+  FALSE
+)
+
+# Create the scatter plot
+ggplot(data, aes(x = Distance, y = dn.ds)) +
+  # Points without outline
+  geom_point(
+    data = subset(data, !has_outline), 
+    aes(fill = category), 
+    shape = 21, size = 1.8, stroke = 0.001 , color = "white" # stroke = 0 ensures no outline
+  ) +
+  # Points with outline
+  geom_point(
+    data = subset(data, has_outline), 
+    aes(fill = category), 
+    shape = 21, color = "black", size = 1.5, stroke = 0.5  # stroke > 0 adds a black outline
+  ) +
+  # Horizontal line at dn/ds = 1
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
+  # Customize labels and titles
+  scale_fill_manual(
+    values = c(
+      "dn/ds < 1" = "grey",
+      "dn/ds >= 1" = "deepskyblue4",
+      "Highlighted Residues" = "red"
+    ),
+    name = NULL
+  ) +
+  labs(
+    title = "AtFLS2 Distance from flg22, all atoms",
+    x = "Minimal Distance from flg22 (Å)",
+    y = "dN/dS"
+  ) +
+  # Additional styling
+  my_ggplot_theme+
+  theme(legend.position = "NONE")
+
+# Save the plot
+ggsave("../output/omega/Atfls2_distance_from_flg22_all_atoms.pdf", width = 6, height = 4.5)
+
 
 ```
