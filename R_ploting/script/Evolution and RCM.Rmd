@@ -818,7 +818,7 @@ final_plot <- marginal_plot + scatter_plot +
   plot_layout(heights = c(1, 4))  # Adjust height ratio for marginal and scatter plots
 
 # Save the plot
-ggsave("../output/omega/combined_distances_plot_flg22_full.pdf", final_plot, width = 6, height = 4.5)
+ggsave("../output/omega/combined_distances_plot_flg22.pdf", final_plot, width = 6, height = 4.5)
 
 
 ```
