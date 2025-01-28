@@ -475,3 +475,99 @@ print(final_plot)
 ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 7, height = 5.5)
 
 ```
+
+
+### compare modeling full complex vs FLS2/flg22
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(pROC)
+library(readr)
+
+# Read the data from the CSV files
+data_fullcomplex <- read_csv("../input/af3/af3_fullcomplex.csv")
+data_fls2_flg22 <- read_csv("../input/af3/af3_FLS2_flg22.csv")
+
+# Ensure the experimental results are properly formatted
+data_fullcomplex$Known_outcome <- as.factor(data_fullcomplex$Known_outcome)
+data_fls2_flg22$Known_outcome <- as.factor(data_fls2_flg22$Known_outcome)
+
+# Transform the predictive metric from "full complex" data
+data_fullcomplex$`ipTM flg22_FLS2` <- -data_fullcomplex$`ipTM flg22_FLS2`
+
+# Transform the predictive metric from "Binary FLS2/flg22 modeling" data
+data_fls2_flg22$Average_ipTM <- -data_fls2_flg22$Average_ipTM
+
+# Define predictive metrics and labels
+metrics <- list(
+  "Full Complex Modeling" = list(data = data_fullcomplex, predictor = "ipTM flg22_FLS2"),
+  "Binary FLS2/flg22 modeling" = list(data = data_fls2_flg22, predictor = "Average_ipTM")
+)
+
+# Initialize a list to store ROC results
+roc_results <- list()
+auc_values <- list()
+
+# Calculate ROC curves and AUC for each dataset and predictive metric
+for (metric_name in names(metrics)) {
+  metric_data <- metrics[[metric_name]]$data
+  predictor <- metrics[[metric_name]]$predictor
+  
+  roc_obj <- roc(response = metric_data$Known_outcome, predictor = metric_data[[predictor]])
+  roc_results[[metric_name]] <- roc_obj
+  auc_values[[metric_name]] <- auc(roc_obj)
+}
+
+# Prepare data for plotting
+roc_coords <- lapply(roc_results, function(roc_obj) {
+  coords(roc_obj, "all", ret = c("specificity", "sensitivity"))
+})
+
+roc_data <- do.call(rbind, lapply(names(roc_coords), function(metric_name) {
+  data.frame(
+    Metric = metric_name,
+    Specificity = 1 - roc_coords[[metric_name]]$specificity,
+    Sensitivity = roc_coords[[metric_name]]$sensitivity
+  )
+}))
+
+# Assign colors for each metric
+color_matrix <- c(
+  "Full Complex Modeling" = "#845ec2",
+  "Binary FLS2/flg22 modeling" = "#5dc4c9"
+)
+
+# Custom ggplot theme
+my_ggplot_theme <- theme_classic() +
+  theme(
+    text = element_text(size = 16),
+    axis.title.x = element_text(size = 20, color = "black"),
+    axis.title.y = element_text(size = 20, color = "black"),
+    axis.text.x = element_text(size = 20, color = "black"),
+    axis.text.y = element_text(size = 20, color = "black"),
+    axis.ticks = element_line(size = 0.8),
+    legend.position = c(0.66, 0.15),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 14)
+  )
+
+# Plot the ROC curves using ggplot2
+roc_plot <- ggplot(roc_data, aes(x = Specificity, y = Sensitivity, color = Metric)) +
+  geom_line(size = 1, show.legend = TRUE) +
+  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "darkgrey") +
+  scale_color_manual(values = color_matrix, 
+                     labels = paste(names(auc_values), "(AUC:", round(unlist(auc_values), 3), ")")) +
+  labs(title = "ROC Curves for Predictive Metrics", x = "False Positive Rate", y = "True Positive Rate") +
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  my_ggplot_theme
+
+# Print the plot
+print(roc_plot)
+
+# Save the plot
+ggsave("../output/af3/ROC_multiple_metrics_combined.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+
+```
+
