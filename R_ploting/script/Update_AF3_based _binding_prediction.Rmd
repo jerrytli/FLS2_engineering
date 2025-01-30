@@ -112,46 +112,49 @@ ordered_metrics <- names(sort(auc_values, decreasing = TRUE))
 roc_coords <- lapply(roc_results, function(roc_obj) {
   coords(roc_obj, "all", ret = c("specificity", "sensitivity"))
 })
+# Convert "Metric" to factor with the same level order as ordered_metrics
+roc_data$Metric <- factor(roc_data$Metric, levels = ordered_metrics)
 
-# Combine ROC coordinates into a single data frame for ggplot
-roc_data <- do.call(rbind, lapply(ordered_metrics, function(metric) {
-  data.frame(
-    Metric = metric,
-    Specificity = 1 - roc_coords[[metric]]$specificity,
-    Sensitivity = roc_coords[[metric]]$sensitivity
-  )
-}))
-
-# Custom theme for ggplot
-my_ggplot_theme <- theme_classic() +
-  theme(
-    text = element_text(size = 16),
-    axis.title.x = element_text(size = 20, color = "black"),
-    axis.title.y = element_text(size = 20, color = "black"),
-    axis.text.x = element_text(size = 20, color = "black"),
-    axis.text.y = element_text(size = 20, color = "black"),
-    axis.ticks = element_line(size = 0.8),
-    legend.position = c(0.66, 0.15),  # Position the legend inside the plot, above X-axis
-    legend.title = element_blank(),
-    legend.text = element_text(size = 14)
-  )
-
-# Plot the ROC curves using ggplot2
+# Plot the ROC curves using ggplot2 (minimal changes below)
 roc_plot <- ggplot(roc_data, aes(x = Specificity, y = Sensitivity, color = Metric)) +
   geom_line(size = 1, show.legend = TRUE) +
-  geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "darkgrey") +
-  scale_color_manual(values = color_matrix, 
-                     labels = paste(ordered_metrics, "(AUC:", round(auc_values[ordered_metrics], 3), ")")) +
-  labs(title = "ROC Curves for Predictive Metrics", x = "False Positive Rate", y = "True Positive Rate") +
-  scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  geom_line(
+    data = data.frame(x = c(0, 1), y = c(0, 1)), 
+    aes(x, y), 
+    linetype = "dashed", 
+    color = "darkgrey"
+  ) +
+  scale_color_manual(
+    values = color_matrix,
+    breaks = ordered_metrics,   # Ensure order and matching with factor levels
+    labels = paste(
+      ordered_metrics,
+      "(AUC:", round(auc_values[ordered_metrics], 3), ")"
+    )
+  ) +
+  labs(
+    title = "ROC Curves for Predictive Metrics", 
+    x = "False Positive Rate", 
+    y = "True Positive Rate"
+  ) +
+  scale_x_continuous(
+    expand = c(0, 0), 
+    limits = c(0, 1), 
+    breaks = c(0, 0.25, 0.5, 0.75, 1), 
+    labels = c("0", "0.25", "0.5", "0.75", "1")
+  ) +
+  scale_y_continuous(
+    expand = c(0, 0), 
+    limits = c(0, 1), 
+    breaks = c(0, 0.25, 0.5, 0.75, 1), 
+    labels = c("0", "0.25", "0.5", "0.75", "1")
+  ) +
   my_ggplot_theme
 
-# Print the plot
+# Print and save the plot
 print(roc_plot)
-
-# Save the plot
-ggsave("../output/af3/ROC_multiple_metrics.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+ggsave("../output/af3/ROC_multiple_metrics.pdf", 
+       plot = roc_plot, width = 6.5, height = 6, dpi = 300)
 
 ```
 
