@@ -906,7 +906,7 @@ scatter_plot <- ggplot(data, aes(x = Distance_Z, y = `dn/ds`)) +
     name = NULL
   ) +
   labs(
-    x = "Minimal Distance from ligand (\u00c5)",
+    x = "Minimal Distance from SERK3 (\u00c5)",
     y = "dN/dS"
   ) +
   # Apply original theme and axis settings
