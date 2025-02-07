@@ -989,7 +989,7 @@ scatter_plot <- ggplot(data, aes(x = Minimal_Distance, y = `dn/ds`)) +
   # Plot all residues with different colors based on conditions
   geom_point(
     aes(fill = category),  
-    shape = 21, size = 1.3, stroke = 0.2, color = "white", alpha = 0.7
+    shape = 21, size = 1.5, stroke = 0.1, color = "white", alpha = 0.8
   ) +
   # Horizontal line at dN/dS = 1
   geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
@@ -997,8 +997,8 @@ scatter_plot <- ggplot(data, aes(x = Minimal_Distance, y = `dn/ds`)) +
   scale_fill_manual(
     values = c(
       "dN/dS <= 1" = "grey", 
-      "Closest to flg22" = "#ff474c", 
-      "Closest to SERK3" = "#ffaf42"
+      "Closest to flg22" = "deepskyblue4", 
+      "Closest to SERK3" = "#de8e2a"
     ),
     name = NULL
   ) +
@@ -1018,11 +1018,11 @@ scatter_plot <- ggplot(data, aes(x = Minimal_Distance, y = `dn/ds`)) +
 # Create the marginal density plot with three distributions
 marginal_plot <- ggplot() +
   # Density of all residues (background) in gray
-  geom_density(data = data, aes(x = Minimal_Distance), fill = "gray", alpha = 0.3) +
+  #geom_density(data = data, aes(x = Minimal_Distance), fill = "gray", alpha = 0.3) +
   # Density of dN/dS > 1 residues in blue
-  geom_density(data = subset(data, `dn/ds` > 1), aes(x = Minimal_Distance), fill = "deepskyblue4", alpha = 0.5) +
+  geom_density(data = subset(data, `dn/ds` > 1), aes(x = Minimal_Distance), fill = "#75a44c", alpha = 0.5) +
   # Density of dN/dS <= 1 residues in a new color (e.g., dark red)
-  geom_density(data = subset(data, `dn/ds` <= 1), aes(x = Minimal_Distance), fill = "darkred", alpha = 0.5) +
+  #geom_density(data = subset(data, `dn/ds` <= 1), aes(x = Minimal_Distance), fill = "gray", alpha = 0.5) +
   # Align axes with scatter plot
   scale_x_continuous(expand = c(0, 0), limits = c(min(data$Minimal_Distance), max(data$Minimal_Distance))) +
   theme_void() +
@@ -1034,6 +1034,5 @@ final_plot <- marginal_plot + scatter_plot +
 
 # Save the plot
 ggsave("../output/omega/combined_distances_plot_flg22_SERK3.pdf", final_plot, width = 8, height = 4.5)
-
 
 ```
