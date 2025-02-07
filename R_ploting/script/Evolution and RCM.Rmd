@@ -762,8 +762,8 @@ data$category <- ifelse(
   ifelse(data$`dn/ds` >= 1, "dn/ds >= 1", "dn/ds < 1")
 )
 
-# Filter data for marginal plot (outlined residues only)
-marginal_data <- subset(data, has_outline)
+# Filter data for marginal plot (all dN/dS > 1)
+marginal_data <- subset(data, `dn/ds` > 1)
 
 # Create the scatter plot
 scatter_plot <- ggplot(data, aes(x = Distance_Y, y = `dn/ds`)) +
@@ -803,9 +803,12 @@ scatter_plot <- ggplot(data, aes(x = Distance_Y, y = `dn/ds`)) +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 2.5))
 
-# Create the marginal density plot
-marginal_plot <- ggplot(marginal_data, aes(x = Distance_Y)) +
-  geom_density(fill = "deepskyblue4", alpha = 0.5) +
+# Create the marginal density plot with all data in gray and dN/dS > 1 in blue
+marginal_plot <- ggplot() +
+  # Density of all plotted dots in gray
+  geom_density(data = data, aes(x = Distance_Y), fill = "gray", alpha = 0.5) +
+  # Density of dN/dS > 1 residues in blue
+  geom_density(data = marginal_data, aes(x = Distance_Y), fill = "deepskyblue4", alpha = 0.5) +
   # Align axes with scatter plot
   scale_x_continuous(expand = c(0, 0), limits = c(min(data$Distance_Y), max(data$Distance_Y))) +
   theme_void() +
@@ -877,8 +880,8 @@ data$category <- ifelse(
   ifelse(data$`dn/ds` >= 1, "dn/ds >= 1", "dn/ds < 1")
 )
 
-# Filter data for marginal plot (outlined residues only)
-marginal_data <- subset(data, has_outline)
+# Filter data for marginal plot (all dN/dS > 1)
+marginal_data <- subset(data, `dn/ds` > 1)
 
 # Create the scatter plot
 scatter_plot <- ggplot(data, aes(x = Distance_Z, y = `dn/ds`)) +
@@ -918,9 +921,12 @@ scatter_plot <- ggplot(data, aes(x = Distance_Z, y = `dn/ds`)) +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 2.5))
 
-# Create the marginal density plot
-marginal_plot <- ggplot(marginal_data, aes(x = Distance_Z)) +
-  geom_density(fill = "deepskyblue4", alpha = 0.5) +
+# Create the marginal density plot with all data in gray and dN/dS > 1 in blue
+marginal_plot <- ggplot() +
+  # Density of all plotted dots in gray
+  geom_density(data = data, aes(x = Distance_Z), fill = "gray", alpha = 0.3) +
+  # Density of dN/dS > 1 residues in blue
+  geom_density(data = marginal_data, aes(x = Distance_Z), fill = "deepskyblue4", alpha = 0.5) +
   # Align axes with scatter plot
   scale_x_continuous(expand = c(0, 0), limits = c(min(data$Distance_Z), max(data$Distance_Z))) +
   theme_void() +
@@ -934,5 +940,100 @@ final_plot <- marginal_plot + scatter_plot +
 
 # Save the plot
 ggsave("../output/omega/combined_distances_plot_SERK3.pdf", final_plot, width = 6, height = 4.5)
+
+```
+
+
+### Plot min of flg22 SERK3 distance
+```{r}
+# Load necessary libraries
+library(ggplot2)
+library(patchwork)  # For combining plots
+
+# Read the CSV files and add receptor-specific labels
+files <- list(
+  AtFLS2 = "../input/omega/AtFLS2_minimal_distances_from_all_atoms.csv",
+  MdFLS2 = "../input/omega/MdFLS2_minimal_distances_all_atoms.csv",
+  QvFLS2 = "../input/omega/QvFLS2_minimal_distances_from_all_atoms.csv"
+)
+
+data_list <- lapply(names(files), function(receptor) {
+  # Read CSV without modifying column names
+  df <- read.csv(files[[receptor]], check.names = FALSE)
+  
+  # Add receptor column
+  df$Receptor <- receptor
+  
+  # Determine minimal distance and closest molecule
+  df$Minimal_Distance <- pmin(df$Distance_Y, df$Distance_Z, na.rm = TRUE)
+  df$Closest_To <- ifelse(df$Distance_Y < df$Distance_Z, "flg22", "SERK3")
+  
+  df
+})
+
+# Combine data into a single data frame
+data <- do.call(rbind, data_list)
+
+# Define color categories
+data$category <- ifelse(
+  data$`dn/ds` <= 1, "dN/dS <= 1",
+  ifelse(data$Closest_To == "flg22", "Closest to flg22", "Closest to SERK3")
+)
+
+# Filter data for marginal plot
+marginal_data_higher <- subset(data, `dn/ds` > 1)
+marginal_data_lower <- subset(data, `dn/ds` <= 1)
+
+# Create the scatter plot
+scatter_plot <- ggplot(data, aes(x = Minimal_Distance, y = `dn/ds`)) +
+  # Plot all residues with different colors based on conditions
+  geom_point(
+    aes(fill = category),  
+    shape = 21, size = 1.3, stroke = 0.2, color = "white", alpha = 0.7
+  ) +
+  # Horizontal line at dN/dS = 1
+  geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
+  # Customize fill colors
+  scale_fill_manual(
+    values = c(
+      "dN/dS <= 1" = "grey", 
+      "Closest to flg22" = "#ff474c", 
+      "Closest to SERK3" = "#ffaf42"
+    ),
+    name = NULL
+  ) +
+  labs(
+    x = "Minimal Distance to flg22 or SERK3 (\u00c5)",
+    y = "dN/dS"
+  ) +
+  # Apply theme
+  my_ggplot_theme +
+  theme(
+    legend.position = "right",
+    plot.title = element_blank()  
+  ) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 2.5))
+
+# Create the marginal density plot with three distributions
+marginal_plot <- ggplot() +
+  # Density of all residues (background) in gray
+  geom_density(data = data, aes(x = Minimal_Distance), fill = "gray", alpha = 0.3) +
+  # Density of dN/dS > 1 residues in blue
+  geom_density(data = subset(data, `dn/ds` > 1), aes(x = Minimal_Distance), fill = "deepskyblue4", alpha = 0.5) +
+  # Density of dN/dS <= 1 residues in a new color (e.g., dark red)
+  geom_density(data = subset(data, `dn/ds` <= 1), aes(x = Minimal_Distance), fill = "darkred", alpha = 0.5) +
+  # Align axes with scatter plot
+  scale_x_continuous(expand = c(0, 0), limits = c(min(data$Minimal_Distance), max(data$Minimal_Distance))) +
+  theme_void() +
+  theme(plot.margin = margin(0, 0, 0, 0))
+
+# Combine marginal and scatter plots
+final_plot <- marginal_plot + scatter_plot +
+  plot_layout(heights = c(1, 4))  
+
+# Save the plot
+ggsave("../output/omega/combined_distances_plot_flg22_SERK3.pdf", final_plot, width = 8, height = 4.5)
+
 
 ```
