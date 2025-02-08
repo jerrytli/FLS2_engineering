@@ -1022,7 +1022,7 @@ marginal_plot <- ggplot() +
   # Density of dN/dS > 1 residues in blue
   geom_density(data = subset(data, `dn/ds` > 1), aes(x = Minimal_Distance), fill = "#75a44c", alpha = 0.5) +
   # Density of dN/dS <= 1 residues in a new color (e.g., dark red)
-  #geom_density(data = subset(data, `dn/ds` <= 1), aes(x = Minimal_Distance), fill = "gray", alpha = 0.5) +
+  geom_density(data = subset(data, `dn/ds` <= 1), aes(x = Minimal_Distance), fill = "gray", alpha = 0.5) +
   # Align axes with scatter plot
   scale_x_continuous(expand = c(0, 0), limits = c(min(data$Minimal_Distance), max(data$Minimal_Distance))) +
   theme_void() +
