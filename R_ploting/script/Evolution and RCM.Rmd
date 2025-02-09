@@ -771,13 +771,13 @@ scatter_plot <- ggplot(data, aes(x = Distance_Y, y = `dn/ds`)) +
   geom_point(
     data = subset(data, !has_outline),
     aes(fill = category),  # Map fill color only
-    shape = 21, size = 1.8, stroke = 0.2, color = "white", alpha = 0.5  # Thin white outline, semi-transparency
+    shape = 21, size = 2.5, stroke = 0.01, color = "white", alpha = 0.5  # Thin white outline, semi-transparency
   ) +
   # Residues in range (dark outline, solid fill)
   geom_point(
     data = subset(data, has_outline),
     aes(fill = category),  # Map fill color only
-    shape = 21, size = 1.8, stroke = 0.5, color = "black", alpha = 1  # Thicker dark outline, solid fill
+    shape = 21, size = 2.5, stroke = 0.3, color = "black", alpha = 1  # Thicker dark outline, solid fill
   ) +
   # Horizontal line at dn/ds = 1
   geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
@@ -805,8 +805,8 @@ scatter_plot <- ggplot(data, aes(x = Distance_Y, y = `dn/ds`)) +
 
 # Create the marginal density plot with all data in gray and dN/dS > 1 in blue
 marginal_plot <- ggplot() +
-  # Density of all plotted dots in gray
-  geom_density(data = data, aes(x = Distance_Y), fill = "gray", alpha = 0.5) +
+  # Density of dN.dS <=1 dots in gray
+  geom_density(data = subset(data, `dn/ds` <= 1), aes(x = Distance_Z), fill = "gray", alpha = 0.3) +
   # Density of dN/dS > 1 residues in blue
   geom_density(data = marginal_data, aes(x = Distance_Y), fill = "deepskyblue4", alpha = 0.5) +
   # Align axes with scatter plot
@@ -821,7 +821,7 @@ final_plot <- marginal_plot + scatter_plot +
   plot_layout(heights = c(1, 4))  # Adjust height ratio for marginal and scatter plots
 
 # Save the plot
-ggsave("../output/omega/combined_distances_plot_flg22.pdf", final_plot, width = 6, height = 4.5)
+ggsave("../output/omega/combined_distances_plot_flg22.pdf", final_plot, width = 8, height = 6)
 
 
 ```
@@ -889,13 +889,13 @@ scatter_plot <- ggplot(data, aes(x = Distance_Z, y = `dn/ds`)) +
   geom_point(
     data = subset(data, !has_outline),
     aes(fill = category),  # Map fill color only
-    shape = 21, size = 1.8, stroke = 0.2, color = "white", alpha = 0.5  # Thin white outline, semi-transparency
+    shape = 21, size = 2.5, stroke = 0.01, color = "white", alpha = 0.5  # Thin white outline, semi-transparency
   ) +
   # Residues in range (dark outline, solid fill)
   geom_point(
     data = subset(data, has_outline),
     aes(fill = category),  # Map fill color only
-    shape = 21, size = 1.8, stroke = 0.5, color = "black", alpha = 1  # Thicker dark outline, solid fill
+    shape = 21, size = 2.5, stroke = 0.3, color = "black", alpha = 1  # Thicker dark outline, solid fill
   ) +
   # Horizontal line at dn/ds = 1
   geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
@@ -903,7 +903,7 @@ scatter_plot <- ggplot(data, aes(x = Distance_Z, y = `dn/ds`)) +
   scale_fill_manual(
     values = c(
       "dn/ds < 1" = "grey",
-      "dn/ds >= 1" = "deepskyblue4",
+      "dn/ds >= 1" = "#de8e2a",
       "Highlighted Residues" = "red"
     ),
     name = NULL
@@ -923,10 +923,10 @@ scatter_plot <- ggplot(data, aes(x = Distance_Z, y = `dn/ds`)) +
 
 # Create the marginal density plot with all data in gray and dN/dS > 1 in blue
 marginal_plot <- ggplot() +
-  # Density of all plotted dots in gray
-  geom_density(data = data, aes(x = Distance_Z), fill = "gray", alpha = 0.3) +
-  # Density of dN/dS > 1 residues in blue
-  geom_density(data = marginal_data, aes(x = Distance_Z), fill = "deepskyblue4", alpha = 0.5) +
+  # Density of dN.dS <=1 dots in gray
+  geom_density(data = subset(data, `dn/ds` <= 1), aes(x = Distance_Z), fill = "gray", alpha = 0.3) +
+  # Density of dN/dS > 1 residues in orange
+  geom_density(data = marginal_data, aes(x = Distance_Z), fill = "#de8e2a", alpha = 0.5) +
   # Align axes with scatter plot
   scale_x_continuous(expand = c(0, 0), limits = c(min(data$Distance_Z), max(data$Distance_Z))) +
   theme_void() +
@@ -939,7 +939,7 @@ final_plot <- marginal_plot + scatter_plot +
   plot_layout(heights = c(1, 4))  # Adjust height ratio for marginal and scatter plots
 
 # Save the plot
-ggsave("../output/omega/combined_distances_plot_SERK3.pdf", final_plot, width = 6, height = 4.5)
+ggsave("../output/omega/combined_distances_plot_SERK3.pdf", final_plot, width = 8, height = 6)
 
 ```
 
@@ -989,7 +989,7 @@ scatter_plot <- ggplot(data, aes(x = Minimal_Distance, y = `dn/ds`)) +
   # Plot all residues with different colors based on conditions
   geom_point(
     aes(fill = category),  
-    shape = 21, size = 1.5, stroke = 0.1, color = "white", alpha = 0.8
+    shape = 21, size = 2.7, stroke = 0.1, color = "white", alpha = 0.8
   ) +
   # Horizontal line at dN/dS = 1
   geom_hline(yintercept = 1, color = "red", linetype = "dashed", size = 1) +
@@ -1033,6 +1033,6 @@ final_plot <- marginal_plot + scatter_plot +
   plot_layout(heights = c(1, 4))  
 
 # Save the plot
-ggsave("../output/omega/combined_distances_plot_flg22_SERK3.pdf", final_plot, width = 8, height = 4.5)
+ggsave("../output/omega/combined_distances_plot_flg22_SERK3.pdf", final_plot, width = 10, height = 6)
 
 ```

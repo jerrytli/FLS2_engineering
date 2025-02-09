@@ -10,57 +10,54 @@ output: html_document
 # Load necessary libraries
 library(ggplot2)
 library(dplyr)
-library(readr)  # For reading the CSV file
+library(readr)
 
 # Read the data from a CSV file
 data <- read_csv("../input/af3/af3_fullcomplex.csv")
 
-# Assuming the data has columns 'Known_outcome' and 'ipTM flg22_FLS2'
+# Convert Known_outcome to a factor and define group
+# Ensure the x-axis is ordered as Non-Perceived then Perceived within each group
 data <- data %>%
-  mutate(Known_outcome = factor(Known_outcome))
+  mutate(Known_outcome = factor(Known_outcome, levels = c("No perception", "Perception")),
+         Group = factor(ifelse(receptor == "AtFLS2", "AtFLS2", "Non-AtFLS2"), levels = c("AtFLS2", "Non-AtFLS2")))
 
-# Assess normality using Shapiro-Wilk test
+# Assess normality using Shapiro-Wilk test for each receptor group separately
 shapiro_results <- data %>%
-  group_by(Known_outcome) %>%
+  group_by(Group, Known_outcome) %>%
   summarise(shapiro_p_value = shapiro.test(`ipTM flg22_FLS2`)$p.value)
 
 print("Shapiro-Wilk Test for Normality:")
 print(shapiro_results)
 
-# If p-value < 0.05, data is not normally distributed
-if(any(shapiro_results$shapiro_p_value < 0.05)) {
-  test_method <- "wilcox.test"
-  test_name <- "Wilcoxon rank-sum test"
-  # Perform Wilcoxon rank-sum test
-  wilcox_test <- wilcox.test(`ipTM flg22_FLS2` ~ Known_outcome, data = data)
-  p_value <- wilcox_test$p.value
-} else {
-  test_method <- "t.test"
-  test_name <- "t-test"
-  # Perform t-test
-  t_test <- t.test(`ipTM flg22_FLS2` ~ Known_outcome, data = data)
-  p_value <- t_test$p.value
-}
+# Perform statistical tests separately for each receptor group
+test_results <- data %>%
+  group_by(Group) %>%
+  summarise(
+    test_name = ifelse(any(shapiro.test(`ipTM flg22_FLS2`)$p.value < 0.05), "Wilcoxon rank-sum test", "t-test"),
+    p_value = ifelse(any(shapiro.test(`ipTM flg22_FLS2`)$p.value < 0.05),
+                      wilcox.test(`ipTM flg22_FLS2` ~ Known_outcome, data = .)$p.value,
+                      t.test(`ipTM flg22_FLS2` ~ Known_outcome, data = .)$p.value)
+  )
 
-# Print the selected test method and p-value
-print(paste("Selected test:", test_name))
-print(paste("P-value:", p_value))
+print("Statistical Test Results:")
+print(test_results)
 
-# Creating the raincloud plot without p-value display
-ggplot(data, aes(x = Known_outcome, y = `ipTM flg22_FLS2`, fill = Known_outcome)) +
-  geom_violin(trim = FALSE, alpha = 0.5, color = NA, show.legend = FALSE) +  # Density plot
-  geom_boxplot(width = 0.03, outlier.shape = NA, show.legend = FALSE) +  # Boxplot inside the violin
-  geom_jitter(size = 1, alpha = 0.5, color = "black", width = 0.1, show.legend = FALSE) +  # Points with jitter
-   annotate("text", x = 1.5, y = max(data$`ipTM flg22_FLS2`) + 0.1, 
-           label = expression(italic(p) < "0.0001"), size = 7, hjust = 0.5) +  # Add italic p-value text above violins
-  scale_fill_manual(values = c("#fd5901", "#4477aa")) +  # Custom colors for each experimental result
-  labs(title = "Raincloud Plot of ipTM flg22_FLS2 by Experimental Result",
-       x = "Experimental Result",
+# Creating the combined raincloud plot
+p <- ggplot(data, aes(x = interaction(Group, Known_outcome, lex.order = TRUE), 
+                      y = `ipTM flg22_FLS2`, fill = Known_outcome)) +
+  geom_violin(trim = FALSE, alpha = 0.5, color = NA, show.legend = FALSE, scale = "width", width = 0.4) +  # Density plot
+  geom_boxplot(width = 0.09, outlier.shape = NA, show.legend = FALSE, color = "black", alpha = 0.8) +  # Slightly wider boxplot
+  geom_jitter(size = 0.3, alpha = 0.6, color = "black", width = 0.1, show.legend = FALSE) +  # Less prominent points
+  labs(title = "Raincloud Plot of ipTM flg22_FLS2 by Experimental Result and Receptor Type",
+       x = "Experimental Result (Grouped by Receptor Type)",
        y = "ipTM flg22_FLS2") +
-  my_ggplot_theme
+  scale_fill_manual(values = c("#fd5901", "#4477aa")) +
+  my_ggplot_theme  # Apply custom ggplot theme
 
-ggsave("../output/af3/raincloud.pdf", width = 6, height = 6, dpi = 300)
 
+p
+# Save the plot
+ggsave("../output/af3/raincloud_combined.pdf", plot = p, width = 8, height = 6, dpi = 300)
 
 ```
 
