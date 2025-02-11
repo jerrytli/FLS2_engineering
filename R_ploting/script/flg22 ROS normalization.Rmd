@@ -93,7 +93,7 @@ pcm$Color <- case_when(
 )
 xx <- ggplot(pcm, aes(y = Receptor, x = variable)) + 
   geom_point(aes(size = value, fill = Color), alpha = 0.85, shape = 21) + 
-  scale_size_continuous(limits = c(0, 160), range = c(1, 14), breaks = c(25, 50, 75, 140)) + 
+  scale_size_continuous(limits = c(0, 160), range = c(1, 14), breaks = c(25, 50, 75, 100, 140)) + 
   labs(y = "", x = "", size = "Normalized ROS (%)", fill = "")  + 
   theme_classic() +
   theme(
