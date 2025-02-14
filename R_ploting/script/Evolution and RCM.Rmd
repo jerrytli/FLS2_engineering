@@ -721,11 +721,11 @@ highlighted_residues <- list(
   QvFLS2 = c(246, 390, 438, 459, 486)
 )
 
-# Mark residues from LRR 8 - 18
+# Mark residues from LRR 10 - 20
 outline_ranges <- list(
-  AtFLS2 = c(265, 528),
-  MdFLS2 = c(241, 505),
-  QvFLS2 = c(239, 503)
+  AtFLS2 = c(289, 551),
+  MdFLS2 = c(289, 552),
+  QvFLS2 = c(287, 550)
 )
 
 # Read the CSV files and add receptor-specific labels
@@ -839,11 +839,11 @@ highlighted_residues <- list(
   QvFLS2 = c(246, 390, 438, 459, 486)
 )
 
-# Mark residues from LRR 8 - 18
+# Mark residues from LRR 10 - 20
 outline_ranges <- list(
-  AtFLS2 = c(265, 528),
-  MdFLS2 = c(241, 505),
-  QvFLS2 = c(239, 503)
+  AtFLS2 = c(289, 551),
+  MdFLS2 = c(289, 552),
+  QvFLS2 = c(287, 550)
 )
 
 # Read the CSV files and add receptor-specific labels
