@@ -5,12 +5,31 @@ date: "2024-07-29"
 output: html_document
 ---
 
-### Raincloud plot panel A
+#### Define theme and load libraries
 ```{r}
-# Load necessary libraries
+
 library(ggplot2)
 library(dplyr)
 library(readr)
+
+my_ggplot_theme <- theme_classic() +
+  theme(
+    text = element_text(size = 16),
+    axis.title.x = element_text(size = 20, color = "black"),
+    axis.title.y = element_text(size = 20, color = "black"),
+    axis.text.x = element_text(size = 20, color = "black"),
+    axis.text.y = element_text(size = 20, color = "black"),
+    axis.ticks = element_line(size = 0.8),
+    legend.position = c(0.66, 0.12),  # Position the legend inside the plot, above X-axis
+    legend.title = element_blank(),
+    legend.text = element_text(size = 14),
+  )
+
+```
+
+
+### Raincloud plot panel A
+```{r}
 
 # Read the data from a CSV file
 data <- read_csv("../input/af3/af3_fullcomplex.csv")
