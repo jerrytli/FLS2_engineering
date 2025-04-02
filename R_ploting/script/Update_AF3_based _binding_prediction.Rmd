@@ -128,6 +128,14 @@ ordered_metrics <- names(sort(auc_values, decreasing = TRUE))
 roc_coords <- lapply(roc_results, function(roc_obj) {
   coords(roc_obj, "all", ret = c("specificity", "sensitivity"))
 })
+
+roc_data <- do.call(rbind, lapply(names(roc_coords), function(metric_name) {
+  data.frame(
+    Metric = metric_name,
+    Specificity = 1 - roc_coords[[metric_name]]$specificity,
+    Sensitivity = roc_coords[[metric_name]]$sensitivity
+  )
+}))
 # Convert "Metric" to factor with the same level order as ordered_metrics
 roc_data$Metric <- factor(roc_data$Metric, levels = ordered_metrics)
 
@@ -250,7 +258,7 @@ roc_plot <- ggplot() +
 print(roc_plot)
 
 # Save the plot
-ggsave("../output/af3/ROC_multiple_curves.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+ggsave("../output/af3/ROC_receptor_subset.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
 
 
 
@@ -491,7 +499,7 @@ final_plot <- stacked_plot +
 print(final_plot)
 
 # Optionally, save the plot
-ggsave("../output/af3/combined_metrics_similarity_plot.pdf", final_plot, width = 7, height = 5.5)
+ggsave("../output/af3/combined_accuracy_flg22_similarity_plot.pdf", final_plot, width = 7, height = 5.5)
 
 ```
 
@@ -586,107 +594,7 @@ roc_plot <- ggplot(roc_data, aes(x = Specificity, y = Sensitivity, color = Metri
 print(roc_plot)
 
 # Save the plot
-ggsave("../output/af3/ROC_multiple_metrics_combined.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
+ggsave("../output/af3/ROC_compare_2vs3_complex.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
 
 ```
 
-### Accuracy on flg22 variants, using binary complex models
-```{r}
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-
-# Load and prepare the data
-data <- read.csv("../input/af3/af3_FLS2_flg22.csv") 
-
-# Define filters
-receptor_filter <- c("NbFLS2-1", "FLS2XL", "QvFLS2", "TjFLS2", "HlFLS2", 
-                     "MdFLS2", "VrFLS2", "FcFLS2", "SlFLS2", "AtFLS2")
-ligand_filter <- c("Paeflg22", "Atuflg22", "Rrhflg22", "Rso_1flg22", 
-                   "Rso_2flg22", "Ddiflg22", "Eamflg22", "Pviflg22", 
-                   "Xfrflg22", "Xorflg22")
-
-# Apply the filter
-filtered_data <- data %>%
-  filter(receptor %in% receptor_filter, ligand_name %in% ligand_filter)
-
-# Process the filtered data
-data_processed <- filtered_data %>%
-  mutate(
-    Accuracy = ifelse((`Average_ipTM` >= 0.82 & Known_outcome == "Perception") | 
-                      (`Average_ipTM` < 0.82 & Known_outcome == "No perception"), 1, 0),
-    Type_1_Error = ifelse(`Average_ipTM` >= 0.82 & Known_outcome == "No perception", 1, 0),
-    Type_2_Error = ifelse(`Average_ipTM` < 0.82 & Known_outcome == "Perception", 1, 0)
-  ) %>%
-  group_by(ligand_name) %>%
-  summarise(
-    Accuracy_Percentage = mean(Accuracy) * 100,
-    Type_1_Error_Percentage = mean(Type_1_Error) * 100,
-    Type_2_Error_Percentage = mean(Type_2_Error) * 100,
-    .groups = 'drop'
-  )
-
-# Correctly pivot the data
-data_long <- data_processed %>%
-  pivot_longer(
-    cols = c("Accuracy_Percentage", "Type_1_Error_Percentage", "Type_2_Error_Percentage"),
-    names_to = "Metric",
-    values_to = "Percentage"
-  ) %>%
-  mutate(Metric = gsub("_Percentage$", "", Metric))
-
-# Set the order of flg22 variants as in the similarity matrix
-variant_order <- c("Paeflg22", "Atuflg22", "Rrhflg22", "Rso_1flg22", 
-                   "Rso_2flg22", "Ddiflg22", "Eamflg22", "Pviflg22", 
-                   "Xfrflg22", "Xorflg22")
-data_long$ligand_name <- factor(data_long$ligand_name, levels = rev(variant_order))
-data_long$Metric <- factor(data_long$Metric, levels = c("Type_1_Error", "Type_2_Error", "Accuracy"))
-
-# Prepare similarity data
-similarity_data <- data.frame(
-  ligand_name = variant_order,
-  sim = c(100, 50, 36.4, 59.1, 68.2, 63.6, 63.6, 31.8, 59.1, 59.1)
-)
-similarity_data$ligand_name <- factor(similarity_data$ligand_name, levels = variant_order)
-
-my_ggplot_theme <- theme_classic() +
-  theme(text = element_text(size = 16),
-        axis.title.x = element_text(size = 14, color = "black"),
-        axis.title.y = element_text(size = 14, color = "black"),
-        axis.text.x = element_text(size = 14, color = "black"),
-        axis.text.y = element_text(size = 14, color = "black"),
-        axis.ticks = element_line(size = 0.8))
-
-# Plot
-stacked_plot <- ggplot(data_long, aes(x = ligand_name, y = Percentage, fill = Metric)) +
-  geom_bar(stat = "identity", position = "stack") +
-  #coord_flip() +  # This flips the plot to vertical orientation
-  scale_fill_manual(values = c("Accuracy" = "#4477aa", "Type_1_Error" = "#ee6677", "Type_2_Error" = "#ccbb44")) +
-  labs(title = "Metric at ipTM Cutoff 0.82",
-       x = "flg22 Variants", y = "Percentage") +
-  my_ggplot_theme +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 105)) +
-  scale_x_discrete(expand = c(0, 0), limits = rev) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "bottom",  # Moves legend to the bottom
-        legend.title = element_blank(),  # Optionally remove the legend title
-        legend.box = "horizontal",  # Horizontal layout for the legend items
-        legend.box.background = element_rect(color="black", size=0.5),  # Adds a box around the legend with a border
-        legend.text = element_text(size = 8),  # Adjust text size for better fit
-        legend.key.size = unit(0.3, "cm"))  # Adjusts the size of the legend keys
-
-# Add similarity data as a line plot over the bars
-final_plot <- stacked_plot +
-  geom_line(data = similarity_data, aes(x = ligand_name, y = sim, group = 1), 
-            color = "black", size = 1.2, inherit.aes = FALSE, alpha = 0.7) +
-  geom_point(data = similarity_data, aes(x = ligand_name, y = sim), 
-             color = "black", size = 4, inherit.aes = FALSE, 
-             shape = 21, fill = "grey", stroke = 1)  # Increased size and added border
-
-# Display the combined plot
-print(final_plot)
-
-# Optionally, save the plot
-ggsave("../output/af3/flg22_variants_accuracy_binary_complex.pdf", final_plot, width = 7, height = 5.5)
-
-```
