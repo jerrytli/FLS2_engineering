@@ -499,7 +499,7 @@ final_plot <- stacked_plot +
 print(final_plot)
 
 # Optionally, save the plot
-ggsave("../output/af3/combined_accuracy_flg22_similarity_plot.pdf", final_plot, width = 7, height = 5.5)
+ggsave("../output/af3/combined_accuracy_flg22_similarity_plot.pdf", final_plot, width = 7.3, height = 5.5)
 
 ```
 

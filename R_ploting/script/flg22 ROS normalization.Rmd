@@ -110,7 +110,7 @@ xx <- ggplot(pcm, aes(y = Receptor, x = variable)) +
  scale_x_discrete(limits = new_order_vector) + # Set x-axis labels and order
   scale_y_discrete(limits = rev(levels(pcm$Receptor))) # Ensure Y axis order is as in the raw dataset 
 print(xx)
-ggsave(filename = "../output/Qv-Fc.pdf", width = 7, height = 3.4)
+ggsave(filename = "../output/ros/Qv-Fc.pdf", width = 7, height = 3.4)
 
 ```
 
