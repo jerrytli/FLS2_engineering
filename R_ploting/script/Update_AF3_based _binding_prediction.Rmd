@@ -201,9 +201,9 @@ data_AtFLS2 <- data[data$receptor == "AtFLS2", ]
 data_no_AtFLS2 <- data[data$receptor != "AtFLS2", ]
 
 # Calculate ROC curves for each subset
-roc_all <- roc(response = data_all$Known_outcome, predictor = data_all$"ipTM flg22_FLS2")
-roc_AtFLS2 <- roc(response = data_AtFLS2$Known_outcome, predictor = data_AtFLS2$"ipTM flg22_FLS2")
-roc_no_AtFLS2 <- roc(response = data_no_AtFLS2$Known_outcome, predictor = data_no_AtFLS2$"ipTM flg22_FLS2")
+roc_all <- roc(response = data_all$Known_outcome, predictor = data_all$`ipTM flg22_FLS2`)
+roc_AtFLS2 <- roc(response = data_AtFLS2$Known_outcome, predictor = data_AtFLS2$`ipTM flg22_FLS2`)
+roc_no_AtFLS2 <- roc(response = data_no_AtFLS2$Known_outcome, predictor = data_no_AtFLS2$`ipTM flg22_FLS2`)
 
 # Extract AUC values
 auc_all <- auc(roc_all)
@@ -220,6 +220,7 @@ coords_all_df <- as.data.frame(coords_all)
 coords_AtFLS2_df <- as.data.frame(coords_AtFLS2)
 coords_no_AtFLS2_df <- as.data.frame(coords_no_AtFLS2)
 
+# Custom ggplot theme
 my_ggplot_theme <- theme_classic() +
   theme(
     text = element_text(size = 16),
@@ -230,8 +231,11 @@ my_ggplot_theme <- theme_classic() +
     axis.ticks = element_line(size = 0.8),
     legend.position = c(0.66, 0.12),  # Position the legend inside the plot, above X-axis
     legend.title = element_blank(),
-    legend.text = element_text(size = 14),
+    legend.text = element_text(size = 14)
   )
+
+# Define the desired order of legend entries
+legend_order <- c("All data", "AtFLS2", "Non-AtFLS2")
 
 # Plot the ROC curves using ggplot2
 roc_plot <- ggplot() +
@@ -239,19 +243,27 @@ roc_plot <- ggplot() +
   geom_line(data = coords_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity, color = "AtFLS2"), size = 1.2) +
   geom_line(data = coords_no_AtFLS2_df, aes(x = 1 - specificity, y = sensitivity, color = "Non-AtFLS2"), size = 1.2) +
   geom_line(data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), linetype = "dashed", color = "darkgrey") +
-  scale_color_manual(values = c(
-    "All data" = "#4477aa",
-    "AtFLS2" = "#5dc4c9",
-    "Non-AtFLS2" = "#117733"
-  ), labels = c(
-    paste("All data (AUC:", round(auc_all, 3), ")"),
-    paste("AtFLS2 (AUC:", round(auc_AtFLS2, 3), ")"),
-    paste("Non-AtFLS2 (AUC:", round(auc_no_AtFLS2, 3), ")")
-  )) +
+  scale_color_manual(
+    values = c(
+      "All data" = "#4477aa",
+      "AtFLS2" = "#5dc4c9",
+      "Non-AtFLS2" = "#117733"
+    ),
+    labels = c(
+      paste("All data (AUC:", round(auc_all, 3), ")"),
+      paste("AtFLS2 (AUC:", round(auc_AtFLS2, 3), ")"),
+      paste("Non-AtFLS2 (AUC:", round(auc_no_AtFLS2, 3), ")")
+    ),
+    breaks = legend_order
+  ) +
   labs(title = "ROC Curves for Different Receptor Subsets", 
        x = "False Positive Rate", y = "True Positive Rate", color = NULL) +
-  scale_x_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks = c(0, 0.25, 0.5, 0.75, 1), labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 1),
+                     breaks = c(0, 0.25, 0.5, 0.75, 1),
+                     labels = c("0", "0.25", "0.5", "0.75", "1")) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1),
+                     breaks = c(0, 0.25, 0.5, 0.75, 1),
+                     labels = c("0", "0.25", "0.5", "0.75", "1")) +
   my_ggplot_theme
 
 # Print the plot
@@ -259,8 +271,6 @@ print(roc_plot)
 
 # Save the plot
 ggsave("../output/af3/ROC_receptor_subset.pdf", plot = roc_plot, width = 6.5, height = 6, dpi = 300)
-
-
 
 ```
 
@@ -558,6 +568,9 @@ roc_data <- do.call(rbind, lapply(names(roc_coords), function(metric_name) {
     Sensitivity = roc_coords[[metric_name]]$sensitivity
   )
 }))
+
+roc_data$Metric <- factor(roc_data$Metric, levels = c("Full Complex Modeling", "Binary FLS2/flg22 modeling"))
+
 
 # Assign colors for each metric
 color_matrix <- c(
